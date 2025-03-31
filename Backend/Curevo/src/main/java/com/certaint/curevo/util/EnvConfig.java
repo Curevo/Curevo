@@ -1,4 +1,4 @@
-package com.certaint.Utilities;
+package com.certaint.curevo.util;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class EnvConfig {
