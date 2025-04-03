@@ -6,9 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter @Setter
+@Table(name = "doctors")
 public class Doctor {
 
     @Id
@@ -19,7 +18,12 @@ public class Doctor {
     @JoinColumn(name = "user_id", nullable = false, unique = true) // Link to User table
     private User user;
 
+    @Column(nullable = false)
     private String specialization;
-    private String availableDays;  // Example: "Monday, Wednesday, Friday"
-    private String availableTime;  // Example: "10:00 AM - 5:00 PM"
+
+    @Column(nullable = false)
+    private String availableDays;
+
+    @Column(nullable = false)
+    private String availableTime;
 }

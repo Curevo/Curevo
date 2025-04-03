@@ -22,6 +22,21 @@ spring:
       name: ${SECURITY_USERNAME}
       password: ${SECURITY_PASSWORD}
 
+  cloudinary:
+    cloud_name: ${IMAGE_HOSTING_CLOUD_NAME}
+    api_key: ${IMAGE_HOSTING_API_KEY}
+    api_secret: ${IMAGE_HOSTING_API_SECRET}
+
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+      file-size-threshold: 2MB
+
 
 server:
   port: 8080
+  tomcat:
+    max-swallow-size: 50MB  # Allows large requests to be processed
