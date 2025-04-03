@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <nav className="bg-white shadow-md p-4">
+    <nav className="bg-white  p-4">
       <div className="container mx-auto flex justify-between items-center">
         <img className='w-32' src={assets.logo} alt="Logo of curevo"/>
         
