@@ -8,7 +8,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <img className='w-32' src={assets.logo} alt="Logo of curevo"/>
+        <img className='w-36' src={assets.logo} alt="Logo of curevo"/>
         
         <div className="hidden md:flex space-x-6 ml-16 text-black font-semibold">
           <a href="#" className="hover:text-teal-600 duration-300">Home</a>

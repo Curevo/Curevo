@@ -13,6 +13,7 @@ export default function Hero() {
         loop
         muted
         playsInline
+        type="video/mp4"
       />
 
       {/* Overlay */}
