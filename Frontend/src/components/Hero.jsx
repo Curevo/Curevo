@@ -4,7 +4,7 @@ import { assets } from '../assets/assets';
 
 export default function Hero() {
   return (
-    <div className="relative h-[800px] w-full flex items-center justify-left rounded-3xl overflow-hidden">
+    <div className="relative h-[700px] w-full flex items-center justify-left rounded-t-3xl overflow-hidden z-0 p-36">
       {/* Video Background */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
