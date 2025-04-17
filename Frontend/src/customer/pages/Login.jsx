@@ -9,10 +9,12 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
+
     const handleLogin = async (e) => {
         e.preventDefault();
-        try{
-            const response = await axios.post("http://localhost:8080/api/auth/login", {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
                 email,
                 password
             });
@@ -27,6 +29,7 @@ export default function Login() {
             alert("Failed to login. Please try again.");
         }
     };
+
 
 
 
