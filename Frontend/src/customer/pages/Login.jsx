@@ -1,5 +1,6 @@
 import {useState} from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import LeftPanel from "../../components/LeftPanel";
 
@@ -9,7 +10,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -18,11 +19,27 @@ export default function Login() {
                 email,
                 password
             });
-            if (response.data === "Login successful") {
-                alert("Login successful");
-                navigate("/home");
+
+            if (response.data.token) {
+
+                const decodedToken = jwtDecode(response.data.token);
+
+
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("role", decodedToken.role);
+
+
+                if (decodedToken.role === "ADMIN") {
+                    navigate("/admin-dashboard");
+                } else if (decodedToken.role === "DOCTOR") {
+                    navigate("/doctor-dashboard");
+                } else if (decodedToken.role === "CUSTOMER") {
+                    navigate("/home");
+                } else {
+                    navigate("/");
+                }
             } else {
-                alert("Invalid Credentials");
+                alert("Login failed: Invalid credentials");
             }
         } catch (error) {
             console.error(error);

@@ -1,6 +1,6 @@
 package com.certaint.curevo;
 
-import com.certaint.curevo.util.EnvConfig;
+import com.certaint.curevo.config.EnvConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

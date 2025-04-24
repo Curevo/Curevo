@@ -1,18 +1,18 @@
 package com.certaint.curevo.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter
-@Table(name="customers")
+@Table(name = "customers")
 public class Customer {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long customerId;
+
     @Column(nullable = false)
     private String name;
 
@@ -20,5 +20,7 @@ public class Customer {
 
     private String image;
 
-    private String prescription;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 }

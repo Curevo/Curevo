@@ -4,26 +4,31 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @Table(name = "doctors")
 public class Doctor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long doctorId;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true) // Link to User table
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    @Column(name = "name")
+    private String name;
 
     @Column(nullable = false)
     private String specialization;
 
-    @Column(nullable = false)
-    private String availableDays;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DoctorAvailability> availabilities;
 
-    @Column(nullable = false)
-    private String availableTime;
+    @Column(name = "image_url")
+    private String image;
 }
