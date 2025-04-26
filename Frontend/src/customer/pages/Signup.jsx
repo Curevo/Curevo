@@ -6,6 +6,8 @@ import LeftPanel from "../../components/LeftPanel";
 export default function Signup() {
     const navigate = useNavigate();
 
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -30,7 +32,7 @@ export default function Signup() {
         }
 
         try {
-            const response = await axios.post("http://localhost:8080/api/auth/signup", {
+            const response = await axios.post("${BACKEND_URL}/api/auth/signup", {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,

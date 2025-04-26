@@ -5,8 +5,10 @@ import Section from './components/Section'
 import Footer from './components/Footer'
 import Button from './components/Button'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
 import Signup from './customer/pages/Signup'
 import Login from './customer/pages/Login'
+import Products from './customer/pages/Products'
 
 
 const App = () => {
@@ -22,6 +24,8 @@ const App = () => {
       <Routes>
         <Route path="/signup" element={<Signup/>} />
         <Route path="/login" element={<Login/>} />
+        <Route path="/home" element={<Home />} />
+        {/* <Route path="/products" element={<Products/>} /> */}
       </Routes>
     </BrowserRouter>
   )
