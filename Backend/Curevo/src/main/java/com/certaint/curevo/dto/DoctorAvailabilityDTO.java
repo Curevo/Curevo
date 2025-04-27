@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class DoctorAvailabilityDTO {
 
-    private String day;    // Day of the week, e.g., "Monday"
+    private String day;
 
-    private String time;   // Available time, e.g., "14:00"
+    private String time;
 }

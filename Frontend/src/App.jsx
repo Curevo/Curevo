@@ -8,7 +8,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Signup from './customer/pages/Signup'
 import Login from './customer/pages/Login'
-import Products from './customer/pages/Products'
+import Products from './Store/components/products'
+// import Products from './customer/pages/Products'
 
 
 const App = () => {
@@ -25,6 +26,8 @@ const App = () => {
         <Route path="/signup" element={<Signup/>} />
         <Route path="/login" element={<Login/>} />
         <Route path="/home" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+
         {/* <Route path="/products" element={<Products/>} /> */}
       </Routes>
     </BrowserRouter>

@@ -4,6 +4,7 @@ import com.certaint.curevo.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -31,17 +32,36 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Public GET access for all under /api/**
+                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+
+                        // Admin-only for POST, PUT, DELETE
+                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+
+                        // Public authentication routes
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/customers/add").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/doctor/**").hasRole("DOCTOR")
+
+                        // Role-specific private sections
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                        .anyRequest().authenticated() // All other requests require authentication
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // All others must be authenticated
+                        .anyRequest().authenticated()
+                );
+
+        // Disable JWT during testing
+        // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
