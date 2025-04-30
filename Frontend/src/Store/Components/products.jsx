@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function ProductGrid() {
+export default function ProductGrid({searchTerm}) {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
@@ -14,13 +14,17 @@ export default function ProductGrid() {
             });
     }, []);
 
+    const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
             <h2 className="text-3xl font-bold text-gray-800 mb-8">
                 Recent <span className="text-green-600">products</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {products.map((product) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {filteredProducts.map((product) => (
                     <div
                         key={product.productId}
                         className="bg-white p-4 rounded-2xl shadow-md hover:shadow-xl transition relative overflow-hidden"
