@@ -3,11 +3,12 @@ package com.certaint.curevo.controller;
 import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -24,11 +25,28 @@ public class ProductController {
         return ResponseEntity.ok(savedProduct);
     }
 
-
+    // ✅ Default paginated GET
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<Page<Product>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> products = productService.getAllProducts(pageable);
         return ResponseEntity.ok(products);
+    }
+
+
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Product>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> results = productService.searchProducts(keyword, pageable);
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/{id}")
