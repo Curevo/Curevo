@@ -17,9 +17,9 @@ public class CloudinaryImageHosting implements ImageHostingProvider {
     private final Cloudinary cloudinary;
 
     public CloudinaryImageHosting(
-            @Value("${spring.cloudinary.cloud-name}") String cloudName,
-            @Value("${spring.cloudinary.api-key}") String apiKey,
-            @Value("${spring.cloudinary.api-secret}") String apiSecret) {
+            @Value("${IMAGE_HOSTING_CLOUD_NAME}") String cloudName,
+            @Value("${IMAGE_HOSTING_API_KEY}") String apiKey,
+            @Value("${IMAGE_HOSTING_API_SECRET}") String apiSecret) {
         this.cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudName,
                 "api_key", apiKey,

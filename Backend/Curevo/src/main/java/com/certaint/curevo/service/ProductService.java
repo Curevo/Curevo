@@ -4,20 +4,19 @@ import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class ProductService {
 
-
     private final ProductRepository productRepository;
     private final ImageHostingService imageHostingService;
-
 
     @Transactional
     public Product saveProduct(Product product, MultipartFile imageFile) {
@@ -29,8 +28,13 @@ public class ProductService {
     }
 
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
+
+
+    public Page<Product> searchProducts(String keyword, Pageable pageable) {
+        return productRepository.findByNameContainingIgnoreCase(keyword, pageable);
     }
 
     public Optional<Product> getProductById(Long productId) {

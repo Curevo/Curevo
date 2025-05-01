@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public GET access for all under /api/**
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
 
                         // Admin-only for POST, PUT, DELETE
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
@@ -54,7 +55,7 @@ public class SecurityConfig {
                 );
 
         // Disable JWT during testing
-        // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
