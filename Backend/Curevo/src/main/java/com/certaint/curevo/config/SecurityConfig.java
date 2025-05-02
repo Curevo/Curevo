@@ -35,6 +35,7 @@ public class SecurityConfig {
                         // Public GET access for all under /api/**
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
 
                         // Admin-only for POST, PUT, DELETE
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")

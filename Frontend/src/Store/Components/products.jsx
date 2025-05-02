@@ -1,22 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef } from "react";
 import axios from "axios";
 
-export default function ProductGrid({searchTerm}) {
+export default function ProductGrid() {
     const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(0);
+    const size = 1;
+    const [loading, setLoading] = useState(false);
+    const didFetch = useRef(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`http://localhost:8080/api/products?page=${page}&size=${size}`);
+            if (response.data.content.length === 0) {
+                setHasMore(false); // No more products to load
+            } else {
+                setProducts(prev => [...prev, ...response.data.content]);
+                setPage(prev => prev + 1); // Increment page for next fetch
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/products")
-            .then((response) => {
-                setProducts(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching products:", error);
-            });
+        if (!didFetch.current) {
+            fetchProducts();
+            didFetch.current = true;
+        }
     }, []);
-
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
 
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
@@ -24,7 +39,7 @@ export default function ProductGrid({searchTerm}) {
                 Recent <span className="text-green-600">products</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {filteredProducts.map((product) => (
+                {products.map((product) => (
                     <div
                         key={product.productId}
                         className="bg-white p-4 rounded-2xl shadow-md hover:shadow-xl transition relative overflow-hidden"
@@ -35,17 +50,34 @@ export default function ProductGrid({searchTerm}) {
                                 alt={product.name}
                                 className="w-full h-full object-cover rounded-2xl transition-opacity duration-300"
                             />
+                            <img
+                                src={product.hoverImage}
+                                alt={product.name + " hovering"}
+                                className="absolute inset-0 w-full h-full rounded-2xl object-cover opacity-0 hover:opacity-100 transition-opacity duration-300"
+                            />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-800">
                             {product.name}
                         </h3>
                         <div className="text-sm text-gray-600">
-                            ${parseFloat(product.price).toFixed(2)} {/* FIX 3: format price */}
+                            ${parseFloat(product.price).toFixed(2)}
                         </div>
                         <div className="text-sm text-gray-600">{product.quantity}</div>
                     </div>
                 ))}
             </div>
+
+            {hasMore && (
+                <div className="mt-8 flex justify-center">
+                    <button
+                        onClick={fetchProducts}
+                        disabled={loading}
+                        className="px-6 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition disabled:opacity-50"
+                    >
+                        {loading ? "Loading..." : "Load More"}
+                    </button>
+                </div>
+            )}
         </section>
     );
 }

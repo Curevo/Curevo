@@ -19,10 +19,14 @@ public class ProductService {
     private final ImageHostingService imageHostingService;
 
     @Transactional
-    public Product saveProduct(Product product, MultipartFile imageFile) {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = imageHostingService.uploadImage(imageFile, "products");
+    public Product saveProduct(Product product, MultipartFile image,MultipartFile hoverImage) {
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = imageHostingService.uploadImage(image, "products");
             product.setImage(imageUrl);
+        }
+        if (hoverImage != null && !hoverImage.isEmpty()) {
+            String imageUrl = imageHostingService.uploadImage(hoverImage, "products");
+            product.setHoverImage(imageUrl);
         }
         return productRepository.save(product);
     }
@@ -52,6 +56,7 @@ public class ProductService {
                     product.setDescription(updatedProduct.getDescription());
                     product.setPrice(updatedProduct.getPrice());
                     product.setImage(updatedProduct.getImage());
+                    product.setHoverImage(updatedProduct.getHoverImage());
                     product.setQuantity(updatedProduct.getQuantity());
                     product.setCategory(updatedProduct.getCategory());
                     product.setPrescriptionRequired(updatedProduct.getPrescriptionRequired());

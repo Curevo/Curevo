@@ -20,16 +20,18 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> saveProduct(
             @RequestPart("product") Product product,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
-        Product savedProduct = productService.saveProduct(product, imageFile);
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "hoverImage", required = false) MultipartFile hoverImage)
+    {
+        Product savedProduct = productService.saveProduct(product, image,hoverImage);
         return ResponseEntity.ok(savedProduct);
     }
 
-    // ✅ Default paginated GET
+
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "1") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> products = productService.getAllProducts(pageable);
@@ -42,7 +44,7 @@ public class ProductController {
     public ResponseEntity<Page<Product>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "2") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> results = productService.searchProducts(keyword, pageable);

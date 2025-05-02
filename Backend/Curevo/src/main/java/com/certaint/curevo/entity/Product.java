@@ -27,6 +27,8 @@ public class Product {
 
     private String image;
 
+    private String hoverImage;
+
     private String quantity;
 
     @Column(nullable = false)
