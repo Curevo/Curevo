@@ -1,22 +1,22 @@
-// import React from 'react'
-// import NavbarHome from '../../components/NavbarHome'
-// import HeroHome from './HeroHome'
-// import InfoCards from './InfoCards'
-// import WellBeingSection from './WellBeingSection'
-// import StatsSection from '../../components/StatsSection'
-// import HealthFooter from '../../components/HealthFooter'
-// import FooterHome from '../../components/FooterHome'
+import React from 'react'
+import FooterHome from "../Components/FooterHome"
+import HealthFooter from "../Components/HealthFooter"
+import HeroHome from "../Components/Home/HeroHome"
+import InfoCards from "../Components/Home/InfoCards"
+import WellBeingSection from "../Components/Home/WellBeingSection"
+import NavbarHome from "../Components/NavbarHome"
+import StatsSection from "../Components/StatsSection"
 
 const Home = () => {
   return (
     <>
-        {/*<NavbarHome/>*/}
-        {/*<HeroHome/>*/}
-        {/*<InfoCards/>*/}
-        {/*<WellBeingSection/>*/}
-        {/*<StatsSection/>*/}
-        {/*<HealthFooter/>*/}
-        {/*<FooterHome/>*/}
+        <NavbarHome/>
+        <HeroHome/>
+        <InfoCards/>
+        <WellBeingSection/>
+        <StatsSection/>
+        <HealthFooter/>
+        <FooterHome/>
     </>
   )
 }
