@@ -3,8 +3,8 @@ import { FaFacebookF, FaInstagram, FaXTwitter, FaLinkedinIn, FaYoutube } from "r
 
 const Footer = () => {
     return (
-        <footer className="bg-gradient-to-b from-white to-[#f3ffb2] pt-12 pb-6 px-6 md:px-16 ">
-        <div className="max-w-full px-8 sm:px-10 mx-auto flex flex-col md:flex-row md:justify-between gap-10">
+        <footer className="bg-gradient-to-b from-white to-blue-200 pt-12 pb-6 px-6 md:px-16 ">
+        <div className="max-w-full px-8 sm:px-10 mx-auto flex flex-col md:flex-row md:justify-between gap-12">
             
             {/* Subscribe and Socials */}
             <div className="flex flex-col items-start">
@@ -17,80 +17,65 @@ const Footer = () => {
                 placeholder="Enter your email"
                 className="flex-1 p-2.5 border rounded-l-md focus:outline-none"
                 />
-                <button className="bg-green-700 text-white px-4 rounded-r-md hover:bg-green-800">
+                <button className="bg-blue-500 text-white px-4 rounded-r-md hover:bg-blue-700 duration-300">
                 →
                 </button>
             </div>
-            <div className="flex space-x-3 mt-6">
-                <div className="bg-black text-white p-2 rounded-md">
+            <div className="flex space-x-3 mt-6 ">
+                <div className="bg-black text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
                 <FaFacebookF size={18} />
                 </div>
-                <div className="bg-black text-white p-2 rounded-md">
+                <div className="bg-black text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
                 <FaInstagram size={18} />
                 </div>
-                <div className="bg-black text-white p-2 rounded-md">
+                <div className="bg-black text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
                 <FaXTwitter size={18} />
-                </div>
-                <div className="bg-black text-white p-2 rounded-md">
-                <FaLinkedinIn size={18} />
-                </div>
-                <div className="bg-black text-white p-2 rounded-md">
-                <FaYoutube size={18} />
                 </div>
             </div>
             </div>
 
             {/* Pages */}
             <div className="flex flex-col">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Pages</h3>
-            <ul className="space-y-2 text-gray-700">
-                <li>Home</li>
-                <li>Home 2</li>
-                <li>Shop</li>
-                <li>About</li>
-                <li>Blog</li>
-                <li>Contact</li>
-                <li>FAQs</li>
-                <li>Privacy Policy</li>
+            <h3 className="text-lg font-bold mb-3 text-gray-800">Pages</h3>
+            <ul className="space-y-2 text-gray-700 font-medium">
+                <li className="cursor-pointer hover:text-blue-500">Home</li>
+                <li className="cursor-pointer hover:text-blue-500">Shop</li>
+                <li className="cursor-pointer hover:text-blue-500">About</li>
+                <li className="cursor-pointer hover:text-blue-500">Contact</li>
             </ul>
             </div>
 
             {/* Utility Pages */}
             <div className="flex flex-col">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Utility Pages</h3>
-            <ul className="space-y-2 text-gray-700">
-                <li>Style Guide</li>
-                <li>Instructions</li>
-                <li>Licenses</li>
-                <li>Changelog</li>
-                <li>Coming Soon</li>
-                <li>Link in Bio</li>
-                <li>Password Protected</li>
-                <li>Error 404</li>
+            <h3 className="text-lg font-bold mb-3 text-gray-800">Resources</h3>
+            <ul className="space-y-2 text-gray-700 font-medium">
+                <li className="cursor-pointer hover:text-blue-500">Terms of Service</li>
+                <li className="cursor-pointer hover:text-blue-500">Privacy Policy</li>
+                <li className="cursor-pointer hover:text-blue-500">Licenses</li>
+                <li className="cursor-pointer hover:text-blue-500">Instructions</li>
+                <li className="cursor-pointer hover:text-blue-500">Support</li>
             </ul>
             </div>
 
             {/* Contact */}
             <div className="flex flex-col">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Contact</h3>
-            <ul className="space-y-2 text-gray-700">
-                <li>+1 (123) 456-7890</li>
-                <li>hello@example.com</li>
-                <li>123 Main Street, Cityville, State</li>
+            <h3 className="text-lg font-bold mb-3 text-gray-800">Curevo Office</h3>
+            <ul className="space-y-2 text-gray-700 font-medium">
+                <li>+91 123-456-7890</li>
+                <li>support@curevo.com</li>
+                <li>123 Main Street, Bangalore, India</li>
             </ul>
             </div>
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row justify-between items-center text-gray-600 text-sm mt-10 border-t pt-4">
+        <div 
+            className="flex flex-col md:flex-row justify-between items-center text-gray-600 text-sm mt-10 border-t pt-4 px-6 md:px-7">
             <div className="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="green" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 12.75l-1.5-1.5m0 0l1.5-1.5m-1.5 1.5h9m-6 3.75v.75m0 3.75v.75m0-11.25v.75m0 3.75v.75m-3.75 3.75h.75m3.75 0h.75m-7.5 0h.75m7.5 0h.75M3.75 3.75h16.5v16.5H3.75V3.75z" />
-            </svg>
-            <span className="text-green-700 font-bold text-lg">Healup</span>
+            <img src="/src/assets/Curevo-logo.png" alt="Curevo logo" onClick={() => window.location.href = "/"} className="h-8 w-auto"/>
             </div>
             <div className="mt-4 md:mt-0">
-            Designed by <a href="#" className="underline">Webestica</a>, Powered by <a href="#" className="underline">Webflow</a>
+            Designed by <a href="#" className="underline">Team A3</a>
             </div>
         </div>
         </footer>

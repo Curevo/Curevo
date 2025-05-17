@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useRef } from "react";
+import React, { useEffect, useState , useRef, useNavigate } from "react";
 import axios from "axios";
 
 export default function ProductGrid() {
@@ -33,6 +33,8 @@ export default function ProductGrid() {
         }
     }, []);
 
+    const navigate = useNavigate();
+
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
             <h2 className="text-3xl font-bold text-gray-800 mb-8">
@@ -43,6 +45,7 @@ export default function ProductGrid() {
                     <div
                         key={product.productId}
                         className="bg-white p-4 rounded-2xl shadow-md hover:shadow-xl transition relative overflow-hidden"
+                        onClick={() => navigate(`/product/${product.productId}`)}
                     >
                         <div className="relative w-full h-96 mb-4">
                             <img

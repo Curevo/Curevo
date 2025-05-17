@@ -5,11 +5,11 @@ import product3 from "../../assets/product3.png";
 const Hero = () => {
     return (
         <div className="w-full h-auto flex items-center justify-center">
-        <section className="w-[95%] md:w-[90%] h-[50vh] md:h-[90vh] relative bg-gradient-to-b from-white to-[#E4FF46] py-20 md:py-32 overflow-hidden rounded-3xl">
+        <section className="w-[95%] md:w-[90%] h-[50vh] md:h-[90vh] relative bg-gradient-to-b from-white to-blue-300 py-20 md:py-32 overflow-hidden rounded-3xl">
             {/* Content */}
             <div className="relative z-10 text-center max-w-3xl mx-auto px-4">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-800 leading-snug md:leading-tight">
-                Your pathway to <span className="text-green-700">wellness</span> <br className="hidden sm:block" /> begins here
+                Your pathway to <span className="text-blue-500">wellness</span> <br className="hidden sm:block" /> begins here
             </h1>
             <p className="mt-4 text-sm md:text-base text-gray-900 font-semibold ">
                 Personalized treatments made with Rx ingredients and supplements.

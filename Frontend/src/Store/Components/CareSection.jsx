@@ -2,13 +2,13 @@ import React from "react";
 
 const CareSection = () => {
     return (
-        <section className="bg-gray-300 rounded-3xl overflow-hidden my-12 mx-4 md:mx-24">
+        <section className="bg-sky-100 rounded-3xl overflow-hidden my-12 mx-4 md:mx-24">
         <div className="grid grid-cols-1 md:grid-cols-2">
             {/* Left Side - Text */}
             <div className="p-8 md:p-16 flex flex-col justify-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 leading-tight mb-8">
                 Clarify pores and minimize <br /> 
-                Imperfections for <span className="text-green-700">clearer skin</span>
+                Imperfections for <span className="text-blue-500">clearer skin</span>
             </h2>
 
             <div className="space-y-6">

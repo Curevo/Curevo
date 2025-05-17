@@ -45,7 +45,7 @@ const testimonials = [
                 <svg
                 key={index}
                 className={`w-5 h-5 mx-0.5 ${
-                    index < testimonials[currentIndex].rating ? "text-green-700" : "text-gray-300"
+                    index < testimonials[currentIndex].rating ? "text-blue-500" : "text-gray-300"
                 }`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
@@ -59,7 +59,7 @@ const testimonials = [
             {testimonials[currentIndex].quote}
         </p>
 
-        <div className="text-green-700 font-semibold text-lg">{testimonials[currentIndex].name}</div>
+        <div className="text-blue-500 font-semibold text-lg">{testimonials[currentIndex].name}</div>
         <div className="text-gray-500">{testimonials[currentIndex].title}</div>
 
         {/* Dots */}
