@@ -4,12 +4,13 @@ import com.certaint.curevo.dto.CustomerDTO;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.service.CustomerService;
 import com.certaint.curevo.service.ImageHostingService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 
 @RestController
@@ -32,6 +33,19 @@ public class CustomerController {
 
         CustomerDTO savedCustomer = customerService.saveCustomer(customer, image);
         return ResponseEntity.ok(savedCustomer);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Customer> getCurrentCustomer(Authentication authentication) {
+        String userEmail = authentication.getName(); // email from JWT principal
+
+        Optional<Customer> customer = customerService.getByEmail(userEmail);
+
+        if (customer.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        // map Customer entity to DTO if you want
+        return ResponseEntity.ok(customer.get());
     }
 
 

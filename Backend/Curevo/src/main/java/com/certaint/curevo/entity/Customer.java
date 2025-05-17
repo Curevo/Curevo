@@ -16,6 +16,8 @@ public class Customer {
     @Column(nullable = false)
     private String name;
 
+    private String age;
+
     private String address;
 
     private String image;

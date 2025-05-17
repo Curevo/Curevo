@@ -10,9 +10,10 @@ import Login from './customer/pages/Login'
 import ProductGrid from './Store/Components/products'
 import HomeStore from './Store/Pages/HomeStore'
 import ProductStore from './Store/Pages/ProductStore'
+
 // import ProductDetails from './Store/Components/ProductDetails'
 import ProductDetailsPage from './Store/Pages/ProductDetailsPage'
-import Home from './pages/Home'
+import Home from './HealthCare/pages/Home'
 import Doctors from './HealthCare/Pages/Doctors'
 import About from './HealthCare/Pages/About'
 import Contact from './HealthCare/Pages/Contact'
@@ -20,6 +21,9 @@ import Contact from './HealthCare/Pages/Contact'
 import Services from './HealthCare/Pages/Services'
 
 // import Products from './customer/pages/Products'
+
+import UserProfile from './customer/pages/UserProfile'
+
 
 
 const App = () => {
@@ -29,10 +33,10 @@ const App = () => {
     //   <Hero />
     //   <Section/>
     //   <Footer/>
-
     // </>
     <BrowserRouter>
       <Routes>
+
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -46,6 +50,15 @@ const App = () => {
         <Route path="/store/products" element={<ProductStore/>} />
         {/* <Route path="/products" element={<Products/>} /> */}
         <Route path="/product/:productId" element={<ProductDetailsPage />} />
+
+        <Route path="/Signup" element={<Signup/>} />
+        <Route path="/Login" element={<Login/>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/Products" element={<ProductGrid/>} />
+        <Route path="/Store/Home" element={<HomeStore/>} />
+        <Route path="/Store/Products" element={<ProductStore/>} />
+        <Route path="/UserProfile" element={<UserProfile/>} />
+
       </Routes>
     </BrowserRouter>
   )

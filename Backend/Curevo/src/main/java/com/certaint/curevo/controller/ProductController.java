@@ -44,7 +44,7 @@ public class ProductController {
     public ResponseEntity<Page<Product>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size
+            @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> results = productService.searchProducts(keyword, pageable);

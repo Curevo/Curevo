@@ -68,9 +68,11 @@ public class CustomerService {
 
 
 
-    public Optional<Customer> getCustomerById(Long id) {
-        return customerRepository.findById(id);
+    public Optional<Customer> getByEmail(String email) {
+        return customerRepository.findByUserEmail(email);
     }
+
+
 
     public boolean deleteCustomer(Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
@@ -80,4 +82,5 @@ public class CustomerService {
         }
         return false;
     }
+
 }

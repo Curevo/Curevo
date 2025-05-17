@@ -1,5 +1,6 @@
 package com.certaint.curevo.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,9 +10,11 @@ public class UserDTO {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private String phone;
 
     private String role;
+
 }

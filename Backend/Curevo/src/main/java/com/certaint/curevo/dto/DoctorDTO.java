@@ -8,7 +8,6 @@ import java.util.List;
 @Setter
 public class DoctorDTO {
 
-
     private UserDTO user;
 
     private String name;

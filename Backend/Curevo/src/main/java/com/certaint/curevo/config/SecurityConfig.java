@@ -28,14 +28,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public GET access for all under /api/**
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/customers/me").authenticated()
 
                         // Admin-only for POST, PUT, DELETE
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
@@ -53,10 +57,10 @@ public class SecurityConfig {
 
                         // All others must be authenticated
                         .anyRequest().authenticated()
-                );
+                )
 
         // Disable JWT during testing
-//         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -68,9 +72,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
-//        // For development purposes only, use BCryptPasswordEncoder in production
-//        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean

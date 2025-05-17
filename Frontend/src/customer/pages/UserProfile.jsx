@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '@/Config/axiosConfig.js';
 import { Enable2StepModal } from './Enable2StepModal';
 import { Verify2StepModal } from './Verify2StepModal';
-import ResetPassword from './ResetPassword';
+// import ResetPassword from './ResetPassword';
 
 export default function UserProfile() {
   const [user, setUser] = useState(null);
@@ -11,17 +11,19 @@ export default function UserProfile() {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [showReset, setShowReset] = useState(false);
 
+  const handleSetupAuth = () => setShowEnableModal(true);
+  const handleEnableContinue = () => {
+    setShowEnableModal(false);
+    setShowVerifyModal(true);
+  };
+  const handleVerifyComplete = () => setShowVerifyModal(false);
   useEffect(() => {
-    // Fetch user data on mount
-    axios.get('/api/user/profile')
-      .then(res => {
-        setUser(res.data);
-      })
-      .catch(err => {
-        console.error('Failed to fetch profile', err);
-      })
-      .finally(() => setLoading(false));
+    axios.get('/api/customers/me')
+        .then(res => setUser(res.data))
+        .catch(err => console.error('Failed to fetch profile', err))
+        .finally(() => setLoading(false));
   }, []);
+
 
   if (loading) {
     return <div className="text-center py-20">Loading...</div>;
@@ -45,9 +47,9 @@ export default function UserProfile() {
         <div className="flex flex-wrap gap-6">
           <div className="flex-shrink-0 w-40 text-center">
             <img
-              src={user.avatarUrl || '/default-avatar.png'}
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover mb-2"
+                src={user?.image|| '/default-avatar.png'}
+                alt="Profile"
+                className="w-20 h-20 rounded-full object-cover mb-2"
             />
             <button className="px-3 py-1 border border-gray-300 rounded text-xs bg-gray-100 hover:bg-gray-200">
               Replace Photo
@@ -58,70 +60,71 @@ export default function UserProfile() {
             <div>
               <label className="block text-sm mb-1">Name *</label>
               <input
-                type="text"
-                value={user.name}
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
+                  type="text"
+                  value={user?.user?.name || ''}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
               />
             </div>
             <div>
               <label className="block text-sm mb-1">Email *</label>
               <input
-                type="email"
-                value={user.email}
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
+                  type="email"
+                  value={user?.user?.email || ''}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
               />
             </div>
             <div>
               <label className="block text-sm mb-1">Date of Birth *</label>
               <input
-                type="date"
-                value={user.dob}
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
+                  type="date"
+                  value={user?.dob || ''}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
               />
             </div>
             <div>
               <label className="block text-sm mb-1">Phone *</label>
               <input
-                type="tel"
-                value={user.phone}
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
+                  type="tel"
+                  value={user?.user?.phone || ''}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
               />
             </div>
             <div>
               <label className="block text-sm mb-1">Country *</label>
               <select
-                value={user.country}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
+                  value={user?.country || ''}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
               >
-                <option>{user.country}</option>
+                <option>{user?.country || 'Not specified'}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm mb-1">City *</label>
               <input
-                type="text"
-                value={user.city}
-                onChange={e => setUser({ ...user, city: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  type="text"
+                  value={user?.city || ''}
+                  onChange={e => setUser({ ...user, city: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
               />
             </div>
             <div className="col-span-2">
               <label className="block text-sm mb-1">Address *</label>
               <input
-                type="text"
-                value={user.address || ''}
-                onChange={e => setUser({ ...user, address: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  type="text"
+                  value={user?.address || ''}
+                  onChange={e => setUser({ ...user, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
               />
             </div>
           </div>
         </div>
       </section>
+
 
       <hr className="border-t border-gray-200 my-6" />
 

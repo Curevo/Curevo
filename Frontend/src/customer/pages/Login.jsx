@@ -1,5 +1,5 @@
 import {useState} from "react";
-import axios from "axios";
+import axios from '@/Config/axiosConfig.js';
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import LeftPanel from "../../components/LeftPanel";
@@ -15,7 +15,7 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+            const response = await axios.post(`/api/auth/login`, {
                 email,
                 password
             });
@@ -34,7 +34,7 @@ export default function Login() {
                 } else if (decodedToken.role === "DOCTOR") {
                     navigate("/doctor-dashboard");
                 } else if (decodedToken.role === "CUSTOMER") {
-                    navigate("/home");
+                    navigate("/UserProfile");
                 } else {
                     navigate("/");
                 }
