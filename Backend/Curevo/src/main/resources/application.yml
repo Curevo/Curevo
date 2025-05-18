@@ -22,12 +22,6 @@ spring:
       name: ${SECURITY_USERNAME}
       password: ${SECURITY_PASSWORD}
 
-#  cloudinary:
-#    cloud_name: ${IMAGE_HOSTING_CLOUD_NAME}
-#    api_key: ${IMAGE_HOSTING_API_KEY}
-#    api_secret: ${IMAGE_HOSTING_API_SECRET}
-
-
   servlet:
     multipart:
       enabled: true
@@ -35,8 +29,24 @@ spring:
       max-request-size: 20MB
       file-size-threshold: 2MB
 
+  mail:
+    host: in-v3.mailjet.com
+    port: 587
+    username: ${MAILJET_API_KEY}         # Mailjet public API key
+    password: ${MAILJET_API_SECRET_KEY}      # Mailjet private API key
+    protocol: smtp
+    from: curevoapp@gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 15000
+          timeout: 15000
+          writetimeout: 15000
 
 server:
   port: 8080
   tomcat:
-    max-swallow-size: 50MB  # Allows large requests to be processed
+    max-swallow-size: 50MB

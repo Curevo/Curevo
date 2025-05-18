@@ -5,6 +5,7 @@ import com.certaint.curevo.dto.UserDTO;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.enums.Role;
+import com.certaint.curevo.exception.EmailAlreadyExistsException;
 import com.certaint.curevo.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
+import static java.lang.Boolean.TRUE;
+
 @RequiredArgsConstructor
 @Service
 public class CustomerService {
@@ -24,15 +27,19 @@ public class CustomerService {
     private final UserService userService;
     private final ImageHostingService imageHostingService;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
+    private final SignupCacheService cacheService;
+    private final EmailService emailService;
+
+
 
     @Transactional
-    public CustomerDTO saveCustomer(CustomerDTO customerDTO, MultipartFile imageFile) {
+    public Boolean saveCustomer(CustomerDTO customerDTO) {
         // 1. Create and save the User
         User user = new User();
         user.setEmail(customerDTO.getUser().getEmail());
         user.setPassword(passwordEncoder.encode(customerDTO.getUser().getPassword()));
-        user.setPhone(customerDTO.getUser().getPhone());
-        user.setRole(Role.valueOf(customerDTO.getUser().getRole())); // should be "CUSTOMER"
+        user.setRole(Role.valueOf("CUSTOMER")); // should be "CUSTOMER"
 
         User savedUser = userService.saveUser(user);
 
@@ -40,38 +47,15 @@ public class CustomerService {
         Customer customer = new Customer();
         customer.setUser(savedUser);
         customer.setName(customerDTO.getName());
-        customer.setAddress(customerDTO.getAddress());
-
-        // 3. Upload image if provided
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = imageHostingService.uploadImage(imageFile, "customers");
-            customer.setImage(imageUrl);
-        }
 
         Customer savedCustomer = customerRepository.save(customer);
-
-        // 4. Build and return safe CustomerDTO
-        CustomerDTO responseDTO = new CustomerDTO();
-        responseDTO.setName(savedCustomer.getName());
-        responseDTO.setAddress(savedCustomer.getAddress());
-        responseDTO.setImage(savedCustomer.getImage());
-
-        // Map UserDTO (excluding sensitive fields like password and role)
-        UserDTO responseUserDTO = new UserDTO();
-        responseUserDTO.setEmail(savedUser.getEmail());
-        responseUserDTO.setPhone(savedUser.getPhone());
-
-        responseDTO.setUser(responseUserDTO);
-
-        return responseDTO;
+        return TRUE;
     }
-
 
 
     public Optional<Customer> getByEmail(String email) {
         return customerRepository.findByUserEmail(email);
     }
-
 
 
     public boolean deleteCustomer(Long id) {
@@ -81,6 +65,37 @@ public class CustomerService {
             return true;
         }
         return false;
+    }
+    public Boolean registerCustomer(CustomerDTO customerDTO) {
+        String email = customerDTO.getUser().getEmail();
+
+        if (userService.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException("Email already in use.");
+        }
+
+
+        String otp = otpService.generateOtp(email);
+        cacheService.cacheCustomerData(email, customerDTO);
+        emailService.sendOtpEmail(email, otp, customerDTO.getName());
+
+        System.out.println(customerDTO.getUser().getPassword());
+        return TRUE;
+    }
+    public Boolean validateAndSaveCustomer(String email, String otp) {
+        String cachedOtp = cacheService.getCachedOtp(email);
+        if (cachedOtp == null || !cachedOtp.equals(otp)) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        CustomerDTO customerDTO = cacheService.getCachedCustomerData(email);
+        System.out.println(customerDTO.getUser().getPassword());
+        if (customerDTO == null) {
+            throw new IllegalStateException("Customer data not found or expired");
+        }
+
+        Boolean saved = saveCustomer(customerDTO);
+        cacheService.evictCachedData(email); // Clean up cache
+        return saved;
     }
 
 }

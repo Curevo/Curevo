@@ -19,20 +19,19 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    @Autowired
-    private ImageHostingService imageHostingService;
 
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
 
-    @PostMapping(value = "/add")
-    public ResponseEntity<CustomerDTO> addCustomer(
-            @RequestPart CustomerDTO customer,
-            @RequestPart MultipartFile image) {
+    @PostMapping("/register")
+    public Boolean registerCustomer(@RequestBody CustomerDTO customerDTO) {
+        return customerService.registerCustomer(customerDTO);
+    }
 
-        CustomerDTO savedCustomer = customerService.saveCustomer(customer, image);
-        return ResponseEntity.ok(savedCustomer);
+    @PostMapping("/verify-otp")
+    public Boolean verifyOtpAndSaveCustomer(@RequestParam String email, @RequestParam String otp) {
+        return customerService.validateAndSaveCustomer(email, otp);
     }
 
     @GetMapping("/me")

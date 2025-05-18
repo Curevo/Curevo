@@ -1,5 +1,6 @@
-import React, { useEffect, useState , useRef, useNavigate } from "react";
-import axios from "axios";
+import React, { useEffect, useState , useRef } from "react";
+import { useNavigate } from 'react-router-dom';
+import axios from '@/Config/axiosConfig.js';
 
 export default function ProductGrid() {
     const [products, setProducts] = useState([]);
@@ -12,12 +13,12 @@ export default function ProductGrid() {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:8080/api/products?page=${page}&size=${size}`);
+            const response = await axios.get(`/api/products?page=${page}&size=${size}`);
             if (response.data.content.length === 0) {
                 setHasMore(false); // No more products to load
             } else {
                 setProducts(prev => [...prev, ...response.data.content]);
-                setPage(prev => prev + 1); // Increment page for next fetch
+                setPage(prev => prev + 1);
             }
         } catch (error) {
             console.error("Error fetching products:", error);

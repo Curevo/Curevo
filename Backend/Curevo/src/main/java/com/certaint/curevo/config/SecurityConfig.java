@@ -28,8 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors()
-                .and()
+                .cors(cors -> cors.configure(http))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -37,9 +36,15 @@ public class SecurityConfig {
                         // Public GET access for all under /api/**
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
+
+
+                        // Custom Matchers for testing
+                        .requestMatchers("/api/customers/register").permitAll()
+                        .requestMatchers("/api/customers/verify-otp").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/customers/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                         // Admin-only for POST, PUT, DELETE
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
@@ -55,8 +60,11 @@ public class SecurityConfig {
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
+
+
                         // All others must be authenticated
                         .anyRequest().authenticated()
+
                 )
 
         // Disable JWT during testing

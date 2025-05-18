@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
-import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import axios from '@/Config/axiosConfig.js';
+import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line no-unused-vars
-const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com', onVerify }) => {
+const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com'}) => {
     const [otp, setOtp] = useState(Array(6).fill(''));
     const inputsRef = useRef([]);
+    const navigate = useNavigate();
 
     const handleChange = (index, value) => {
         if (!/^[0-9]?$/.test(value)) return;
@@ -30,18 +31,18 @@ const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com', onVerify }
     const enteredOtp = otp.join('');
 
     try {
-        const response = await axios.post('/api/verify-otp', {
-        email,
-        otp: enteredOtp,
+        const response = await axios.post('/api/customers/verify-otp', null, {
+            params: { email, otp: enteredOtp }
         });
 
-        if (response.data.success) {
-        alert('OTP Verified!');
-        onVerify(enteredOtp); // Optional callback
-        Navigate('/');
+
+        if (response.data === true) {
+            alert('OTP Verified!');
+            navigate('/');
         } else {
-        alert('Invalid OTP. Try again.');
+            alert('Invalid OTP. Try again.');
         }
+
     } catch (error) {
         alert('Verification failed. Please try again.');
         console.error(error);
