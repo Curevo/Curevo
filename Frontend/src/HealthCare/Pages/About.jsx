@@ -6,6 +6,7 @@ import StatsSection from '../components/StatsSection'
 import AboutServices from '../components/about/AboutServices'
 import HealthFooter from '../components/Healthfooter'
 import FooterHome from '../Components/FooterHome'
+import DoctorsPreview from '../Components/Doctors/DoctorsPreview'
 
 
 const About = () => {
@@ -16,6 +17,7 @@ const About = () => {
         <WhyChooseUs/>
         <StatsSection/>
         <AboutServices/>
+        <DoctorsPreview/>
         <HealthFooter/>
         <FooterHome/>
     </>
