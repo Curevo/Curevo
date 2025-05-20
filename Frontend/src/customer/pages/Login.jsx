@@ -9,6 +9,7 @@ export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    // const response = useRef(null);
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -20,14 +21,12 @@ export default function Login() {
                 password
             });
 
-            if (response.data.token) {
+            const token = response.data.data.token;
+            if (token) {
+                const decodedToken = jwtDecode(token);
 
-                const decodedToken = jwtDecode(response.data.token);
-
-
-                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("token", token);
                 localStorage.setItem("role", decodedToken.role);
-
 
                 if (decodedToken.role === "ADMIN") {
                     navigate("/admin-dashboard");
@@ -39,15 +38,15 @@ export default function Login() {
                     navigate("/");
                 }
             } else {
-                alert("Login failed: Invalid credentials");
+                const message = response?.data?.message || "Failed to login. Please try again.";
+                alert(message);
             }
         } catch (error) {
-            console.error(error);
-            alert("Failed to login. Please try again.");
+            console.error("Login error:", error);
+            const message = error.response?.data?.message || "Failed to login. Please try again.";
+            alert(message);
         }
     };
-
-
 
 
     return (

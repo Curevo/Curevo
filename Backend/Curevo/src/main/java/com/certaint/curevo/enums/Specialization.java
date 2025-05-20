@@ -1,0 +1,20 @@
+package com.certaint.curevo.enums;
+
+public enum Specialization {
+    CARDIOLOGY,
+    NEUROLOGY,
+    ONCOLOGY,
+    ORTHOPEDICS,
+    PEDIATRICS,
+    DERMATOLOGY,
+    GENERAL_MEDICINE,
+    GYNECOLOGY,
+    PSYCHIATRY,
+    RADIOLOGY,
+    SURGERY,
+    UROLOGY,
+    GASTROENTEROLOGY,
+    ENDOCRINOLOGY,
+    PULMONOLOGY
+}
+

@@ -1,5 +1,6 @@
 package com.certaint.curevo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,6 @@ public class DoctorAvailability {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
+    @JsonBackReference
     private Doctor doctor;
 }

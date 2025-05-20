@@ -14,10 +14,10 @@ export default function ProductGrid() {
         try {
             setLoading(true);
             const response = await axios.get(`/api/products?page=${page}&size=${size}`);
-            if (response.data.content.length === 0) {
+            if (response.data.data.content.length === 0) {
                 setHasMore(false); // No more products to load
             } else {
-                setProducts(prev => [...prev, ...response.data.content]);
+                setProducts(prev => [...prev, ...response.data.data.content]);
                 setPage(prev => prev + 1);
             }
         } catch (error) {

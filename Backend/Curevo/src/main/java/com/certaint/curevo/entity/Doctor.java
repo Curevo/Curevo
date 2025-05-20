@@ -1,5 +1,7 @@
 package com.certaint.curevo.entity;
 
+import com.certaint.curevo.enums.Specialization;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +25,12 @@ public class Doctor {
     @Column(name = "name")
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String specialization;
+    private Specialization specialization;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<DoctorAvailability> availabilities;
 
     @Column(name = "image_url")

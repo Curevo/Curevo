@@ -2,79 +2,73 @@ package com.certaint.curevo.config;
 
 import com.certaint.curevo.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final UserDetailsService userDetailsService; // Your UserService
+    private final UserDetailsService userDetailsService;
+    @Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
 
+    // Public endpoints - no JWT filter, permit all those listed
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configure(http))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // Public GET access for all under /api/**
-                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-
-
-                        // Custom Matchers for testing
-                        .requestMatchers("/api/customers/register").permitAll()
-                        .requestMatchers("/api/customers/verify-otp").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-
-                        // Admin-only for POST, PUT, DELETE
-                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-
-                        // Public authentication routes
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/customers/add").permitAll()
-
-                        // Role-specific private sections
-                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                        .requestMatchers("/doctor/**").hasRole("DOCTOR")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-
-
-
-                        // All others must be authenticated
-                        .anyRequest().authenticated()
-
+                .cors(withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .securityMatcher(
+                        "/api/auth/**",
+                        "/api/customers/register",
+                        "/api/customers/verify-otp",
+                        "/api/customers/add",
+                        "/api/chat",
+                        "/api/doctors/add",
+                        "/api/doctors",
+                        "/api/products",
+                        "/api/products/**"
                 )
-
-        // Disable JWT during testing
-         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
     }
 
+    // Protected endpoints - JWT filter applied, roles checked here
+    @Bean
+    @Order(2)
+    public SecurityFilterChain protectedChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-
+        return http.build();
+    }
 
 
     @Bean
@@ -87,6 +81,19 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(frontendUrl);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
 
 }

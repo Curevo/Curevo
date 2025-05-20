@@ -33,14 +33,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            filterChain.doFilter(request, response);
             return;
         }
 

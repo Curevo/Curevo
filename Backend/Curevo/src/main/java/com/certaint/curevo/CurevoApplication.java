@@ -7,9 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CurevoApplication {
     public static void main(String[] args) {
-        // Load environment variables from .env
-        new EnvConfig();
-
+        // Ensure static block in EnvConfig is triggered
+        EnvConfig.get("DUMMY"); // triggers static block and loads .env
         SpringApplication.run(CurevoApplication.class, args);
     }
 }

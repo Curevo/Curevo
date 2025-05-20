@@ -19,7 +19,7 @@ export default function UserProfile() {
   const handleVerifyComplete = () => setShowVerifyModal(false);
   useEffect(() => {
     axios.get('/api/customers/me')
-        .then(res => setUser(res.data))
+        .then(res => setUser(res.data.data))
         .catch(err => console.error('Failed to fetch profile', err))
         .finally(() => setLoading(false));
   }, []);

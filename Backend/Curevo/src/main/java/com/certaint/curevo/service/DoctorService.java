@@ -5,14 +5,18 @@ import com.certaint.curevo.dto.DoctorDTO;
 import com.certaint.curevo.dto.UserDTO;
 import com.certaint.curevo.entity.Doctor;
 import com.certaint.curevo.entity.DoctorAvailability;
+import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.enums.Role;
+import com.certaint.curevo.enums.Specialization;
 import com.certaint.curevo.repository.DoctorAvailabilityRepository;
 import com.certaint.curevo.repository.DoctorRepository;
 import com.certaint.curevo.service.ImageHostingService;
 import com.certaint.curevo.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,7 +49,7 @@ public class DoctorService {
         Doctor doctor = new Doctor();
         doctor.setUser(savedUser);
         doctor.setName(doctorDTO.getName());
-        doctor.setSpecialization(doctorDTO.getSpecialization());
+        doctor.setSpecialization(Specialization.valueOf(doctorDTO.getSpecialization()));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = imageHostingService.uploadImage(imageFile, "doctors");
@@ -69,7 +73,7 @@ public class DoctorService {
         // 4. Build and return safe DoctorDTO
         DoctorDTO responseDTO = new DoctorDTO();
         responseDTO.setName(savedDoctor.getName());
-        responseDTO.setSpecialization(savedDoctor.getSpecialization());
+        responseDTO.setSpecialization(String.valueOf(savedDoctor.getSpecialization()));
         responseDTO.setImage(savedDoctor.getImage());
 
         UserDTO responseUserDTO = new UserDTO();
@@ -92,5 +96,12 @@ public class DoctorService {
         responseDTO.setAvailabilities(availabilityDTOs);
 
         return responseDTO;
+    }
+
+    public Page<Doctor> getAllDoctors(Pageable pageable) {
+        return doctorRepository.findAll(pageable);
+    }
+    public Page<Doctor> searchDoctors(String keyword, Pageable pageable) {
+        return doctorRepository.findByNameContainingIgnoreCase(keyword, pageable);
     }
 }

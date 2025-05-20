@@ -37,6 +37,9 @@ public class AuthController {
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
+            System.out.println("User found: " + user.getEmail());
+            System.out.println("User Password: " + request.getPassword());
+
             String token = jwtService.generateToken(request.getEmail(), user.getRole().name());
 
             return ResponseEntity.ok(new ApiResponse<>(true, "Login successful", new AuthResponse(token)));
