@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalTime;
+
 @Entity
 @Getter @Setter
 @NoArgsConstructor
@@ -16,9 +18,11 @@ public class DoctorAvailability {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String day;
+    private String day; // e.g., "MONDAY"
 
-    private String time;
+    private LocalTime time; // e.g., "10:00-11:00"
+
+    private Integer maxAppointments; // Maximum allowed in this slot
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")

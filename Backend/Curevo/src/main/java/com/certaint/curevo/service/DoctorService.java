@@ -9,6 +9,7 @@ import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.enums.Role;
 import com.certaint.curevo.enums.Specialization;
+import com.certaint.curevo.exception.DoctorNotFoundException;
 import com.certaint.curevo.repository.DoctorAvailabilityRepository;
 import com.certaint.curevo.repository.DoctorRepository;
 import com.certaint.curevo.service.ImageHostingService;
@@ -35,67 +36,33 @@ public class DoctorService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public DoctorDTO saveDoctor(DoctorDTO doctorDTO, MultipartFile imageFile) {
-        // 1. Create and save the User
-        User user = new User();
-        user.setEmail(doctorDTO.getUser().getEmail());
-        user.setPassword(passwordEncoder.encode(doctorDTO.getUser().getPassword()));
-        user.setPhone(doctorDTO.getUser().getPhone());
-        user.setRole(Role.valueOf(doctorDTO.getUser().getRole()));
-
+    public Doctor saveDoctor(Doctor doctor, MultipartFile imageFile) {
+        // 1. Encode and save the User
+        User user = doctor.getUser();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.saveUser(user);
 
-        // 2. Create and save the Doctor
-        Doctor doctor = new Doctor();
+        // 2. Set saved user to the doctor and save the doctor
         doctor.setUser(savedUser);
-        doctor.setName(doctorDTO.getName());
-        doctor.setSpecialization(Specialization.valueOf(doctorDTO.getSpecialization()));
 
+        // Handle image upload
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = imageHostingService.uploadImage(imageFile, "doctors");
             doctor.setImage(imageUrl);
         }
 
+        // Save doctor
         Doctor savedDoctor = doctorRepository.save(doctor);
 
-        // 3. Save doctor availabilities
-        if (doctorDTO.getAvailabilities() != null) {
-            for (DoctorAvailabilityDTO availabilityDTO : doctorDTO.getAvailabilities()) {
-                DoctorAvailability availability = new DoctorAvailability();
-                availability.setDoctor(savedDoctor);
-                availability.setDay(availabilityDTO.getDay());
-                availability.setTime(availabilityDTO.getTime());
-
+        // 3. Save doctor availabilities if present
+        if (doctor.getAvailabilities() != null) {
+            for (DoctorAvailability availability : doctor.getAvailabilities()) {
+                availability.setDoctor(savedDoctor); // Set the doctor for each availability
                 availabilityRepository.save(availability);
             }
         }
 
-        // 4. Build and return safe DoctorDTO
-        DoctorDTO responseDTO = new DoctorDTO();
-        responseDTO.setName(savedDoctor.getName());
-        responseDTO.setSpecialization(String.valueOf(savedDoctor.getSpecialization()));
-        responseDTO.setImage(savedDoctor.getImage());
-
-        UserDTO responseUserDTO = new UserDTO();
-        responseUserDTO.setEmail(savedUser.getEmail());
-        responseUserDTO.setPhone(savedUser.getPhone());
-        responseUserDTO.setRole(savedUser.getRole().name());
-
-        responseDTO.setUser(responseUserDTO);
-
-        List<DoctorAvailabilityDTO> availabilityDTOs = availabilityRepository.findByDoctor(savedDoctor)
-                .stream()
-                .map(a -> {
-                    DoctorAvailabilityDTO dto = new DoctorAvailabilityDTO();
-                    dto.setDay(a.getDay());
-                    dto.setTime(a.getTime());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        responseDTO.setAvailabilities(availabilityDTOs);
-
-        return responseDTO;
+        return savedDoctor; // Return the saved doctor entity
     }
 
     public Page<Doctor> getAllDoctors(Pageable pageable) {
@@ -103,5 +70,9 @@ public class DoctorService {
     }
     public Page<Doctor> searchDoctors(String keyword, Pageable pageable) {
         return doctorRepository.findByNameContainingIgnoreCase(keyword, pageable);
+    }
+    public Doctor getDoctorById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + id));
     }
 }

@@ -3,10 +3,12 @@ package com.certaint.curevo.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter @Setter
 @Table(name = "customers")
+@ToString
 public class Customer {
 
     @Id
@@ -22,7 +24,7 @@ public class Customer {
 
     private String image;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 }

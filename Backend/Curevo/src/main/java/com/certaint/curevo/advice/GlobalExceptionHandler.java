@@ -1,18 +1,13 @@
 package com.certaint.curevo.advice;
 
 import com.certaint.curevo.dto.ApiResponse;
-import com.certaint.curevo.exception.DuplicateResourceException;
-import com.certaint.curevo.exception.EmailAlreadyExistsException;
-import com.certaint.curevo.exception.InvalidJwtException;
+import com.certaint.curevo.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -49,6 +44,20 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
+    @ExceptionHandler(DoctorNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDoctorNotFound(DoctorNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(DoctorNotAvailableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDoctorNotAvailable(DoctorNotAvailableException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+
 
 }
 

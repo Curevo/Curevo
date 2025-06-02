@@ -14,6 +14,8 @@ public class DoctorDTO {
 
     private String specialization;
 
+    private String qualification;
+
     private List<DoctorAvailabilityDTO> availabilities;
 
     private String image;

@@ -2,7 +2,9 @@ package com.certaint.curevo.service;
 
 
 import com.certaint.curevo.entity.User;
+import com.certaint.curevo.exception.DoctorNotFoundException;
 import com.certaint.curevo.exception.DuplicateResourceException;
+import com.certaint.curevo.exception.UserNotFoundException;
 import com.certaint.curevo.repository.UserRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +40,15 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("DUser not found with id: " + id));
     }
 
     public Boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);

@@ -34,9 +34,8 @@ public class UserController {
 
     @GetMapping("/view/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
 

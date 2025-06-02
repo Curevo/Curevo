@@ -6,6 +6,7 @@ import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.enums.Role;
 import com.certaint.curevo.exception.EmailAlreadyExistsException;
+import com.certaint.curevo.exception.UserNotFoundException;
 import com.certaint.curevo.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,10 @@ public class CustomerService {
         Boolean saved = saveCustomer(customerDTO);
         cacheService.evictCachedData(email); // Clean up cache
         return saved;
+    }
+    public Customer getCustomerById(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Customer not found with id: " + id));
     }
 
 }

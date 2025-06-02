@@ -14,6 +14,7 @@ import VerifyOTP from './components/OTPVerifyPopup'
 import Services from './HealthCare/Pages/Services'
 import UserProfile from './customer/pages/UserProfile'
 import DoctorPreview from './HealthCare/Components/Doctors/DoctorsPreview'
+import Appointments from './HealthCare/Components/Doctors/AppointmentForm'
 
 
 
@@ -37,6 +38,8 @@ const App = () => {
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/otp" element={<VerifyOTP />} />
         <Route path="/dtp" element={<DoctorPreview />} />
+        <Route path="/appointments/:doctorId" element={<Appointments />} />
+
       </Routes>
   );
 };

@@ -26,8 +26,8 @@ public class DoctorController {
 
     // Create a new doctor
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<DoctorDTO>> createDoctor(@RequestPart DoctorDTO doctor, @RequestPart MultipartFile image) {
-        DoctorDTO savedDoctor = doctorService.saveDoctor(doctor,image);
+    public ResponseEntity<ApiResponse<Doctor>> createDoctor(@RequestPart Doctor doctor, @RequestPart MultipartFile image) {
+        Doctor savedDoctor = doctorService.saveDoctor(doctor,image);
         return ResponseEntity.ok(new ApiResponse<>(true, "Doctor saved successfully", savedDoctor));
     }
 

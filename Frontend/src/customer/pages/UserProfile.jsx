@@ -33,10 +33,14 @@ export default function UserProfile() {
       .finally(() => setLoading(false));
   }, []);
 
+<<<<<<< Updated upstream
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
+=======
+  console.log(user);
+>>>>>>> Stashed changes
 
   if (loading) {
     return <div className="text-center py-20">Loading...</div>;
