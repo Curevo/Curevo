@@ -61,7 +61,7 @@ export default function UserProfile() {
                 <label className="block text-sm mb-1">Name *</label>
                 <input
                     type="text"
-                    value={user?.user?.name || ''}
+                    value={user?.name || ''}
                     readOnly
                     className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
                 />
