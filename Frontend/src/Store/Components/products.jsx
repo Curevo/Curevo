@@ -5,7 +5,7 @@ import axios from '@/Config/axiosConfig.js';
 export default function ProductGrid() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
-    const size = 1;
+    const size = 5;
     const [loading, setLoading] = useState(false);
     const didFetch = useRef(false);
     const [hasMore, setHasMore] = useState(true);
