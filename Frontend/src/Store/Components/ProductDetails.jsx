@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "@/Config/axiosConfig.js";
+import AddToCartButton from "@/Store/Components/AddToCartButton.jsx";
 
 const ProductDetails = () => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/products/${productId}`)
-        .then(res => setProduct(res.data))
+        axios.get(`/api/products/${productId}`)
+        .then(res => setProduct(res.data.data))
         .catch(err => console.error("Error fetching product:", err));
     }, [productId]);
-
+    console.log(product);
     if (!product) return <div className="mt-24 text-center">Loading...</div>;
 
     return (
@@ -25,7 +26,7 @@ const ProductDetails = () => {
                 className="w-full h-auto rounded-xl object-cover"
             />
             <img
-                src={product.hoverImage || product.image}
+                src={product.hoverImage}
                 alt={product.name + " extra"}
                 className="w-full h-auto rounded-xl object-cover"
             />
@@ -35,18 +36,13 @@ const ProductDetails = () => {
             <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
             <p className="text-xl font-semibold text-green-800 mb-2">
-                ${parseFloat(product.price).toFixed(2)} USD
+                ₹{parseFloat(product.price).toFixed(2)}
             </p>
             <p className="text-gray-600 mb-4">{product.description || "No description available."}</p>
 
             {/* Bottle Quantity */}
             <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mr-2">Bottle:</label>
-                <select className="border border-gray-300 rounded px-3 py-1">
-                <option>5</option>
-                <option>10</option>
-                <option>15</option>
-                </select>
+                <label className="text-sm font-medium text-gray-700 mr-2">Quantity: {product.quantity}</label>
             </div>
 
             {/* Ingredients and Features */}
@@ -66,9 +62,7 @@ const ProductDetails = () => {
             </div>
 
             {/* Add to Cart Button */}
-            <button className="mt-6 bg-lime-600 hover:bg-lime-700 text-white font-semibold px-6 py-2 rounded">
-                Add to Cart
-            </button>
+                <AddToCartButton productId={product.productId} />
             </div>
         </section>
         </div>

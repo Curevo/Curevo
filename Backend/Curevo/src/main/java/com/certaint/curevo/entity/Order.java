@@ -21,8 +21,8 @@ public class Order {
 
     // User placing the order
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     // Store fulfilling the order
     @ManyToOne
@@ -37,12 +37,12 @@ public class Order {
     private Double deliveryLng;
 
     // Prescription
-    private String prescriptionUrl;       // Temporarily stored until verified
-    private Boolean prescriptionVerified; // Flag after admin/doctor verification
+    private String prescriptionUrl;
+    private Boolean prescriptionVerified;
 
     // Payment
     private BigDecimal totalAmount;
-    private String paymentMethod;         // "COD" or "ONLINE"
+    private String paymentMethod;
     private Boolean isPaid;
 
     // Status
