@@ -1,10 +1,10 @@
 import React from 'react'
 import ProductDetails from '../Components/ProductDetails'
-import Navbar from '../components/Navbar'
+import Navbar from '../Components/Navbar'
 import HowToUseSection from '../Components/HowToUseSection'
 import FeaturesSection from '../Components/FeaturesSection'
 import ProductGrid from '../Components/products'
-import Footer from '../components/Footer'
+import Footer from '../Components/Footer'
 
 const ProductDetailsPage = () => {
     return (

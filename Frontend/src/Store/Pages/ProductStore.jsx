@@ -1,8 +1,8 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../Components/Navbar'
 import HeroSection from '../Components/HeroSection'
 import ProductGrid from '../Components/products'
-import Footer from '../components/Footer'
+import Footer from '../Components/Footer'
 
 
 
