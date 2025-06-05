@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
-// import assets from "@/assets/assets.js"
+// import Assets from "@/Assets/Assets.js"
 
 
 export default function HeroHome() {

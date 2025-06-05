@@ -3,19 +3,19 @@ import React from "react";
 const FeaturesSection = () => {
     const features = [
         {
-        icon: "/src/assets/6642e35c9752a40d3c4f73ab_icon-01.svg", // Replace with your actual path
+        icon: "/src/Assets/6642e35c9752a40d3c4f73ab_icon-01.svg", // Replace with your actual path
         label: "Consciously formulated",
         },
         {
-        icon: "/src/assets/6642e35cf21de4f31f188a1d_icon-02.svg",
+        icon: "/src/Assets/6642e35cf21de4f31f188a1d_icon-02.svg",
         label: "No-harmful chemicals",
         },
         {
-        icon: "/src/assets/6642e35c441f55e658e55bc0_icon-03.svg",
+        icon: "/src/Assets/6642e35c441f55e658e55bc0_icon-03.svg",
         label: "Natural essentials",
         },
         {
-        icon: "/src/assets/6642e35c877f843ed8a55e2c_icon-04.svg",
+        icon: "/src/Assets/6642e35c877f843ed8a55e2c_icon-04.svg",
         label: "Suitable for all",
         },
     ];

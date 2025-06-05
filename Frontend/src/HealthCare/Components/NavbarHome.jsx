@@ -19,7 +19,7 @@ export default function NavbarHome() {
                 onClick={() => (window.location.href = '/')}
             >
                 <img
-                src="/public/assets/Curevo-logo.png"
+                src="/Assets/Curevo-logo.png"
                 alt="Curevo logo"
                 className="h-8 w-auto"
                 />

@@ -1,5 +1,5 @@
 // import { useState } from "react";
-// import {productImg} from "../../assets/assets.js"; // Use placeholder initially
+// import {productImg} from "../../Assets/Assets.js"; // Use placeholder initially
 //
 // export default function Products() {
 //     const [search, setSearch] = useState("");

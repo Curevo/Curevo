@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { assets } from '../assets/assets';
+import { assets } from '../Assets/Assets';
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {

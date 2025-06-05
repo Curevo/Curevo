@@ -4,9 +4,9 @@
 //     return (
 //         <div
 //             className="w-1/2 bg-cover bg-center relative hidden lg:block p-10 opacity-75 rounded-[50px] border-[20px] border-[#2d2d44]"
-//             style={{ backgroundImage: `url(${assets.leftPanel})` }}
+//             style={{ backgroundImage: `url(${Assets.leftPanel})` }}
 //         >
-//             <img className='w-36' src={assets.logo} alt="Logo of curevo"/>
+//             <img className='w-36' src={Assets.logo} alt="Logo of curevo"/>
 //             <button className="absolute top-10 right-8  bg-white text-sm px-3 py-2 rounded-full hover:bg-slate-600 hover:text-white duration-300">
 //             Back to website →
 //             </button>

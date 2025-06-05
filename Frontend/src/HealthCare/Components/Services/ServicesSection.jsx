@@ -7,7 +7,7 @@ const services = [
         subtitle: "Chronic Pain Relief",
         description:
         "Therapy Services are designed to enhance recovery and improve quality of life.",
-        image: "/src/assets/6789e3a9bc6f1dc6f9bb8258_service-thumb-06.jpg",
+        image: "/src/Assets/6789e3a9bc6f1dc6f9bb8258_service-thumb-06.jpg",
     },
     {
         title: "Diagnostic Excellence",

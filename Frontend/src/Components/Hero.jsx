@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowRight } from 'lucide-react';
-import { assets } from '../assets/assets';
+import { assets } from '../Assets/Assets';
 
 export default function Hero() {
   return (

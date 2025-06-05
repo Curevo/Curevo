@@ -1,5 +1,5 @@
 import { Mail, Facebook, Instagram, Twitter } from 'lucide-react';
-import { assets } from '../assets/assets';
+import { assets } from '../Assets/Assets';
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12 ">

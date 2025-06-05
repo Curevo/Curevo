@@ -4,7 +4,7 @@ import axios from '@/Config/axiosConfig.js';
 import Calendar from '@/Components/Calendar';
 import useDoctorAvailability from '@/Hooks/useDoctorAvailability';
 import { toast } from 'react-hot-toast';
-import assets from '@/assets/assets.js';
+import assets from '@/Assets/Assets.js';
 
 
 const AppointmentForm = () => {

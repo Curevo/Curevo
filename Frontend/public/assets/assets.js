@@ -1,1 +1,0 @@
-import HeroHome from './HeroHome.png';
