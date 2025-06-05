@@ -1,13 +1,15 @@
 import React from 'react';
 import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
+// import assets from "@/assets/assets.js"
+
 
 export default function HeroHome() {
     const [animate, setAnimate] = useState(false);
     return (
         <section className="relative w-[100%] flex items-center justify-center bg-white font-sans">
             <img
-                src="/src/assets/pexels-mart-production-7088526e.png"
+                src="/Assets/HeroHome.png"
                 alt="Hero"
                 className="w-[97%] h-[80vh] object-cover object-center rounded-xl brightness-[0.6]"
             />
