@@ -10,7 +10,6 @@ export default function HeroHome() {
         <section className="relative w-[100%] flex items-center justify-center bg-white font-sans">
             <img
                 src="/Assets/HeroHome.png"
-                src="/"
                 alt="Hero"
                 className="w-[97%] h-[80vh] object-cover object-center rounded-xl brightness-[0.6]"
             />
