@@ -1,0 +1,16 @@
+{
+  "plugins": ["import"],
+  "rules": {
+    "import/no-unresolved": [2, { "caseSensitive": true }]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js", "**/*.jsx"],
+      "rules": {
+        "no-unused-vars": "off",
+        "react-hooks/rules-of-hooks": "off",
+        "react-hooks/exhaustive-deps": "off"
+      }
+    }
+  ]
+}

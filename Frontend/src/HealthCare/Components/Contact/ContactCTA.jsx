@@ -1,4 +1,4 @@
-// components/ContactCTA.jsx
+// Components/ContactCTA.jsx
 import { Phone, ArrowRight } from "lucide-react";
 
 const ContactCTA = () => {

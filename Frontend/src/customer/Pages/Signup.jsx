@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from '@/Config/axiosConfig.js';
 import { Link, useNavigate } from "react-router-dom";
-import LeftPanel from "../../components/LeftPanel";
-import OTPVerifyPopup from '@/components/OTPVerifyPopup';
+import LeftPanel from "../../Components/LeftPanel";
+import OTPVerifyPopup from '@/Components/OTPVerifyPopup';
 
 
 export default function Signup() {

@@ -3,7 +3,7 @@ import React from 'react';
 const stats = [
     {
         value: '16+',
-        description: 'Vaxet has been a trusted provider of exceptional healthcare services.',
+        description: 'Vaxet has been a trusted provider of exceptional healthcare Services.',
     },
     {
         value: '6000+',

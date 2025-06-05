@@ -6,7 +6,7 @@ const Button = () => {
 
   return (
     <button
-      onClick={() => (window.location.href = "./navigation-pages/contact.html")}
+      onClick={() => (window.location.href = "./navigation-Pages/contact.html")}
       onMouseEnter={() => setAnimate(true)}
       onAnimationEnd={() => setAnimate(false)}
       className="flex items-center justify-between px-4 py-2 rounded-full bg-neutral-900 text-neutral-200 font-medium text-lg transition duration-300"

@@ -6,7 +6,7 @@ const services = [
         title: "Physical Therapy",
         subtitle: "Chronic Pain Relief",
         description:
-        "Therapy services are designed to enhance recovery and improve quality of life.",
+        "Therapy Services are designed to enhance recovery and improve quality of life.",
         image: "/src/assets/6789e3a9bc6f1dc6f9bb8258_service-thumb-06.jpg",
     },
     {

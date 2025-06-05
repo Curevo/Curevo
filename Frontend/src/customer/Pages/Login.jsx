@@ -2,7 +2,7 @@ import {useState} from "react";
 import axios from '@/Config/axiosConfig.js';
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
-import LeftPanel from "../../components/LeftPanel";
+import LeftPanel from "../../Components/LeftPanel";
 
 
 export default function Login() {

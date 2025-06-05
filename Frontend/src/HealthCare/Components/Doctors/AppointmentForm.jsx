@@ -1,8 +1,8 @@
 import React, { useState,useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '@/Config/axiosConfig.js';
-import Calendar from '@/components/Calendar';
-import useDoctorAvailability from '@/hooks/useDoctorAvailability';
+import Calendar from '@/Components/Calendar';
+import useDoctorAvailability from '@/Hooks/useDoctorAvailability';
 import { toast } from 'react-hot-toast';
 
 const AppointmentForm = () => {
@@ -132,7 +132,7 @@ const AppointmentForm = () => {
                 data.append('image', formData.prescription);
             }
 
-            const response = await axios.post('/api/appointments/book', data);
+            await axios.post('/api/appointments/book', data);
 
             toast.success('Appointment booked successfully!');
             navigate('/'
