@@ -1,24 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserPlus, Trash2, X } from "lucide-react";
+import axios from "axios";
 
 const DoctorProfiles = () => {
-    // Sample doctor data
-    const [doctors, setDoctors] = useState([
-        {
-        id: 1,
-        name: "Dr. Sarah Johnson",
-        specialization: "Cardiologist",
-        visitingDays: ["Mon", "Wed", "Fri"],
-        photo: "https://randomuser.me/api/portraits/women/65.jpg"
-        },
-        {
-        id: 2,
-        name: "Dr. Michael Chen",
-        specialization: "Neurologist",
-        visitingDays: ["Tue", "Thu", "Sat"],
-        photo: "https://randomuser.me/api/portraits/men/32.jpg"
-        }
-    ]);
+    // API base URL
+    const API_URL = "/api/doctors"; // Update with your Spring Boot endpoint
+
+    // State for doctors data
+    const [doctors, setDoctors] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // State for modal and form
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +22,26 @@ const DoctorProfiles = () => {
 
     // Days of the week
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    // Fetch doctors from backend
+    const fetchDoctors = async () => {
+        try {
+        setLoading(true);
+        const response = await axios.get(API_URL);
+        setDoctors(response.data);
+        setError(null);
+        } catch (err) {
+        setError("Failed to fetch doctors. Please try again later.");
+        console.error("Error fetching doctors:", err);
+        } finally {
+        setLoading(false);
+        }
+    };
+
+    // Load doctors on component mount
+    useEffect(() => {
+        fetchDoctors();
+    }, []);
 
     // Toggle day selection
     const toggleDay = (day) => {
@@ -74,35 +85,56 @@ const DoctorProfiles = () => {
     };
 
     // Add new doctor
-    const addDoctor = () => {
+    const addDoctor = async () => {
         if (!newDoctor.name || !newDoctor.specialization || newDoctor.visitingDays.length === 0) {
         alert("Please fill all required fields");
         return;
         }
 
+        try {
         const doctorToAdd = {
-        id: doctors.length + 1,
-        ...newDoctor,
-        photo: newDoctor.photo || "https://randomuser.me/api/portraits/lego/1.jpg"
+            ...newDoctor,
+            photo: newDoctor.photo || "https://randomuser.me/api/portraits/lego/1.jpg"
         };
 
-        setDoctors([...doctors, doctorToAdd]);
+        const response = await axios.post(API_URL, doctorToAdd);
+        setDoctors([...doctors, response.data]);
+        
+        // Reset form
         setNewDoctor({
-        name: "",
-        specialization: "",
-        visitingDays: [],
-        photo: ""
+            name: "",
+            specialization: "",
+            visitingDays: [],
+            photo: ""
         });
         setIsModalOpen(false);
+        } catch (err) {
+        console.error("Error adding doctor:", err);
+        alert("Failed to add doctor. Please try again.");
+        }
     };
 
     // Delete doctor
-    const deleteDoctor = (id) => {
+    const deleteDoctor = async (id) => {
+        try {
+        await axios.delete(`${API_URL}/${id}`);
         setDoctors(doctors.filter(doctor => doctor.id !== id));
+        } catch (err) {
+        console.error("Error deleting doctor:", err);
+        alert("Failed to delete doctor. Please try again.");
+        }
     };
 
+    if (loading) {
+        return <div className="p-6 text-center">Loading doctors...</div>;
+    }
+
+    if (error) {
+        return <div className="p-6 text-red-500">{error}</div>;
+    }
+
     return (
-        <div className="p-6 w-full mt-10">
+        <div className="p-6 w-full">
         {/* Header with Add Doctor button */}
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">Doctor Profiles</h1>
@@ -117,43 +149,47 @@ const DoctorProfiles = () => {
 
         {/* Doctors List */}
         <div className="space-y-4">
-            {doctors.map((doctor) => (
-            <div
+            {doctors.length === 0 ? (
+            <p className="text-center text-gray-500">No doctors found</p>
+            ) : (
+            doctors.map((doctor) => (
+                <div
                 key={doctor.id}
                 className="flex items-center p-4 bg-white rounded-lg shadow hover:shadow-md transition"
-            >
+                >
                 {/* Doctor Photo */}
                 <img
-                src={doctor.photo}
-                alt={doctor.name}
-                className="w-16 h-16 rounded-full object-cover mr-4"
+                    src={doctor.photo}
+                    alt={doctor.name}
+                    className="w-16 h-16 rounded-full object-cover mr-4"
                 />
 
                 {/* Doctor Info */}
                 <div className="flex-1">
-                <h3 className="font-semibold text-lg">{doctor.name}</h3>
-                <p className="text-gray-600">{doctor.specialization}</p>
-                <p className="text-sm text-gray-500">
+                    <h3 className="font-semibold text-lg">{doctor.name}</h3>
+                    <p className="text-gray-600">{doctor.specialization}</p>
+                    <p className="text-sm text-gray-500">
                     Visiting Days: {doctor.visitingDays.join(", ")}
-                </p>
+                    </p>
                 </div>
 
                 {/* Delete Button */}
                 <button
-                onClick={() => deleteDoctor(doctor.id)}
-                className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100 transition"
-                aria-label={`Delete ${doctor.name}`}
+                    onClick={() => deleteDoctor(doctor.id)}
+                    className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100 transition"
+                    aria-label={`Delete ${doctor.name}`}
                 >
-                <Trash2 size={20} />
+                    <Trash2 size={20} />
                 </button>
-            </div>
-            ))}
+                </div>
+            ))
+            )}
         </div>
 
         {/* Add Doctor Modal */}
         {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Add New Doctor</h2>
                 <button
