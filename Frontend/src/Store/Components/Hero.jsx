@@ -1,6 +1,6 @@
-import product1 from "../../assets/product1.png";
-import product2 from "../../assets/product2.png";
-import product3 from "../../assets/product3.png";
+import product1 from "/Assets/product1.png";
+import product2 from "/Assets/product2.png";
+import product3 from "/Assets/product3.png";
 
 const Hero = () => {
     return (

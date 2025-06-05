@@ -1,13 +1,11 @@
 import React, { useState,useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '@/Config/axiosConfig.js';
-<<<<<<< Updated upstream
 import Calendar from '@/Components/Calendar';
 import useDoctorAvailability from '@/Hooks/useDoctorAvailability';
 import { toast } from 'react-hot-toast';
-=======
 import assets from '@/assets/assets.js';
->>>>>>> Stashed changes
+
 
 const AppointmentForm = () => {
     const { doctorId } = useParams();

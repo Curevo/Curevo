@@ -9,11 +9,8 @@ export default function HeroHome() {
     return (
         <section className="relative w-[100%] flex items-center justify-center bg-white font-sans">
             <img
-<<<<<<< Updated upstream
                 src="/Assets/HeroHome.png"
-=======
                 src="/"
->>>>>>> Stashed changes
                 alt="Hero"
                 className="w-[97%] h-[80vh] object-cover object-center rounded-xl brightness-[0.6]"
             />
