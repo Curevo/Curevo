@@ -1,9 +1,13 @@
 import React, { useState,useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '@/Config/axiosConfig.js';
+<<<<<<< Updated upstream
 import Calendar from '@/Components/Calendar';
 import useDoctorAvailability from '@/Hooks/useDoctorAvailability';
 import { toast } from 'react-hot-toast';
+=======
+import assets from '@/assets/assets.js';
+>>>>>>> Stashed changes
 
 const AppointmentForm = () => {
     const { doctorId } = useParams();
@@ -178,6 +182,7 @@ const AppointmentForm = () => {
 
     return (
         <div className="flex flex-col items-center bg-blue-50 px-4 py-10 sm:px-6 lg:px-8">
+            <img src={assets.appointment} alt="" className='max-w-7xl rounded-xl w-full object-cover"'/>
             <div className="max-w-7xl w-full bg-white rounded-xl shadow-md p-6 sm:p-10">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-6">Book Appointment Now</h2>
 

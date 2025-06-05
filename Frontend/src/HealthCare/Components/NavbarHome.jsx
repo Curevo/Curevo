@@ -19,7 +19,7 @@ export default function NavbarHome() {
                 onClick={() => (window.location.href = '/')}
             >
                 <img
-                src="/src/assets/Curevo-logo.png"
+                src="/public/assets/Curevo-logo.png"
                 alt="Curevo logo"
                 className="h-8 w-auto"
                 />
@@ -79,10 +79,10 @@ export default function NavbarHome() {
         {/* Mobile Menu */}
         {menuOpen && (
             <div className="md:hidden bg-white px-6 py-4 space-y-4 text-center border-t">
-            <a href="/about" className="block">About us</a>
+            <a href="/store" className="block">Store</a>
             <a href="/services" className="block">Services</a>
             <a href="/doctors" className="block">Doctors</a>
-            <a href="/blogs" className="block">Blogs</a>
+            <a href="/about" className="block">About Us</a>
             <a href="/contact" className="block">Contact</a>
             {!isLoggedIn && (
                 <>

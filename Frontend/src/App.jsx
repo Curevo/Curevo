@@ -14,7 +14,11 @@ import Contact from './HealthCare/Pages/Contact'
 import VerifyOTP from './Components/OTPVerifyPopup'
 import Services from './HealthCare/Pages/Services'
 import DoctorPreview from './HealthCare/Components/Doctors/DoctorsPreview'
+<<<<<<< Updated upstream
 import Appointments from './HealthCare/Components/Doctors/AppointmentForm'
+=======
+import PaymentGateway from './HealthCare/Pages/PaymentGateway'
+>>>>>>> Stashed changes
 
 
 
@@ -23,7 +27,6 @@ const App = () => {
   return (
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/doctors" element={<Doctors />} />
@@ -38,8 +41,12 @@ const App = () => {
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/otp" element={<VerifyOTP />} />
         <Route path="/dtp" element={<DoctorPreview />} />
+<<<<<<< Updated upstream
         <Route path="/appointments/:doctorId" element={<Appointments />} />
 
+=======
+        <Route path="/Payment" element={<PaymentGateway />} />
+>>>>>>> Stashed changes
       </Routes>
   );
 };
