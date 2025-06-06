@@ -1,28 +1,27 @@
 package com.certaint.curevo.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+@Entity
+@Table(name = "clinics")
 @Getter
 @Setter
-@Entity
-@Table(name = "stores")
-public class Store {
+@NoArgsConstructor
+public class Clinic {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long storeId;
+    private Long clinicId;
 
-    private String storeName;
+    @Column(nullable = false)
+    private String address;
 
     private Double latitude;
 
     private Double longitude;
 
-    private String address;
-
     private String phoneNumber;
-
 }

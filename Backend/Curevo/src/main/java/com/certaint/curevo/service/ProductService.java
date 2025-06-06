@@ -1,5 +1,6 @@
 package com.certaint.curevo.service;
 
+import com.certaint.curevo.entity.Inventory;
 import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -17,6 +19,8 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ImageHostingService imageHostingService;
+    private final StoreService storeService;
+    private final InventoryService inventoryService;
 
     @Transactional
     public Product saveProduct(Product product, MultipartFile image,MultipartFile hoverImage) {
@@ -45,6 +49,7 @@ public class ProductService {
         return productRepository.findById(productId);
     }
 
+
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);
     }
@@ -63,4 +68,18 @@ public class ProductService {
                     return productRepository.save(product);
                 }).orElseThrow(() -> new RuntimeException("Product not found with id " + productId));
     }
+
+    public Page<Product> getProductsByLocation(double userLat, double userLon, double radiusKm, Pageable pageable) {
+        List<Long> storeIds = storeService.getStoreIdsWithinRadius(userLat, userLon, radiusKm);
+
+        if (storeIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Page<Inventory> inventories = inventoryService.getInventoriesByStoreIds(storeIds, pageable);
+
+        return inventories.map(Inventory::getProduct);
+    }
+
+
 }

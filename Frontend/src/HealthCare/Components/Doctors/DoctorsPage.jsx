@@ -1,9 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 
 
 
     const DoctorsPage = () => {
+        const axios = useAxiosInstance();
         const didFetch = useRef(false);
         const [doctors, setDoctors] = useState([]);
         const [page, setPage] = useState(0);

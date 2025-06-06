@@ -1,5 +1,5 @@
 import {useState} from "react";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import LeftPanel from "../../Components/LeftPanel";
@@ -9,6 +9,7 @@ export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const axios = useAxiosInstance();
     // const response = useRef(null);
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;

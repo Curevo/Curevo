@@ -1,40 +1,95 @@
-import React, { useEffect, useState , useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '@/Config/axiosConfig.js';
+import { useLocation } from '@/Hooks/LocationContext';
+import { useAxiosInstance } from '@/Config/axiosConfig.js';
 
 export default function ProductGrid() {
+    const locationContext = useLocation();
+    const axios = useAxiosInstance();
+    const navigate = useNavigate();
+
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
     const size = 5;
     const [loading, setLoading] = useState(false);
-    const didFetch = useRef(false);
     const [hasMore, setHasMore] = useState(true);
 
-    const fetchProducts = async () => {
+    const initialFetchPerformed = useRef(false);
+
+    const fetchProducts = useCallback(async (reset = false) => {
+        console.log(`[fetchProducts] Called with reset: ${reset}, current loading: ${loading}, current hasMore: ${hasMore}, current page: ${page}`);
+        if (loading || (!hasMore && !reset)) {
+            console.log("[fetchProducts] Skipping fetch due to loading or no more data.");
+            return;
+        }
+
+        setLoading(true);
         try {
-            setLoading(true);
-            const response = await axios.get(`/api/products?page=${page}&size=${size}`);
-            if (response.data.data.content.length === 0) {
-                setHasMore(false); // No more products to load
+            const currentPageToFetch = reset ? 0 : page;
+            console.log(`[fetchProducts] Requesting page: ${currentPageToFetch}, size: ${size}`);
+
+            const response = await axios.get(
+                `/api/products/by-location-all`,
+                {
+                    params: {
+                        page: currentPageToFetch,
+                        size,
+                        _t: Date.now()
+                    }
+                }
+            );
+
+            const newProducts = response.data.data;
+            console.log(`[fetchProducts] Received ${newProducts.length} new products from API.`);
+            console.log(`[fetchProducts] Fetched IDs: ${newProducts.map(p => p.productId).join(', ')}`);
+
+
+            setProducts(prev => {
+                const currentProducts = reset ? [] : prev;
+                const uniqueNewProducts = newProducts.filter(
+                    newProd => !currentProducts.some(existingProd => existingProd.productId === newProd.productId)
+                );
+                console.log(`[fetchProducts] Unique products to add: ${uniqueNewProducts.length}`);
+                console.log(`[fetchProducts] Unique IDs being added: ${uniqueNewProducts.map(p => p.productId).join(', ')}`);
+                return [...currentProducts, ...uniqueNewProducts];
+            });
+
+            if (newProducts.length < size) {
+                setHasMore(false);
+                console.log("[fetchProducts] setHasMore(false) because received less than requested size.");
             } else {
-                setProducts(prev => [...prev, ...response.data.data.content]);
-                setPage(prev => prev + 1);
+                setHasMore(true);
+                console.log("[fetchProducts] setHasMore(true) because received full page.");
             }
+
+            if (newProducts.length > 0) {
+                setPage(prev => {
+                    const nextPage = currentPageToFetch + 1;
+                    console.log(`[fetchProducts] Setting next page state to: ${nextPage}`);
+                    return nextPage;
+                });
+            } else {
+                setHasMore(false);
+                console.log("[fetchProducts] setHasMore(false) because no new products received.");
+            }
+
+
         } catch (error) {
             console.error("Error fetching products:", error);
         } finally {
             setLoading(false);
+            console.log("[fetchProducts] Loading state set to false.");
         }
-    };
+    }, [page, size, loading, hasMore, axios]);
 
     useEffect(() => {
-        if (!didFetch.current) {
-            fetchProducts();
-            didFetch.current = true;
+        console.log(`[useEffect] Initial fetch effect running. initialFetchPerformed: ${initialFetchPerformed.current}, products.length: ${products.length}, page: ${page}, hasMore: ${hasMore}, loading: ${loading}`);
+        if (!initialFetchPerformed.current) {
+            initialFetchPerformed.current = true;
+            console.log("[useEffect] Triggering initial fetchProducts call for first render.");
+            fetchProducts(false);
         }
-    }, []);
-
-    const navigate = useNavigate();
+    }, [fetchProducts]);
 
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
@@ -50,15 +105,25 @@ export default function ProductGrid() {
                     >
                         <div className="relative w-full h-96 mb-4">
                             <img
-                                src={product.image}
+                                src={product.image || `https://placehold.co/400x300/F0F4F8/6B7280?text=${encodeURIComponent(product.name || 'Product')}`}
                                 alt={product.name}
                                 className="w-full h-full object-cover rounded-2xl transition-opacity duration-300"
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = `https://placehold.co/400x300/F0F4F8/6B7280?text=${encodeURIComponent(product.name || 'Product')}`;
+                                }}
                             />
-                            <img
-                                src={product.hoverImage}
-                                alt={product.name + " hovering"}
-                                className="absolute inset-0 w-full h-full rounded-2xl object-cover opacity-0 hover:opacity-100 transition-opacity duration-300"
-                            />
+                            {product.hoverImage && (
+                                <img
+                                    src={product.hoverImage}
+                                    alt={product.name + " hovering"}
+                                    className="absolute inset-0 w-full h-full rounded-2xl object-cover opacity-0 hover:opacity-100 transition-opacity duration-300"
+                                    onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = `https://placehold.co/400x300/F0F4F8/6B7280?text=${encodeURIComponent(product.name || 'Hover')}`;
+                                    }}
+                                />
+                            )}
                         </div>
                         <h3 className="text-lg font-semibold text-gray-800">
                             {product.name}
@@ -74,13 +139,19 @@ export default function ProductGrid() {
             {hasMore && (
                 <div className="mt-8 flex justify-center">
                     <button
-                        onClick={fetchProducts}
+                        onClick={() => fetchProducts()} // Changed this line!
                         disabled={loading}
                         className="px-6 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition disabled:opacity-50"
                     >
                         {loading ? "Loading..." : "Load More"}
                     </button>
                 </div>
+            )}
+
+            {!hasMore && products.length > 0 && !loading && (
+                <p className="text-center text-gray-600 text-lg mt-8 rounded-lg p-4 bg-blue-100 border border-blue-300 shadow-sm">
+                    You've reached the end of the product list!
+                </p>
             )}
         </section>
     );

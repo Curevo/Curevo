@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import { Enable2StepModal } from './Enable2StepModal';
 import { Verify2StepModal } from './Verify2StepModal';
 // import ResetPassword from './ResetPassword';
 
 export default function UserProfile() {
   const [user, setUser] = useState({ name: '', age: '', email: '', phone: '', address: '', avatarUrl: '', tfaSecret: '' });
+  const axios = useAxiosInstance();
   const [loading, setLoading] = useState(true);
   const [showEnableModal, setShowEnableModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
