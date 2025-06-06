@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 
 const DoctorsPreview = () => {
     const [doctors, setDoctors] = useState([]);
 
     useEffect(() => {
+        const axios = useAxiosInstance();
         const fetchDoctors = async () => {
             try {
                 const res = await axios.get('/api/doctors', {

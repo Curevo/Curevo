@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line no-unused-vars
 const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com'}) => {
     const [otp, setOtp] = useState(Array(6).fill(''));
+    const axios = useAxiosInstance();
     const inputsRef = useRef([]);
     const navigate = useNavigate();
 

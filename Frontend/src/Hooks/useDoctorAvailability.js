@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "@/Config/axiosConfig.js";
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 
 function useDoctorAvailability(doctorId, weeksToShow = 3) {
+    const axios = useAxiosInstance();
     const [availabilityDays, setAvailabilityDays] = useState([]);
     const [availabilityTimes, setAvailabilityTimes] = useState({});
     const [availableDates, setAvailableDates] = useState([]);

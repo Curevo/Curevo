@@ -1,5 +1,6 @@
 package com.certaint.curevo.service;
 
+import com.certaint.curevo.dto.CartResponse;
 import com.certaint.curevo.entity.CartItem;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.Product;
@@ -23,9 +24,10 @@ public class CartItemService {
     private final ProductRepository productRepository;
 
 
-    public void addToCart(Customer customer, Long productId, Integer quantity) {
+    public CartItem addToCart(Customer customer, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Integer quantity=1;
 
         Optional<CartItem> existingCartItemOpt = cartItemRepository.findByCustomerAndProduct(customer, product);
 
@@ -34,6 +36,7 @@ public class CartItemService {
             existingCartItem.setQuantity(existingCartItem.getQuantity() + quantity);
             existingCartItem.setAddedAt(Instant.now());
             cartItemRepository.save(existingCartItem);
+            return existingCartItem;
         } else {
             CartItem newCartItem = new CartItem();
             newCartItem.setCustomer(customer);
@@ -41,7 +44,9 @@ public class CartItemService {
             newCartItem.setQuantity(quantity);
             newCartItem.setAddedAt(Instant.now());
             cartItemRepository.save(newCartItem);
+            return newCartItem;
         }
+
     }
 
 
@@ -61,11 +66,44 @@ public class CartItemService {
         cartItemRepository.delete(cartItem);
     }
 
-    /**
-     * Clear all cart items for a customer
-     */
+
     public void clearCart(Customer customer) {
         List<CartItem> items = cartItemRepository.findAllByCustomer(customer);
         cartItemRepository.deleteAll(items);
     }
+
+    public CartResponse decreaseQuantity(Customer customer, Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        CartItem cartItem = cartItemRepository.findByCustomerAndProduct(customer, product)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+
+        if (cartItem.getQuantity() > 1) {
+            cartItem.setQuantity(cartItem.getQuantity() - 1);
+            CartItem updatedItem = cartItemRepository.save(cartItem);
+            return new CartResponse(true, updatedItem);
+        } else {
+            cartItemRepository.delete(cartItem);
+            return new CartResponse(false, null);
+        }
+    }
+
+
+
+    public CartResponse checkProductInCart(Customer customer, Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        Optional<CartItem> cartItemOpt = cartItemRepository.findByCustomerAndProduct(customer, product);
+
+        if (cartItemOpt.isPresent()) {
+            return new CartResponse(true, cartItemOpt.get());
+        } else {
+            return new CartResponse(false, null);
+        }
+    }
+
+
+
 }

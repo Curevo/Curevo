@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "@/Config/axiosConfig.js";
-import AddToCartButton from "@/Store/Components/AddToCartButton.jsx";
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
+import AddToCartButton from "@/Store/Components/CartButton.jsx";
 
 const ProductDetails = () => {
     const { productId } = useParams();
+    const axios = useAxiosInstance();
     const [product, setProduct] = useState(null);
 
     useEffect(() => {

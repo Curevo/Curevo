@@ -42,4 +42,9 @@ public class Doctor {
 
     @Column(name = "image_url")
     private String image;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
+
 }

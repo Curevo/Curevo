@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import { Link, useNavigate } from "react-router-dom";
 import LeftPanel from "../../Components/LeftPanel";
 import OTPVerifyPopup from '@/Components/OTPVerifyPopup';
@@ -7,6 +7,7 @@ import OTPVerifyPopup from '@/Components/OTPVerifyPopup';
 
 export default function Signup() {
     const navigate = useNavigate();
+    const axios = useAxiosInstance();
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
