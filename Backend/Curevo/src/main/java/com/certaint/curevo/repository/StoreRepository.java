@@ -1,6 +1,7 @@
 package com.certaint.curevo.repository;
 
 
+import com.certaint.curevo.dto.StoreDistanceInfo;
 import com.certaint.curevo.entity.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,19 +11,21 @@ import java.util.List;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    @Query(value = """
-        SELECT s 
-        FROM Store s 
-        WHERE 
-            (6371 * acos(cos(radians(:userLat)) 
-            * cos(radians(s.latitude)) 
-            * cos(radians(s.longitude) - radians(:userLon)) 
-            + sin(radians(:userLat)) 
-            * sin(radians(s.latitude)))) <= :radiusKm
-        """)
-    List<Store> findStoresWithinRadius(
-            @Param("userLat") double userLat,
-            @Param("userLon") double userLon,
-            @Param("radiusKm") double radiusKm
-    );
+    @Query(value = "SELECT s.store_id AS storeId, " + // Alias as storeId
+            "(6371 * acos(" +
+            "cos(radians(:userLat)) * cos(radians(s.latitude)) * " +
+            "cos(radians(s.longitude) - radians(:userLon)) + " +
+            "sin(radians(:userLat)) * sin(radians(s.latitude))" +
+            ")) AS distance " +
+            "FROM stores s " +
+            "WHERE (6371 * acos(" +
+            "cos(radians(:userLat)) * cos(radians(s.latitude)) * " +
+            "cos(radians(s.longitude) - radians(:userLon)) + " +
+            "sin(radians(:userLat)) * sin(radians(s.latitude))" +
+            ")) <= :radiusKm",
+            nativeQuery = true)
+    List<StoreDistanceInfo> findStoresWithinRadius(@Param("userLat") double userLat,
+                                                   @Param("userLon") double userLon,
+                                                   @Param("radiusKm") double radiusKm);
 }
+

@@ -16,6 +16,32 @@ export default function ProductGrid() {
 
     const initialFetchPerformed = useRef(false);
 
+    const getDistancePriority = useCallback((distanceTag) => {
+        switch (distanceTag) {
+            case "nearest": return 1;
+            case "far": return 2; // Keep 'far' at priority 2 as per backend, not 'near'
+            case "farthest": return 3;
+            default: return 99;
+        }
+    }, []);
+
+    const sortAndPrioritizeProducts = useCallback((productsArray) => {
+        return [...productsArray].sort((a, b) => {
+            const priorityA = getDistancePriority(a.distanceTag);
+            const priorityB = getDistancePriority(b.distanceTag);
+
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+
+            const stockA = a.availableStock ?? 0;
+            const stockB = b.availableStock ?? 0;
+            if (stockA !== stockB) {
+                return stockB - stockA;
+            }
+        });
+    }, [getDistancePriority]);
+
     const fetchProducts = useCallback(async (reset = false) => {
         console.log(`[fetchProducts] Called with reset: ${reset}, current loading: ${loading}, current hasMore: ${hasMore}, current page: ${page}`);
         if (loading || (!hasMore && !reset)) {
@@ -28,68 +54,89 @@ export default function ProductGrid() {
             const currentPageToFetch = reset ? 0 : page;
             console.log(`[fetchProducts] Requesting page: ${currentPageToFetch}, size: ${size}`);
 
+            const userLat = locationContext.userLat;
+            const userLon = locationContext.userLon;
+
+            if (userLat === null || userLon === null) {
+                console.warn("User location not available yet. Skipping product fetch.");
+                setLoading(false);
+                return;
+            }
+
             const response = await axios.get(
                 `/api/products/by-location-all`,
                 {
                     params: {
                         page: currentPageToFetch,
                         size,
-                        _t: Date.now()
                     }
                 }
             );
 
-            const newProducts = response.data.data;
-            console.log(`[fetchProducts] Received ${newProducts.length} new products from API.`);
-            console.log(`[fetchProducts] Fetched IDs: ${newProducts.map(p => p.productId).join(', ')}`);
+            const responseData = response.data.data;
+            const newProductsContent = responseData.content;
+            const isLastPage = responseData.last;
 
+            console.log(`[fetchProducts] Received ${newProductsContent.length} new products from API.`);
 
             setProducts(prev => {
                 const currentProducts = reset ? [] : prev;
-                const uniqueNewProducts = newProducts.filter(
-                    newProd => !currentProducts.some(existingProd => existingProd.productId === newProd.productId)
-                );
-                console.log(`[fetchProducts] Unique products to add: ${uniqueNewProducts.length}`);
-                console.log(`[fetchProducts] Unique IDs being added: ${uniqueNewProducts.map(p => p.productId).join(', ')}`);
-                return [...currentProducts, ...uniqueNewProducts];
+                const combinedProductsMap = new Map();
+
+                currentProducts.forEach(p => {
+                    // Use a composite key for Map to ensure unique product-store combinations
+                    combinedProductsMap.set(`${p.productId}-${p.store?.storeId || 'no-store'}`, p);
+                });
+
+                newProductsContent.forEach(newProd => {
+                    const newProdKey = `${newProd.productId}-${newProd.store?.storeId || 'no-store'}`;
+                    const existingProd = combinedProductsMap.get(newProdKey);
+
+                    if (!existingProd) {
+                        combinedProductsMap.set(newProdKey, newProd);
+                    } else {
+                        const newProdPriority = getDistancePriority(newProd.distanceTag);
+                        const existingProdPriority = getDistancePriority(existingProd.distanceTag);
+
+                        if (newProdPriority < existingProdPriority) {
+                            combinedProductsMap.set(newProdKey, newProd);
+                        } else if (newProdPriority === existingProdPriority) {
+                            const newProdStock = newProd.availableStock ?? 0;
+                            const existingProdStock = existingProd.availableStock ?? 0;
+                            if (newProdStock > existingProdStock) {
+                                combinedProductsMap.set(newProdKey, newProd);
+                            }
+                        }
+                    }
+                });
+
+                const updatedProducts = Array.from(combinedProductsMap.values());
+                const finalSortedProducts = sortAndPrioritizeProducts(updatedProducts);
+
+                return finalSortedProducts;
             });
 
-            if (newProducts.length < size) {
-                setHasMore(false);
-                console.log("[fetchProducts] setHasMore(false) because received less than requested size.");
-            } else {
-                setHasMore(true);
-                console.log("[fetchProducts] setHasMore(true) because received full page.");
-            }
+            setHasMore(!isLastPage);
 
-            if (newProducts.length > 0) {
-                setPage(prev => {
-                    const nextPage = currentPageToFetch + 1;
-                    console.log(`[fetchProducts] Setting next page state to: ${nextPage}`);
-                    return nextPage;
-                });
-            } else {
-                setHasMore(false);
-                console.log("[fetchProducts] setHasMore(false) because no new products received.");
+            if (newProductsContent.length > 0) {
+                setPage(prev => currentPageToFetch + 1);
             }
-
 
         } catch (error) {
             console.error("Error fetching products:", error);
+            setHasMore(false);
         } finally {
             setLoading(false);
-            console.log("[fetchProducts] Loading state set to false.");
         }
-    }, [page, size, loading, hasMore, axios]);
+    }, [page, size, loading, hasMore, axios, locationContext, getDistancePriority, sortAndPrioritizeProducts]);
+
 
     useEffect(() => {
-        console.log(`[useEffect] Initial fetch effect running. initialFetchPerformed: ${initialFetchPerformed.current}, products.length: ${products.length}, page: ${page}, hasMore: ${hasMore}, loading: ${loading}`);
-        if (!initialFetchPerformed.current) {
+        if (locationContext.userLat !== null && locationContext.userLon !== null && !initialFetchPerformed.current) {
             initialFetchPerformed.current = true;
-            console.log("[useEffect] Triggering initial fetchProducts call for first render.");
-            fetchProducts(false);
+            fetchProducts(true);
         }
-    }, [fetchProducts]);
+    }, [fetchProducts, locationContext.userLat, locationContext.userLon]);
 
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
@@ -99,9 +146,20 @@ export default function ProductGrid() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {products.map((product) => (
                     <div
-                        key={product.productId}
+                        // Ensure product.store is not null before accessing storeId
+                        key={`${product.productId}-${product.store?.storeId || 'no-store'}`}
                         className="bg-white p-4 rounded-2xl shadow-md hover:shadow-xl transition relative overflow-hidden"
-                        onClick={() => navigate(`/product/${product.productId}`)}
+                        // --- CHANGE HERE: Pass storeId to the navigation path ---
+                        onClick={() => {
+                            if (product.store && product.store.storeId) {
+                                navigate(`/product/${product.productId}/store/${product.store.storeId}`);
+                            } else {
+                                // Handle case where storeId might be missing (e.g., product has no associated store)
+                                console.warn(`Cannot navigate to product ${product.productId}: storeId is missing.`);
+                                // Optionally, navigate to a generic product page or show an alert
+                                // navigate(`/product/${product.productId}`);
+                            }
+                        }}
                     >
                         <div className="relative w-full h-96 mb-4">
                             <img
@@ -132,6 +190,22 @@ export default function ProductGrid() {
                             ${parseFloat(product.price).toFixed(2)}
                         </div>
                         <div className="text-sm text-gray-600">{product.quantity}</div>
+                        {product.distanceTag && (
+                            <div className="text-sm text-green-700 font-medium mt-1">
+                                {product.distanceTag.charAt(0).toUpperCase() + product.distanceTag.slice(1)}
+                            </div>
+                        )}
+                        {product.availableStock !== undefined && product.availableStock !== null && (
+                            <div className="text-sm text-gray-500 mt-1">
+                                Stock: {product.availableStock}
+                                {product.availableStock === 0 && <span className="text-red-500 ml-1">(Out of Stock)</span>}
+                            </div>
+                        )}
+                        {product.store && product.store.storeName && (
+                            <div className="text-xs text-gray-400 mt-1">
+                                From: {product.store.storeName}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -139,7 +213,7 @@ export default function ProductGrid() {
             {hasMore && (
                 <div className="mt-8 flex justify-center">
                     <button
-                        onClick={() => fetchProducts()} // Changed this line!
+                        onClick={() => fetchProducts(false)}
                         disabled={loading}
                         className="px-6 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition disabled:opacity-50"
                     >
@@ -151,6 +225,11 @@ export default function ProductGrid() {
             {!hasMore && products.length > 0 && !loading && (
                 <p className="text-center text-gray-600 text-lg mt-8 rounded-lg p-4 bg-blue-100 border border-blue-300 shadow-sm">
                     You've reached the end of the product list!
+                </p>
+            )}
+            {!hasMore && products.length === 0 && !loading && (
+                <p className="text-center text-gray-600 text-lg mt-8 rounded-lg p-4 bg-yellow-100 border border-yellow-300 shadow-sm">
+                    No products found for your location.
                 </p>
             )}
         </section>

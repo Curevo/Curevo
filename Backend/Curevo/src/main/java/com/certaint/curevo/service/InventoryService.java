@@ -1,9 +1,11 @@
 package com.certaint.curevo.service;
 
 import com.certaint.curevo.entity.Inventory;
+import com.certaint.curevo.entity.Product; // Import Product entity
+import com.certaint.curevo.entity.Store;    // Import Store entity
 import com.certaint.curevo.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; // Can remove if only using @RequiredArgsConstructor
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,5 +52,15 @@ public class InventoryService {
 
     public Page<Inventory> getInventoriesByStoreIds(List<Long> storeIds, Pageable pageable) {
         return inventoryRepository.findByStore_StoreIdIn(storeIds, pageable);
+    }
+
+    // --- NEW METHOD: Get Inventory by Product and Store ---
+    public Optional<Inventory> getInventoryByProductAndStore(Product product, Store store) {
+        return inventoryRepository.findByProductAndStore(product, store);
+    }
+
+    // --- NEW METHOD: Get Inventories by Product (for search and single product details where closest needs to be found) ---
+    public List<Inventory> getInventoriesByProduct(Product product) {
+        return inventoryRepository.findByProduct(product);
     }
 }

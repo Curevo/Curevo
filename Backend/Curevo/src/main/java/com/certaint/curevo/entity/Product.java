@@ -38,9 +38,9 @@ public class Product {
     @Column(nullable = false)
     private ProductCategory category;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
+//    @ManyToOne
+//    @JoinColumn(name = "store_id", nullable = false)
+//    private Store store;
 
 
 }

@@ -1,5 +1,6 @@
 package com.certaint.curevo.service;
 
+import com.certaint.curevo.dto.StoreDistanceInfo;
 import com.certaint.curevo.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,7 @@ public class StoreService {
         storeRepository.deleteById(storeId);
     }
 
-    public List<Long> getStoreIdsWithinRadius(double lat, double lon, double radiusKm) {
-        return storeRepository.findStoresWithinRadius(lat, lon, radiusKm)
-                .stream()
-                .map(Store::getStoreId)
-                .collect(Collectors.toList());
+    public List<StoreDistanceInfo> getStoresWithDistancesWithinRadius(double lat, double lon, double radiusKm) {
+        return storeRepository.findStoresWithinRadius(lat, lon, radiusKm);
     }
 }
