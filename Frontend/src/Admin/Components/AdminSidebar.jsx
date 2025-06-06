@@ -20,12 +20,12 @@ const Sidebar = () => {
 
     const navItems = [
         { icon: <UserPen size={20} />, label: "Doctor Profiles", path: "/admin/home" },
-        { icon: <Pill size={20} />, label: "Products", path: "/products" },
-        { icon: <Mails size={20} />, label: "Newsletters", path: "/newsletters" },
-        { icon: <CalendarHeart size={20} />, label: "Appointments", path: "/appointments" },
+        { icon: <Pill size={20} />, label: "Products", path: "/admin/products" },
+        { icon: <Mails size={20} />, label: "Newsletters", path: "/admin/newsletters" },
+        { icon: <CalendarHeart size={20} />, label: "Appointments", path: "/admin/appointments" },
         { icon: <Store size={20} />, label: "Store Management", path: "/admin/store" },
         { icon: <Hospital size={20} />, label: "Clinic Management", path: "/admin/clinics" },
-        { icon: <HelpCircle size={20} />, label: "Help", path: "/help" },
+        { icon: <HelpCircle size={20} />, label: "Help", path: "/admin/help" },
     ];
 
     const handleNavClick = (path) => {

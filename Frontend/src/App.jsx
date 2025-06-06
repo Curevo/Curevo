@@ -19,6 +19,7 @@ import PaymentGateway from './HealthCare/Pages/PaymentGateway'
 import AdminLanding from './Admin/Pages/AdminLanding'
 import StoreManageAdmin from './Admin/Pages/StoreManageAdmin'
 import ClinicManageAdmin from './Admin/Pages/ClinicManageAdmin'
+import ProductManageAdmin from './Admin/Pages/ProductManageAdmin'
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/appointments/:doctorId" element={<Appointments />} />
         <Route path="/Payment" element={<PaymentGateway />} />
         <Route path="/admin/home" element={<AdminLanding/>} />
+        <Route path="/admin/products" element={<ProductManageAdmin/>} />
         <Route path="/admin/store" element={<StoreManageAdmin/>} />
         <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
       </Routes>
