@@ -62,8 +62,9 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
         try {
             // Sends DELETE /api/cart/{itemId}?storeId={storeId}
             // This perfectly matches the new @DeleteMapping("/{itemId}") in CartController.java
-            await axios.delete(`/api/cart/${itemId}?storeId=${storeId}`);
+            await axios.delete(`/api/cart/${itemId}`);
             fetchCartItems();
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
         } catch (err) {
             console.error("Error removing from cart:", err);
             setCartError(err.response?.data?.message || err.message || "Failed to remove item.");
@@ -326,7 +327,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                                     <div className="flex justify-between">
                                                         <h3 className="font-medium">{item.product?.name ?? 'Unknown Product'}</h3>
                                                         <button
-                                                            onClick={() => removeFromCart(item.id, item.product?.storeId)}
+                                                            onClick={() => removeFromCart(item.id)}
                                                             className="text-gray-400 hover:text-red-500"
                                                         >
                                                             <X className="w-4 h-4" />

@@ -119,30 +119,40 @@ public class CartController {
     }
 
 
-    @DeleteMapping("/{itemId}")
+    @DeleteMapping("/{itemId}") // itemId here refers to cartItemId
     public ResponseEntity<ApiResponse<Void>> removeItemFromCart(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long itemId,
-            @RequestParam Long storeId // Used for verification, as sent by Navbar.jsx
+            @PathVariable("itemId") Long cartItemId // Renamed for clarity: itemId is cartItemId
     ) {
         String token = authHeader.substring(7);
         String email = jwtService.extractEmail(token);
         Optional<Customer> customer = customerService.getByEmail(email);
+
         if (customer.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(false, "Customer not found", null));
         }
+
         try {
+            // Call the service method with only customer and cartItemId
+            cartItemService.removeItemFromCart(customer.get(), cartItemId);
+
             return ResponseEntity.ok(new ApiResponse<>(true, "Item removed from cart successfully", null));
+
         } catch (ResourceNotFoundException e) {
+            // If the cart item is not found
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (SecurityException e) {
+            // If the authenticated customer is not authorized to remove this cart item
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
+            // Catch any other unexpected exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false, "Failed to remove item: " + e.getMessage(), null));
         }
     }
-
 
     @PutMapping("/{itemId}")
     public ResponseEntity<ApiResponse<CartItem>> updateCartItemQuantity(
@@ -169,3 +179,6 @@ public class CartController {
         }
     }
 }
+
+
+

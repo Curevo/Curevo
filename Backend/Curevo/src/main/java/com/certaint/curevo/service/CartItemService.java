@@ -60,14 +60,14 @@ public class CartItemService {
         return cartItemRepository.findAllByCustomer(customer);
     }
 
-    public void removeItemFromCart(Customer customer, Long itemId, Long storeId) {
+    public void removeItemFromCart(Customer customer, Long itemId) {
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
 
         if (!cartItem.getCustomer().getCustomerId().equals(customer.getCustomerId())) {
             throw new SecurityException("Unauthorized to remove this cart item: belongs to another customer");
         }
-        
+
         cartItemRepository.delete(cartItem);
     }
 
