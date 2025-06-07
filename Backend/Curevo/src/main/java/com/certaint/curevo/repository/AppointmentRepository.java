@@ -17,5 +17,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     Long countAppointmentsAtTime(Long doctorId, LocalDate date, LocalTime time);
     boolean existsByCustomerCustomerIdAndDoctorDoctorIdAndAppointmentDateAndAppointmentTimeAndStatus(
             Long customerId, Long doctorId, LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatus status);
-
 }

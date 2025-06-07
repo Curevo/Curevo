@@ -1,22 +1,35 @@
-import React from 'react'
-import ProductDetails from '../Components/ProductDetails'
-import Navbar from '../Components/Navbar'
-import HowToUseSection from '../Components/HowToUseSection'
-import FeaturesSection from '../Components/FeaturesSection'
-import ProductGrid from '../Components/products'
-import Footer from '../Components/Footer'
+import React, { useState, useCallback } from 'react';
+import ProductDetails from '../Components/ProductDetails';
+import Navbar from '../Components/Navbar';
+import HowToUseSection from '../Components/HowToUseSection';
+import FeaturesSection from '../Components/FeaturesSection';
+import ProductGrid from '../Components/products';
+import Footer from '../Components/Footer';
 
 const ProductDetailsPage = () => {
+    const [isNavbarCartModalOpen, setIsNavbarCartModalOpen] = useState(false);
+
+    const handleOpenCartModal = useCallback(() => {
+        setIsNavbarCartModalOpen(true);
+    }, []);
+
+    const handleCloseCartModal = useCallback(() => {
+        setIsNavbarCartModalOpen(false);
+    }, []);
+
     return (
         <>
-            <Navbar/>
-            <ProductDetails/>
-            <HowToUseSection/>
-            <FeaturesSection/>
-            <ProductGrid/>
-            <Footer/>
+            <Navbar
+                isCartOpen={isNavbarCartModalOpen}
+                setIsCartOpen={setIsNavbarCartModalOpen}
+            />
+            <ProductDetails onOpenCartModal={handleOpenCartModal} />
+            {/*<HowToUseSection />*/}
+            {/*<FeaturesSection />*/}
+            <ProductGrid />
+            <Footer />
         </>
-    )
-}
+    );
+};
 
-export default ProductDetailsPage
+export default ProductDetailsPage;

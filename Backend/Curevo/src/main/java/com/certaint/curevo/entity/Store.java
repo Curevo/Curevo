@@ -11,11 +11,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "stores")
 public class Store {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long storeId;
 
-    private String storeName;
+    private String name;
 
     private Double latitude;
 

@@ -28,7 +28,7 @@ public class OrderItem {
 
     private Integer quantity;
 
-    private BigDecimal unitPrice;  // Snapshot of the price at time of order
+    private BigDecimal unitPrice;
 
-    private BigDecimal totalPrice; // unitPrice * quantity
+    private BigDecimal totalPrice;
 }

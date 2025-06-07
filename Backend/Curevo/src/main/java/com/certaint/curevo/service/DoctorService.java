@@ -41,6 +41,8 @@ public class DoctorService {
     public Doctor saveDoctor(Doctor doctor, MultipartFile imageFile) {
         User user = doctor.getUser();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.valueOf("DOCTOR"));
+
         User savedUser = userService.saveUser(user);
 
         doctor.setUser(savedUser);
@@ -94,14 +96,9 @@ public class DoctorService {
             if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
                 imageHostingService.deleteImage(oldImageUrl);
             }
-            // Upload the new image and set its URL for the existing doctor.
             String newImageUrl = imageHostingService.uploadImage(imageFile, "doctors");
             existingDoctor.setImage(newImageUrl);
         }
-        // IMPORTANT: If imageFile is null or empty, we do NOT touch existingDoctor.getImage().
-        // It will retain its 'oldImageUrl' value, effectively keeping the current image.
-        // There is no 'else' block here for image handling.
-        // --- End Simplified Image Handling Logic ---
 
 
         if (updatedDoctor.getUser() != null) {

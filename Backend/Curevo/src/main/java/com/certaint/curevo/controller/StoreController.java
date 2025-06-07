@@ -17,7 +17,7 @@ public class StoreController {
     private final StoreService storeService;
 
 
-    @PostMapping("/add")
+    @PostMapping()
     public ResponseEntity<ApiResponse<Store>> createStore(@RequestBody Store store) {
         Store savedStore = storeService.saveStore(store);
         ApiResponse<Store> response = new ApiResponse<>(true, "Store created successfully", savedStore);

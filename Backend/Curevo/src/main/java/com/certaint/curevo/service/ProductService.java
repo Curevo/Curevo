@@ -1,9 +1,12 @@
 package com.certaint.curevo.service;
 
 import com.certaint.curevo.dto.ProductWithDistanceTagDTO;
+import com.certaint.curevo.dto.ProductWithInventoryDTO;
+import com.certaint.curevo.dto.StoreStockDTO;
 import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.entity.Inventory;
 import com.certaint.curevo.entity.Store;
+import com.certaint.curevo.enums.ProductCategory;
 import com.certaint.curevo.repository.ProductRepository;
 import com.certaint.curevo.dto.StoreDistanceInfo;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,19 +31,173 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ImageHostingService imageHostingService;
     private final StoreService storeService;
-    private final InventoryService inventoryService;
+    private final InventoryService inventoryService; // Keep this for direct inventory operations if needed
 
-    public Product saveProduct(Product product, MultipartFile image, MultipartFile hoverImage) {
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = imageHostingService.uploadImage(image, "products");
-            product.setImage(imageUrl);
+    @Transactional
+    public ProductWithInventoryDTO saveOrUpdateProduct(
+            ProductWithInventoryDTO requestDTO,
+            MultipartFile image,
+            MultipartFile hoverImage) throws IOException {
+
+        Product product;
+        if (requestDTO.getProductId() != null) {
+            // This is an update
+            product = productRepository.findById(requestDTO.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found with ID: " + requestDTO.getProductId()));
+
+            // Handle image updates only if new files are provided (as per user's requirement)
+            if (image != null && !image.isEmpty()) {
+                if (product.getImage() != null && !product.getImage().isEmpty()) {
+                    imageHostingService.deleteImage(product.getImage());
+                }
+                String imageUrl = imageHostingService.uploadImage(image, "products");
+                product.setImage(imageUrl);
+            }
+            if (hoverImage != null && !hoverImage.isEmpty()) {
+                if (product.getHoverImage() != null && !product.getHoverImage().isEmpty()) {
+                    imageHostingService.deleteImage(product.getHoverImage());
+                }
+                String hoverImageUrl = imageHostingService.uploadImage(hoverImage, "products");
+                product.setHoverImage(hoverImageUrl);
+            }
+
+        } else {
+            // This is a new product creation
+            product = new Product();
+            // Upload images for new product
+            if (image != null && !image.isEmpty()) {
+                String imageUrl = imageHostingService.uploadImage(image, "products");
+                product.setImage(imageUrl);
+            }
+            if (hoverImage != null && !hoverImage.isEmpty()) {
+                String hoverImageUrl = imageHostingService.uploadImage(hoverImage, "products");
+                product.setHoverImage(hoverImageUrl);
+            }
         }
-        if (hoverImage != null && !hoverImage.isEmpty()) {
-            String imageUrl = imageHostingService.uploadImage(hoverImage, "products");
-            product.setHoverImage(imageUrl);
+
+        // Update basic product details (common for both create and update)
+        product.setName(requestDTO.getName());
+        product.setDescription(requestDTO.getDescription());
+        product.setPrice(requestDTO.getPrice());
+        product.setQuantity(requestDTO.getQuantity());
+        product.setPrescriptionRequired(requestDTO.getPrescriptionRequired());
+        product.setCategory(requestDTO.getCategory());
+
+        // Save the product first to get its ID, crucial for new products
+        Product savedProduct = productRepository.save(product);
+
+
+        if (requestDTO.getInventoryDetails() != null && !requestDTO.getInventoryDetails().isEmpty()) {
+            // If it's an update, we first clear existing inventories to handle deletions
+            // and then add/update based on the DTO. This ensures only specified inventories exist.
+            if (requestDTO.getProductId() != null) {
+                // Clear existing inventories and let orphanRemoval=true handle deletions from DB
+                // Ensure the Product's inventories collection is loaded if FetchType.LAZY
+                // If FetchType.EAGER, it's already loaded.
+                savedProduct.getInventories().clear();
+                productRepository.save(savedProduct); // Persist the change to trigger orphanRemoval
+            }
+
+            for (StoreStockDTO storeStockDTO : requestDTO.getInventoryDetails()) {
+                Store store = storeService.getStoreById(storeStockDTO.getStoreId());
+
+                // Check if an inventory entry already exists for this product and store in the *loaded* collection
+                Optional<Inventory> existingInventoryOptional = savedProduct.getInventories().stream()
+                        .filter(inv -> inv.getStore().getStoreId().equals(store.getStoreId()))
+                        .findFirst();
+
+                Inventory inventory;
+                if (existingInventoryOptional.isPresent()) {
+                    inventory = existingInventoryOptional.get();
+                    inventory.setStock(storeStockDTO.getStock()); // Update existing stock
+                } else {
+                    // Create new inventory entry and add to the product's collection
+                    inventory = new Inventory();
+                    inventory.setProduct(savedProduct); // Set the product side of the relationship
+                    inventory.setStore(store);
+                    inventory.setStock(storeStockDTO.getStock());
+                    savedProduct.getInventories().add(inventory); // Add to the collection
+                }
+                // No need to call inventoryService.saveInventory(inventory) explicitly here if
+                // cascade = CascadeType.ALL or CascadeType.PERSIST is used on the @OneToMany.
+                // The save on savedProduct will handle it.
+            }
+            // Save the product again to persist changes to the inventory collection
+            savedProduct = productRepository.save(savedProduct);
+
+        } else if (requestDTO.getProductId() == null) {
+            // For new products, if no inventoryDetails are provided, create a default initial stock
+            Optional<Store> defaultStoreOptional = storeService.getFirstStoreById();
+            if (defaultStoreOptional.isPresent()) {
+                Inventory initialInventory = new Inventory();
+                initialInventory.setProduct(savedProduct);
+                initialInventory.setStore(defaultStoreOptional.get());
+                initialInventory.setStock(0); // Default to 0 stock if not provided
+                // Add to the product's collection
+                savedProduct.getInventories().add(initialInventory);
+                // Save the product again to persist this new inventory
+                savedProduct = productRepository.save(savedProduct);
+            } else {
+                throw new RuntimeException("Cannot create product without inventory: No inventory details provided and no default store found in the system. Please add at least one store.");
+            }
         }
-        return productRepository.save(product);
+
+
+        // Return the full DTO, including all current inventory details
+        // Now using the product.getInventories() directly
+        return getProductDetailsWithInventory(savedProduct.getProductId());
     }
+
+
+    // --- Helper Method to get DTO from Product Entity ---
+    // This method becomes much simpler by using product.getInventories()
+    private ProductWithInventoryDTO convertProductToDTO(Product product) {
+        // Map Inventory entries to StoreStockDTOs directly from the product's collection
+        List<StoreStockDTO> storeStockDetails = product.getInventories().stream()
+                .map(inventory -> {
+                    Store store = inventory.getStore();
+                    Long storeId = (store != null) ? store.getStoreId() : null;
+                    String storeName = (store != null) ? store.getName() : "Unknown Store";
+                    Integer stock = inventory.getStock();
+                    return new StoreStockDTO(storeId, storeName, stock);
+                })
+                .collect(Collectors.toList());
+
+        return new ProductWithInventoryDTO(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getImage(),
+                product.getHoverImage(),
+                product.getQuantity(),
+                product.getPrescriptionRequired(),
+                product.getCategory(),
+                storeStockDetails
+        );
+    }
+
+
+    @Transactional // Ensure transactional boundary for potential lazy loading of inventories/stores
+    public List<ProductWithInventoryDTO> getAllProductsWithInventory() {
+        // Fetch all products, if inventories are LAZY, they will be loaded when accessed in the stream
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(this::convertProductToDTO) // Use the new helper method
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public ProductWithInventoryDTO getProductDetailsWithInventory(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
+
+        // Inventories are now directly accessible via product.getInventories()
+        return convertProductToDTO(product); // Use the new helper method
+    }
+
 
     public Product updateProduct(Long productId, Product updatedProduct) {
         return productRepository.findById(productId)
@@ -55,10 +214,12 @@ public class ProductService {
                 }).orElseThrow(() -> new RuntimeException("Product not found with id " + productId));
     }
 
+    @Transactional // Ensure this method is transactional for lazy loading if needed
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);
     }
 
+    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
     public Page<ProductWithDistanceTagDTO> getProductsByLocation(double userLat, double userLon, double radiusKm, Pageable pageable) {
         List<StoreDistanceInfo> storeDistances = storeService.getStoresWithDistancesWithinRadius(userLat, userLon, radiusKm);
 
@@ -73,6 +234,9 @@ public class ProductService {
                 .map(StoreDistanceInfo::getStoreId)
                 .collect(Collectors.toList());
 
+        // This still makes sense to use inventoryService as it might have optimized queries
+        // for specific store IDs and pagination. If you're confident in Product.getInventories()
+        // with filtering, you could use that.
         Page<Inventory> inventories = inventoryService.getInventoriesByStoreIds(storeIds, pageable);
 
         List<ProductWithDistanceTagDTO> productWithDistanceTags = inventories.stream()
@@ -87,7 +251,9 @@ public class ProductService {
         return new PageImpl<>(productWithDistanceTags, pageable, inventories.getTotalElements());
     }
 
+    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
     public Page<ProductWithDistanceTagDTO> searchProducts(String keyword, Pageable pageable, Double userLat, Double userLon) {
+        // Fetch products, now Product.getInventories() will be accessible (possibly lazily loaded)
         Page<Product> productsPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
 
         List<ProductWithDistanceTagDTO> dtoList = productsPage.stream()
@@ -97,17 +263,25 @@ public class ProductService {
         return new PageImpl<>(dtoList, pageable, productsPage.getTotalElements());
     }
 
+    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
     public Optional<ProductWithDistanceTagDTO> getProductDetails(Long productId, Long storeId, Double userLat, Double userLon) {
-        Optional<Product> productOpt = productRepository.findById(productId);
-        if (productOpt.isEmpty()) {
+        Product product = productRepository.findById(productId)
+                .orElse(null); // Or throw an exception if product not found
+
+        if (product == null) {
             return Optional.empty();
         }
-        Product product = productOpt.get();
 
         Store store = storeService.getStoreById(storeId);
 
+        if (store == null) {
+            return Optional.empty();
+        }
 
-        Optional<Inventory> inventoryOpt = inventoryService.getInventoryByProductAndStore(product, store);
+        // Find the specific inventory for the product and store from the product's collection
+        Optional<Inventory> inventoryOpt = product.getInventories().stream()
+                .filter(inv -> inv.getStore().getStoreId().equals(storeId))
+                .findFirst();
 
         Integer availableStock = 0;
         if (inventoryOpt.isPresent()) {
@@ -128,8 +302,10 @@ public class ProductService {
         ));
     }
 
-    private ProductWithDistanceTagDTO convertProductToProductWithDistanceTagDTOForSearch(Product product, Double userLat, Double userLon) {
-        List<Inventory> inventories = inventoryService.getInventoriesByProduct(product);
+    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
+    public ProductWithDistanceTagDTO convertProductToProductWithDistanceTagDTOForSearch(Product product, Double userLat, Double userLon) {
+        // Directly use product.getInventories()
+        List<Inventory> inventories = product.getInventories();
 
         Inventory closestInventory = null;
         Double minDistance = Double.MAX_VALUE;
@@ -137,33 +313,39 @@ public class ProductService {
         if (userLat != null && userLon != null) {
             for (Inventory inv : inventories) {
                 Store store = inv.getStore();
-                Double currentDistance = calculateDistance(userLat, userLon, store.getLatitude(), store.getLongitude());
-                if (currentDistance < minDistance) {
-                    minDistance = currentDistance;
-                    closestInventory = inv;
+                // Check for null store just in case, though it should be non-null due to nullable=false
+                if (store != null) {
+                    Double currentDistance = calculateDistance(userLat, userLon, store.getLatitude(), store.getLongitude());
+                    if (currentDistance < minDistance) {
+                        minDistance = currentDistance;
+                        closestInventory = inv;
+                    }
                 }
             }
         } else if (!inventories.isEmpty()) {
             // If no user location, but inventories exist, just pick the first one
-            // This provides *some* store context when location isn't a factor.
             closestInventory = inventories.get(0);
         }
 
         String distanceTag = "N/A";
         Integer availableStock = 0;
-        Store relevantStore = null; // Initialize to null
+        Store relevantStore = null;
 
         if (closestInventory != null) {
-            // If a closest (or arbitrary first) inventory was found
             if (userLat != null && userLon != null && minDistance != Double.MAX_VALUE) {
                 distanceTag = formatDistanceToTag(minDistance);
             }
             availableStock = closestInventory.getStock();
-            relevantStore = closestInventory.getStore(); // Get the store from the found inventory
+            relevantStore = closestInventory.getStore();
         }
-        // If closestInventory is null, relevantStore remains null, availableStock remains 0, distanceTag remains "N/A"
 
         return new ProductWithDistanceTagDTO(product, distanceTag, availableStock, relevantStore);
+    }
+
+    public List<String> getAllProductCategories() {
+        return Arrays.stream(ProductCategory.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
     }
 
     private String formatDistanceToTag(Double distance) {

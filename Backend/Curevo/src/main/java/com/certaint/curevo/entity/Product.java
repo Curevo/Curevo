@@ -2,11 +2,14 @@ package com.certaint.curevo.entity;
 
 
 import com.certaint.curevo.enums.ProductCategory;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -38,9 +41,13 @@ public class Product {
     @Column(nullable = false)
     private ProductCategory category;
 
-//    @ManyToOne
-//    @JoinColumn(name = "store_id", nullable = false)
-//    private Store store;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Inventory> inventories = new ArrayList<>(); // Initialize the list
+
+
+
+
 
 
 }

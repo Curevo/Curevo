@@ -30,8 +30,8 @@ public class Order {
     private Store store;
 
     // Delivery details
-    private String recipientName;         // Name for delivery (can differ from user)
-    private String deliveryInstructions;  // Optional notes
+    private String recipientName;
+    private String deliveryInstructions;
     private String deliveryAddress;
     private Double deliveryLat;
     private Double deliveryLng;

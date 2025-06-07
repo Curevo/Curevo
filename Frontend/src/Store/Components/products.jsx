@@ -201,9 +201,9 @@ export default function ProductGrid() {
                                 {product.availableStock === 0 && <span className="text-red-500 ml-1">(Out of Stock)</span>}
                             </div>
                         )}
-                        {product.store && product.store.storeName && (
+                        {product.store && product.store.name && (
                             <div className="text-xs text-gray-400 mt-1">
-                                From: {product.store.storeName}
+                                From: {product.store.name}
                             </div>
                         )}
                     </div>

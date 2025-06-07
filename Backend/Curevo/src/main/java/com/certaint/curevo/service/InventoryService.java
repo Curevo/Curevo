@@ -63,4 +63,8 @@ public class InventoryService {
     public List<Inventory> getInventoriesByProduct(Product product) {
         return inventoryRepository.findByProduct(product);
     }
+
+    public List<Inventory> getByProduct(Product product) {
+        return inventoryRepository.findByProductWithStore(product);
+    }
 }

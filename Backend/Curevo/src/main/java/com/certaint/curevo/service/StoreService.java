@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.certaint.curevo.entity.Store;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,5 +38,11 @@ public class StoreService {
 
     public List<StoreDistanceInfo> getStoresWithDistancesWithinRadius(double lat, double lon, double radiusKm) {
         return storeRepository.findStoresWithinRadius(lat, lon, radiusKm);
+    }
+    public List<Store> getStoresByIds(List<Long> storeIds) {
+        return storeRepository.findAllById(storeIds);
+    }
+    public Optional<Store> getFirstStoreById(){
+        return storeRepository.findFirstByOrderByStoreIdAsc();
     }
 }

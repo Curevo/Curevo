@@ -1,6 +1,6 @@
 import React from 'react'
 import Sidebar from '../Components/AdminSidebar'
-import ProductDetails from '../Components/ProductDetails'
+import ProductManagement from '../Components/ProductManagement.jsx'
 
 const ProductManageAdmin = () => {
     return (
@@ -12,7 +12,7 @@ const ProductManageAdmin = () => {
 
             {/* Main Content - 80% width */}
             <div className="w-full md:w-4/5">
-                <ProductDetails />
+                <ProductManagement />
             </div>
         </div>
     )

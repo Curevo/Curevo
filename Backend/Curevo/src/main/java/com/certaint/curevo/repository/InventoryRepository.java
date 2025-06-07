@@ -6,6 +6,8 @@ import com.certaint.curevo.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +22,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     // NEW: For getInventoriesByProduct
     List<Inventory> findByProduct(Product product);
+
+
+    @Query("SELECT i FROM Inventory i JOIN FETCH i.store WHERE i.product = :product")
+    List<Inventory> findByProductWithStore(@Param("product") Product product);
+
 }
