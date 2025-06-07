@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter @Setter
@@ -35,15 +37,14 @@ public class Doctor {
     @Column(nullable = false)
     private Specialization specialization;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER
-    )
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<DoctorAvailability> availabilities;
+    private Set<DoctorAvailability> availabilities = new HashSet<>();
 
     @Column(name = "image_url")
     private String image;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
 

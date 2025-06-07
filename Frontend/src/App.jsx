@@ -20,6 +20,7 @@ import AdminLanding from './Admin/Pages/AdminLanding'
 import StoreManageAdmin from './Admin/Pages/StoreManageAdmin'
 import ClinicManageAdmin from './Admin/Pages/ClinicManageAdmin'
 import ProductManageAdmin from './Admin/Pages/ProductManageAdmin'
+import ApMap from './Admin/Pages/ProductManageAdmin'
 
 const App = () => {
   return (

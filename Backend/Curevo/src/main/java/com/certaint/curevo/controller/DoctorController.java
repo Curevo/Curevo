@@ -1,30 +1,28 @@
 package com.certaint.curevo.controller;
 
 import com.certaint.curevo.dto.ApiResponse;
-import com.certaint.curevo.dto.DoctorDTO;
 import com.certaint.curevo.entity.Doctor;
-import com.certaint.curevo.entity.Product;
+import com.certaint.curevo.enums.Specialization;
+import com.certaint.curevo.exception.DoctorNotFoundException;
 import com.certaint.curevo.service.DoctorService;
-import com.cloudinary.Api;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/doctors") // Base URL for all doctor-related APIs
+@RequestMapping("/api/doctors")
+@RequiredArgsConstructor
 public class DoctorController {
 
-    @Autowired
-    private DoctorService doctorService;
+    private final DoctorService doctorService;
 
-    // Create a new doctor
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<Doctor>> createDoctor(@RequestPart Doctor doctor, @RequestPart MultipartFile image) {
         Doctor savedDoctor = doctorService.saveDoctor(doctor,image);
@@ -52,5 +50,46 @@ public class DoctorController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Search completed successfully", results));
     }
 
+    @GetMapping("/get-all")
+    public ResponseEntity<ApiResponse<List<Doctor>>> getAllDoctorsList() {
+        List<Doctor> doctors = doctorService.getAllDoctorsList();
+        return ResponseEntity.ok(new ApiResponse<>(true, "All doctors retrieved successfully", doctors));
+    }
 
+    @GetMapping("/specializations")
+    public ResponseEntity<ApiResponse<List<String>>> getAllSpecializations() {
+        List<String> specializations = doctorService.getAllSpecializationNames();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Specializations retrieved successfully", specializations));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteDoctor(@PathVariable Long id) {
+        try {
+            doctorService.deleteDoctor(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Doctor deleted successfully", "Doctor with ID " + id + " has been removed."));
+        } catch (DoctorNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, ex.getMessage(), null));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "An error occurred while deleting the doctor: " + ex.getMessage(), null));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Doctor>> updateDoctor(
+            @PathVariable Long id,
+            @RequestPart Doctor doctor,
+            @RequestPart(name = "image", required = false) MultipartFile imageFile) {
+        try {
+            Doctor updatedDoctor = doctorService.updateDoctor(id, doctor, imageFile);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Doctor updated successfully", updatedDoctor));
+        } catch (DoctorNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, ex.getMessage(), null));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Failed to update doctor: " + ex.getMessage(), null));
+        }
+    }
 }

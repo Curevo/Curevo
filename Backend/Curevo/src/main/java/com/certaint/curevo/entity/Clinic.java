@@ -16,6 +16,8 @@ public class Clinic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clinicId;
 
+    private String name;
+
     @Column(nullable = false)
     private String address;
 
