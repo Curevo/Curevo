@@ -4,7 +4,7 @@ import { FaArrowLeft, FaCreditCard, FaWallet, FaHospital, FaSpinner } from 'reac
 import { SiNetlify } from 'react-icons/si';
 import { RiNetflixFill } from 'react-icons/ri';
 
-const PaymentGateway = () => {
+const StorePaymentGateway = () => {
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [cartItems, setCartItems] = useState([]);
@@ -76,7 +76,7 @@ const PaymentGateway = () => {
                 <div className="absolute inset-0 bg-blue-600 opacity-70 z-0">
                     <div
                         className="w-full h-full bg-cover rounded-t-[30px] md:rounded-l-[30px] bg-center opacity-20"
-                        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')" }}
+                        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
                     ></div>
                 </div>
                 
@@ -373,4 +373,4 @@ const PaymentGateway = () => {
     );
 };
 
-export default PaymentGateway;
+export default StorePaymentGateway;

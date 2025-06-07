@@ -20,6 +20,7 @@ import AdminLanding from './Admin/Pages/AdminLanding'
 import StoreManageAdmin from './Admin/Pages/StoreManageAdmin'
 import ClinicManageAdmin from './Admin/Pages/ClinicManageAdmin'
 import ProductManageAdmin from './Admin/Pages/ProductManageAdmin'
+import StorePaymentGateway from './Store/Pages/StorePaymentGateway'
 
 const App = () => {
   return (
@@ -40,7 +41,8 @@ const App = () => {
         <Route path="/otp" element={<VerifyOTP />} />
         <Route path="/dtp" element={<DoctorPreview />} />
         <Route path="/appointments/:doctorId" element={<Appointments />} />
-        <Route path="/Payment" element={<PaymentGateway />} />
+        <Route path="/payment" element={<PaymentGateway />} />
+        <Route path="/store/payment" element={<StorePaymentGateway />} />
         <Route path="/admin/home" element={<AdminLanding/>} />
         <Route path="/admin/products" element={<ProductManageAdmin/>} />
         <Route path="/admin/store" element={<StoreManageAdmin/>} />
