@@ -1,13 +1,41 @@
-import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import { Menu, X, ArrowUpRight} from 'lucide-react';
+import { UserIcon } from '@heroicons/react/24/solid';
+import { useAxiosInstance } from '@/Config/axiosConfig.js';
 
 export default function NavbarHome() {
+    const axios = useAxiosInstance();
     const [menuOpen, setMenuOpen] = useState(false);
     const [animate, setAnimate] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // Example: Manage login state (replace with actual auth logic)
-    // eslint-disable-next-line no-unused-vars
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    useEffect(() => {
+        const checkAuthStatusWithBackend = async () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                setIsLoggedIn(false);
+                return;
+            }
+
+            try {
+                const response = await axios.get('/api/auth/check-status');
+                if (response.status === 200) {
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                    localStorage.removeItem('token');
+                }
+            } catch (error) {
+                console.error("Backend authentication check failed:", error);
+                setIsLoggedIn(false);
+                localStorage.removeItem('token');
+            }
+        };
+
+        checkAuthStatusWithBackend();
+
+    }, [axios]);
 
     return (
         <header className="bg-[#f3f9ff] top-0 z-50 font-sans">
@@ -33,24 +61,6 @@ export default function NavbarHome() {
                 <a href="/about">About us</a>
                 <a href="/contact">Contact</a>
 
-                {/* Conditional Buttons (only if not logged in) */}
-                {!isLoggedIn && (
-                <>
-                    <button
-                    onClick={() => (window.location.href = '/signup')}
-                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
-                    >
-                    Sign Up
-                    </button>
-                    <button
-                    onClick={() => (window.location.href = '/login')}
-                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
-                    >
-                    Login
-                    </button>
-                </>
-                )}
-
                 {/* Make Appointment Button */}
                 <button
                 onClick={() => (window.location.href = '/appointments')}
@@ -65,6 +75,38 @@ export default function NavbarHome() {
                     </div>
                 </div>
                 </button>
+
+                {/* Conditional Buttons (only if not logged in) */}
+                {!isLoggedIn ? (
+                <>
+                    <button
+                    onClick={() => (window.location.href = '/signup')}
+                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
+                    >
+                    Sign Up
+                    </button>
+                    <button
+                    onClick={() => (window.location.href = '/login')}
+                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
+                    >
+                    Login
+                    </button>
+                </>
+                ): (
+                    // Show Profile Icon when logged in
+                    <div className="relative"> {/* Use relative for potential dropdown positioning */}
+                <button
+                    onClick={() => console.log("Profile icon clicked!")} // Placeholder for profile menu logic
+                    className="text-black hover:text-gray-700 transition"
+                    aria-label="User Profile"
+                >
+                    <UserIcon className="h-8 w-8" />
+                </button>
+                {/* You would add your dropdown menu here, conditionally rendered */}
+            </div>
+            )}
+
+
             </nav>
 
             {/* Mobile Menu Toggle */}

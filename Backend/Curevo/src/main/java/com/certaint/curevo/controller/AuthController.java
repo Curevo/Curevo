@@ -51,6 +51,10 @@ public class AuthController {
                     .body(new ApiResponse<>(false, "Login failed due to an internal error", null));
         }
     }
+    @GetMapping("/check-status")
+    public ResponseEntity<ApiResponse<String>> checkAuthStatus() {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Authenticated", "Token is valid"));
+    }
 
 
 }
