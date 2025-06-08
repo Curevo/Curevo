@@ -15,7 +15,7 @@ const ContactFormSection = () => {
             {/* Left: Image */}
             <div className="w-full lg:w-1/2">
             <img
-                src="/src/assets/contact1.jpg" // Replace with your image path
+                src="/Assets/contact1.jpg" // Replace with your image path
                 alt="Doctor"
                 className="rounded-lg w-full h-auto object-cover shadow"
             />

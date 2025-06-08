@@ -58,7 +58,7 @@ const Sidebar = () => {
             <div className="flex flex-col justify-center">
             {/* Mobile Close Button */}
             <div className="flex justify-between items-center mb-8 md:hidden">
-                <img src="/Curevo-logo.png" alt="Logo" className="h-10" />
+                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" />
                 <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-500 hover:text-red-500"
@@ -69,7 +69,7 @@ const Sidebar = () => {
 
             {/* Desktop Logo */}
             <div className="hidden md:block text-2xl font-bold text-blue-600 mb-10">
-                <img src="/Curevo-logo.png" alt="Logo" className="h-10" />
+                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" />
             </div>
 
             {/* Navigation Items */}

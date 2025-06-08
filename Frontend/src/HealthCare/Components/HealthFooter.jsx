@@ -24,7 +24,7 @@ const HealthFooter = () => {
                 <div className="flex-1 w-full">
                 <div className="rounded overflow-hidden mb-4">
                     <img
-                    src="/src/assets/about3.jpg"
+                    src="/Assets/HealthFooter.jpg"
                     alt="doctor"
                     className="w-full h-full object-cover rounded"
                     />

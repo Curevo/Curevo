@@ -2,11 +2,12 @@ import React from 'react'
 import NavbarHome from '../Components/NavbarHome'
 import AboutHero from '../components/about/AboutHero'
 import WhyChooseUs from '../components/about/WhyChooseUs'
-import StatsSection from '../components/StatsSection'
 import AboutServices from '../components/about/AboutServices'
-import HealthFooter from '../components/Healthfooter'
+import HealthFooter from '../Components/HealthFooter'
 import FooterHome from '../Components/FooterHome'
 import DoctorsPreview from '../Components/Doctors/DoctorsPreview'
+import StatsSection from '../Components/StatsSection'
+
 
 
 const About = () => {

@@ -38,7 +38,7 @@ const AboutServices = () => {
             {/* Image */}
             <div className="w-full lg:w-1/2">
             <img
-                src="/src/assets/AboutServices1.jpg"
+                src="/Assets/AboutServices1.jpg"
                 alt="Doctor examining a patient"
                 className="w-full rounded-xl object-cover"
             />

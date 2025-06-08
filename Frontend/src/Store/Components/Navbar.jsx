@@ -1,5 +1,4 @@
 // Navbar.jsx (The relevant parts for endpoint calls are unchanged, as they are already correct)
-
 import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import {useAxiosInstance} from "@/Config/axiosConfig.js";
@@ -136,16 +135,10 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                 </div>
 
                 <ul className="hidden md:flex gap-6 text-gray-700 font-medium">
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/store")}>Home</li>
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/product")}>Shop</li>
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "../Pages/ProductStore.jsx")}>About</li>
-                    <li className="relative group cursor-pointer">
-                        <span className="hover:text-blue-500 transition-colors duration-200">Pages</span>
-                        <div className="absolute top-6 left-0 w-28 p-2 bg-white border rounded shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200">
-                            <p className="cursor-pointer text-sm hover:text-blue-500 transition-colors duration-200">Page 1</p>
-                            <p className="cursor-pointer text-sm hover:text-blue-500 transition-colors duration-200">Page 2</p>
-                        </div>
-                    </li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/store/home")}>Home</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/store/products")}>Shop</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/about")}>About</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/contact")}>Contact</li>  
                 </ul>
 
                 <div className="flex items-center gap-4">
@@ -219,7 +212,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
 
                     <Menu
                         className="w-6 h-6 text-gray-700 cursor-pointer md:hidden hover:text-blue-500 transition-colors duration-200"
-                        onClick={() => setMobileMenuMenuOpen(!isMobileMenuMenuOpen)}
+                        onClick={() => setMobileMenuMenuOpen(!isMobileMenuOpen)}
                     />
                 </div>
 
@@ -233,13 +226,13 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                         <ul className="flex flex-col items-start gap-4 p-4 text-gray-700 font-medium">
                             <li
                                 className="text-blue-800 cursor-pointer hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/")}
+                                onClick={() => (window.location.href = "/store/home")}
                             >
                                 Home
                             </li>
                             <li
                                 className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/product")}
+                                onClick={() => (window.location.href = "/store/products")}
                             >
                                 Shop
                             </li>
@@ -249,14 +242,11 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                             >
                                 About
                             </li>
-                            <li>
-                                <details className="w-full">
-                                    <summary className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200">Pages</summary>
-                                    <div className="pl-4 pt-4 flex flex-col gap-1 text-sm">
-                                        <p className="cursor-pointer hover:text-blue-800 mb-2 transition-colors duration-200">Page 1</p>
-                                        <p className="cursor-pointer hover:text-blue-800 mb-2 transition-colors duration-200">Page 2</p>
-                                    </div>
-                                </details>
+                            <li
+                                className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200"
+                                onClick={() => (window.location.href = "/contact")}
+                            >
+                                Contact
                             </li>
                         </ul>
                     </div>

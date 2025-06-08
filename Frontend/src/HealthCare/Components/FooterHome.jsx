@@ -8,7 +8,7 @@ const FooterHome = () => {
             {/* Logo + Description */}
             <div className="md:col-span-1">
                 <div className="flex items-center gap-2 mb-3">
-                    <img src="/src/assets/Curevo-logo.png" alt="vaxet logo" className="h-8 w-auto" />
+                    <img src="/Assets/Curevo-logo.png" alt="Curevo logo" className="h-8 w-auto" />
                 </div>
                 <p className="text-gray-600">
                     Curevo is designed to bridge the gap between
@@ -31,14 +31,13 @@ const FooterHome = () => {
 
             {/* Column 2 - Services (again, second group) */}
             <div>
-            <h3 className="font-semibold mb-3">Services</h3>
+            <h3 className="font-semibold mb-3">Navigation</h3>
             <ul className="space-y-2 text-gray-600">
-                <li>About us</li>
-                <li>Services</li>
-                <li>Blogs</li>
-                <li>Doctors</li>
-                <li>Appointment</li>
-                <li>Contact us</li>
+                <a href="/store/home"><li>Store</li></a>
+                <a href="/doctors"><li>Doctors</li></a>
+                <a href="/about"><li>About Us</li></a>
+                <a href="/doctors"><li>Appointment</li></a>
+                <a href="/contact"><li>Contact us</li></a>
             </ul>
             </div>
 
@@ -46,10 +45,10 @@ const FooterHome = () => {
             <div>
             <h3 className="font-semibold mb-3">Resources</h3>
             <ul className="space-y-2 text-gray-600">
-                <li>Privacy Policy</li>
-                <li>Terms & Conditions</li>
-                <li>Licensing</li>
-                <li>Changelog</li>
+                <a href="/terms"><li>Terms & Conditions</li></a>
+                <a href="/policies"><li>Privacy Policy</li></a>
+                <a href="/licenses"><li>Licensing</li></a>
+                <a href="/services"><li>Services</li></a>
             </ul>
             </div>
 

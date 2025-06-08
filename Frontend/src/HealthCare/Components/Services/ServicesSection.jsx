@@ -7,42 +7,42 @@ const services = [
         subtitle: "Chronic Pain Relief",
         description:
         "Therapy Services are designed to enhance recovery and improve quality of life.",
-        image: "/src/Assets/6789e3a9bc6f1dc6f9bb8258_service-thumb-06.jpg",
+        image: "/Assets/physicaltherapy.jpg",
     },
     {
         title: "Diagnostic Excellence",
         subtitle: "Health Screening",
         description:
         "A commitment to excellence, we ensure accurate insights to guide effective treatment plans.",
-        image: "/images/diagnostic.jpg",
+        image: "/Assets/Diagnostic.jpg",
     },
     {
         title: "Radiation Oncology",
         subtitle: "Cancer Specialists",
         description:
         "Combining cutting-edge technology with expert care, we ensure precise treatment tailored.",
-        image: "/images/radiation.jpg",
+        image: "/Assets/Radiology.jpg",
     },
     {
         title: "Pharmacy",
         subtitle: "Medication Supply",
         description:
         "It’s provides a wide range of quality medications to support your treatment plan.",
-        image: "/images/pharmacy.jpg",
+        image: "/Assets/Pharmacy.jpg",
     },
     {
         title: "Operation Theater",
         subtitle: "Precision Surgery",
         description:
         "With advanced equipment and a skilled surgical team, we provide precision care for all procedures.",
-        image: "/images/operation.jpg",
+        image: "/Assets/Operationtheater.jpg",
     },
     {
         title: "Emergency Care",
         subtitle: "Immediate Attention",
         description:
         "We ensure prompt attention and compassionate support when you need it the most.",
-        image: "/images/emergency.jpg",
+        image: "/Assets/Emergencycare.jpg",
     },
     ];
 

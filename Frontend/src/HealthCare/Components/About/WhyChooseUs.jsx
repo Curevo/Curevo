@@ -33,7 +33,7 @@ const WhyChooseUs = () => {
             {/* Image */}
             <div className="flex-1 rounded-xl overflow-hidden shadow-sm">
                 <img
-                src="https://images.pexels.com/photos/7088534/pexels-photo-7088534.jpeg"
+                src="/Assets/AboutChoosing.jpg"
                 alt="Doctor consultation"
                 className="w-full h-auto object-cover"
                 />

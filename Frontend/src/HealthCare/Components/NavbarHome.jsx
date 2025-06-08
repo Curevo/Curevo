@@ -55,7 +55,7 @@ export default function NavbarHome() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6 text-black font-medium">
-                <a href="/store">Store</a>
+                <a href="/store/home">Store</a>
                 <a href="/services">Services</a>
                 <a href="/doctors">Doctors</a>
                 <a href="/about">About us</a>
@@ -121,7 +121,7 @@ export default function NavbarHome() {
         {/* Mobile Menu */}
         {menuOpen && (
             <div className="md:hidden bg-white px-6 py-4 space-y-4 text-center border-t">
-            <a href="/store" className="block">Store</a>
+            <a href="/store/home" className="block">Store</a>
             <a href="/services" className="block">Services</a>
             <a href="/doctors" className="block">Doctors</a>
             <a href="/about" className="block">About Us</a>

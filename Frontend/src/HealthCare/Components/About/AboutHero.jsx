@@ -19,7 +19,7 @@ return (
             {/* Main Image */}
             <div className="rounded-lg overflow-hidden mb-8">
             <img
-                src="/src/assets/about1.jpg"
+                src="/Assets/about1.jpg"
                 alt="Healthcare team in operation"
                 className="w-full object-cover max-h-[500px]"
             />
@@ -30,7 +30,7 @@ return (
             {/* Card 1 */}
                 <div className="relative rounded overflow-hidden">
                     <img
-                    src="/src/assets/about2.jpg"
+                    src="/Assets/about2.jpg"
                     alt="First aid kit"
                     className="w-full h-52 object-cover"
                     />
@@ -44,7 +44,7 @@ return (
             {/* Card 2 */}
             <div className="relative rounded overflow-hidden">
                 <img
-                src="/src/assets/about3.jpg"
+                src="/Assets/about3.jpg"
                 alt="Doctors in discussion"
                 className="w-full h-52 object-cover"
                 />
@@ -54,7 +54,7 @@ return (
             {/* Card 3 */}
             <div className="relative rounded overflow-hidden">
                 <img
-                src="/src/assets/about4.jpg"
+                src="/Assets/about4.jpg"
                 alt="Patient-centric care"
                 className="w-full h-52 object-cover"
                 />

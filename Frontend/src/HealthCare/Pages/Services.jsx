@@ -1,7 +1,7 @@
 import React from 'react'
 import NavbarHome from '../Components/NavbarHome'
 import ServicesSection from '../Components/Services/ServicesSection'
-import HealthFooter from '../components/Healthfooter'
+import HealthFooter from '../Components/HealthFooter'
 import FooterHome from '../Components/FooterHome'
 
 

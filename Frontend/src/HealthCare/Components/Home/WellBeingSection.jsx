@@ -10,7 +10,7 @@ const WellBeingSection = () => {
             {/* Left Image */}
             <div>
             <img
-                src="/src/assets/678dd906aac271d1741c21cd_about (1).jpg" // Replace with your image path
+                src="/Assets/wellbeingsection.jpg" // Replace with your image path
                 alt="Healthcare professional consulting patient"
                 className="rounded-xl w-full object-cover"
             />
@@ -48,17 +48,17 @@ const WellBeingSection = () => {
                 {/* Features */}
                 <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-6">
                     <div className="flex flex-col items-start text-sm">
-                        <img src="/src/assets/678ddce8dfe722c9cbd05e8b_tf-1.svg" alt="Expert Doctors" className="w-auto h-12 mb-2" />
+                        <img src="/Assets/tf-1.svg" alt="Expert Doctors" className="w-auto h-12 mb-2" />
                         <p className="font-semibold text-gray-800">Expert Doctors</p>
                         <p className="text-gray-600">Your health journey with expert.</p>
                     </div>
                     <div className="flex flex-col items-start text-sm">
-                        <img src="/src/assets/678ddce82e6bce024fc41b50_tf-2.svg" alt="Emergency Care" className="w-auto h-12 mb-2" />
+                        <img src="/Assets/tf-2.svg" alt="Emergency Care" className="w-auto h-12 mb-2" />
                         <p className="font-semibold text-gray-800">Emergency Care</p>
                         <p className="text-gray-600">Proven Experts for Consultation</p>
                     </div>
                     <div className="flex flex-col items-start text-sm">
-                        <img src="/src/assets/678ddce8d11a64d21cfba86a_tf-3.svg" alt="Request Appointment" className="w-auto h-12 mb-2" />
+                        <img src="/Assets/tf-3.svg" alt="Request Appointment" className="w-auto h-12 mb-2" />
                         <p className="font-semibold text-gray-800">Request Appointment</p>
                         <p className="text-gray-600">Schedule Your Visit</p>
                     </div>
