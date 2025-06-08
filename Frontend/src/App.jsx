@@ -22,6 +22,7 @@ import ClinicManageAdmin from './Admin/Pages/ClinicManageAdmin'
 import ProductManageAdmin from './Admin/Pages/ProductManageAdmin'
 import ApMap from './Admin/Pages/ProductManageAdmin'
 import StorePaymentGateway from './Store/Pages/StorePaymentGateway'
+import AppointmentManageAdmin from './Admin/Pages/AppointmentManageAdmin'
 
 const App = () => {
   return (
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/admin/products" element={<ProductManageAdmin/>} />
         <Route path="/admin/store" element={<StoreManageAdmin/>} />
         <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
+        <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
       </Routes>
   );
 };

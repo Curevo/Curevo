@@ -21,7 +21,6 @@ const Sidebar = () => {
     const navItems = [
         { icon: <UserPen size={20} />, label: "Doctor Profiles", path: "/admin/home" },
         { icon: <Pill size={20} />, label: "Products", path: "/admin/products" },
-        { icon: <Mails size={20} />, label: "Newsletters", path: "/admin/newsletters" },
         { icon: <CalendarHeart size={20} />, label: "Appointments", path: "/admin/appointments" },
         { icon: <Store size={20} />, label: "Store Management", path: "/admin/store" },
         { icon: <Hospital size={20} />, label: "Clinic Management", path: "/admin/clinics" },
