@@ -20,11 +20,11 @@ import AdminLanding from './Admin/Pages/AdminLanding'
 import StoreManageAdmin from './Admin/Pages/StoreManageAdmin'
 import ClinicManageAdmin from './Admin/Pages/ClinicManageAdmin'
 import ProductManageAdmin from './Admin/Pages/ProductManageAdmin'
-import ApMap from './Admin/Pages/ProductManageAdmin'
 import StorePaymentGateway from './Store/Pages/StorePaymentGateway'
 import AppointmentManageAdmin from './Admin/Pages/AppointmentManageAdmin'
 
 const App = () => {
+
   return (
       <Routes>
         <Route path="/" element={<Home />} />
@@ -41,9 +41,10 @@ const App = () => {
         <Route path="/product/:productId/store/:storeId" element={<ProductDetailsPage />} />
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/otp" element={<VerifyOTP />} />
-        <Route path="/dtp" element={<DoctorPreview />} />
+          <Route path="/doctor/:doctorId" element={<DoctorPreview />} />
         <Route path="/appointments/:doctorId" element={<Appointments />} />
-        <Route path="/payment" element={<PaymentGateway />} />
+          <Route path="/payment/appointment/:appointmentId" element={<PaymentGateway />} />
+          <Route path="/payment/store/:orderId" element={<StorePaymentGateway />} />
         <Route path="/store/payment" element={<StorePaymentGateway />} />
         <Route path="/admin/home" element={<AdminLanding/>} />
         <Route path="/admin/products" element={<ProductManageAdmin/>} />
@@ -52,6 +53,7 @@ const App = () => {
         <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
       </Routes>
   );
+
 };
 
 export default App;

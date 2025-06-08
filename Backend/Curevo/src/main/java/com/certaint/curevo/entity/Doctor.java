@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,8 @@ public class Doctor {
     @Column(name = "name")
     private String name;
 
+    private BigDecimal fee;
+
     @Column(name = "qualification")
     private String qualification;
 
@@ -47,5 +50,6 @@ public class Doctor {
     @ManyToOne
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
+
 
 }

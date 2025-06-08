@@ -79,8 +79,6 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
         setCartLoading(true);
         setCartError(null);
         try {
-            // Sends PUT /api/cart/{itemId} with { quantity: newQuantity, storeId: storeId } in the body
-            // This perfectly matches the new @PutMapping("/{itemId}") in CartController.java
             await axios.put(`/api/cart/${itemId}`, { quantity: newQuantity, storeId: storeId });
             fetchCartItems();
             window.dispatchEvent(new CustomEvent('cartUpdated'));

@@ -161,4 +161,6 @@ public class DoctorService {
                 .map(Enum::name)
                 .collect(Collectors.toList());
     }
+
+
 }

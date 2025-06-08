@@ -1,157 +1,88 @@
-import { useEffect, useState } from "react";
-import {useAxiosInstance} from '@/Config/axiosConfig.js';
+import { useState, useEffect } from 'react';
+import { useAxiosInstance } from '@/Config/axiosConfig.js';
+import {
+    addMonths,
+    format,
+    startOfDay,
+    isAfter,
+    getDay,
+    addDays,
+    isSameDay
+} from 'date-fns';
 
-function useDoctorAvailability(doctorId, weeksToShow = 3) {
+const useDoctorAvailability = (doctorId) => {
     const axios = useAxiosInstance();
-    const [availabilityDays, setAvailabilityDays] = useState([]);
-    const [availabilityTimes, setAvailabilityTimes] = useState({});
-    const [availableDates, setAvailableDates] = useState([]);
-    const [availableSlotsPerDate, setAvailableSlotsPerDate] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    const [doctorDetails, setDoctorDetails] = useState(null); // Stores the full doctor object
+    const [availabilityTimes, setAvailabilityTimes] = useState({}); // Mapping of DAY -> { time, maxAppointments }
+    const [availableSlotsPerDate, setAvailableSlotsPerDate] = useState({}); // Mapping of "YYYY-MM-DD" -> { time, maxAppointments }
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!doctorId) return;
-
-        setIsLoading(true);
-        setError(null);
-
-        axios
-            .get(`/api/doctors/availability/${doctorId}`)
-            .then((response) => {
+        const fetchDoctorData = async () => {
+            try {
+                setIsLoading(true);
+                const response = await axios.get(`/api/doctors/${doctorId}`);
                 const data = response.data.data;
-                if (!data || !Array.isArray(data)) {
-                    throw new Error("Invalid data format received");
-                }
+                setDoctorDetails(data); // Set the full doctor details
 
-                // Simplified: map each day to a single time and maxAppointments
-                const availabilityByDay = {};
-                console.log(data);
-
-                data.forEach(({ day, time, maxAppointments }) => {
-                    const dayUpper = day.toUpperCase();
-                    availabilityByDay[dayUpper] = {
-                        time: time || null,
-                        maxAppointments: maxAppointments || 0,
-                    };
-                });
-
-                setAvailabilityTimes(availabilityByDay);
-
-                // Extract available days (e.g., ['MONDAY', 'TUESDAY'])
-                const days = Object.keys(availabilityByDay);
-                setAvailabilityDays(days);
-
-                // Get all upcoming dates matching these weekdays
-                const dates = getAvailableDatesFromDays(days, weeksToShow);
-                setAvailableDates(dates);
-
-                // Map each date (YYYY-MM-DD) to its slot info using weekday lookup
-                const mappedSlots = {};
-                dates.forEach((dateStr) => {
-                    const date = new Date(dateStr);
-                    const weekday = date.toLocaleDateString("en-US", { weekday: "long",timeZone:"Asia/Kolkata"}).toUpperCase();
-                    const availability = availabilityByDay[weekday];
-                    if (availability) {
-                        mappedSlots[dateStr] = {
-                            time: availability.time,
-                            maxAppointments: availability.maxAppointments,
+                // Process availabilities into an easier-to-use map (Day of week -> { time, maxAppointments })
+                const processedAvailabilities = {};
+                data.availabilities.forEach(avail => {
+                    if (avail.day) {
+                        processedAvailabilities[avail.day.toUpperCase()] = {
+                            time: avail.time,
+                            // Ensure maxAppointments is treated as 0 if null or undefined
+                            maxAppointments: avail.maxAppointments ?? 0
                         };
-                    } else {
-                        console.warn("No availability found for weekday:", weekday);
                     }
                 });
+                setAvailabilityTimes(processedAvailabilities);
 
+                // Generate available slots for specific future dates
+                const today = startOfDay(new Date());
+                const twoMonthsFromNow = addMonths(today, 2); // Generate for roughly 2 months from today (including current month)
+                const generatedSlots = {};
 
-                setAvailableSlotsPerDate(mappedSlots);
+                let currentDate = today;
+                while (isAfter(twoMonthsFromNow, currentDate) || isSameDay(twoMonthsFromNow, currentDate)) {
+                    const dayName = format(currentDate, 'EEEE').toUpperCase(); // e.g., "WEDNESDAY"
+                    const doctorDayAvailability = processedAvailabilities[dayName];
+                    const dateStr = format(currentDate, 'yyyy-MM-dd');
 
-            })
-            .catch((error) => {
-                console.error("Error fetching doctor availability:", error);
-                setError(error.message);
-            })
-            .finally(() => {
+                    // Crucial Change Here:
+                    // ONLY add an entry to generatedSlots if the doctor has a defined availability record for this day.
+                    // If no record (doctorDayAvailability is undefined), `availableSlotsPerDate[dateStr]`
+                    // will correctly be `undefined`, which the calendar can interpret as "Not Available".
+                    if (doctorDayAvailability) {
+                        generatedSlots[dateStr] = {
+                            time: doctorDayAvailability.time,
+                            maxAppointments: doctorDayAvailability.maxAppointments,
+                            dayOfWeek: getDay(currentDate) // Add dayOfWeek for potential future use
+                        };
+                    }
+
+                    // Move to the next day
+                    currentDate = addDays(currentDate, 1);
+                }
+
+                setAvailableSlotsPerDate(generatedSlots);
+
+            } catch (err) {
+                console.error("Failed to fetch doctor availability:", err);
+                setError(err.response?.data?.message || "Could not load doctor availability.");
+            } finally {
                 setIsLoading(false);
-            });
-    }, [doctorId] );
+            }
+        };
 
-    useEffect(() => {
-        console.log("Available Dates", availableDates);
-    }, [availableDates]);
-
-    useEffect(() => {
-        console.log("Available Days", availabilityDays);
-    }, [availabilityDays]);
-    useEffect(() => {
-        console.log("Available Times", availabilityTimes);
-    }, [availabilityTimes]);
-    useEffect(() => {
-        console.log("Available Slots", availableSlotsPerDate);
-    }, [availableSlotsPerDate]);
-
-
-    return {
-        availabilityDays,
-        availabilityTimes,
-        availableDates,
-        availableSlotsPerDate,
-        isLoading,
-        error,
-    };
-}
-
-function getAvailableDatesFromDays(availabilityDays, weeksToShow = 3) {
-    const dayToNumber = {
-        SUNDAY: 0,
-        MONDAY: 1,
-        TUESDAY: 2,
-        WEDNESDAY: 3,
-        THURSDAY: 4,
-        FRIDAY: 5,
-        SATURDAY: 6,
-    };
-
-    const today = new Date();
-    const availableDates = [];
-
-    for (let i = 0; i < weeksToShow * 7; i++) {
-        const futureDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i); // 🛡️ local time
-        const weekday = futureDate.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase(); // local weekday
-
-        if (availabilityDays.includes(weekday)) {
-            const yyyy = futureDate.getFullYear();
-            const mm = String(futureDate.getMonth() + 1).padStart(2, '0');
-            const dd = String(futureDate.getDate()).padStart(2, '0');
-            const dateStr = `${yyyy}-${mm}-${dd}`;
-
-            availableDates.push(dateStr);
+        if (doctorId) {
+            fetchDoctorData();
         }
-    }
+    }, [doctorId, axios]);
 
-    return availableDates;
-}
-
-
-function calculateSlotsForDates(availableDates, slotsPerDayAndTime) {
-    const slotsPerDate = {};
-
-    availableDates.forEach((date) => {
-        const dayName = new Date(date).toLocaleString("en-US", {
-            weekday: "long",
-        });
-        const slotKeys = Object.keys(slotsPerDayAndTime).filter((key) =>
-            key.startsWith(dayName)
-        );
-
-        const slotsForDate = slotKeys.reduce(
-            (sum, key) => sum + slotsPerDayAndTime[key],
-            0
-        );
-
-        slotsPerDate[date] = slotsForDate;
-    });
-
-    return slotsPerDate;
-}
+    // Removed `availableDates` from return as it's not directly used by Calendar's coloring logic.
+    return { doctorDetails, availabilityTimes, availableSlotsPerDate, isLoading, error };
+};
 
 export default useDoctorAvailability;

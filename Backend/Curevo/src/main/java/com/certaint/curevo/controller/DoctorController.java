@@ -92,4 +92,18 @@ public class DoctorController {
                     .body(new ApiResponse<>(false, "Failed to update doctor: " + ex.getMessage(), null));
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Doctor>> getDoctorById(@PathVariable Long id) {
+        try {
+            Doctor doctor = doctorService.getDoctorById(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Doctor retrieved successfully", doctor));
+        } catch (DoctorNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, ex.getMessage(), null));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Failed to retrieve doctor: " + ex.getMessage(), null));
+        }
+    }
 }

@@ -18,4 +18,8 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
 
     Optional<DoctorAvailability> findByDoctorDoctorIdAndDayAndTime(Long doctorId, String day, LocalTime time);
 
+    List<DoctorAvailability> findByDoctorAndDay(Doctor doctor, String day);
+
+    Optional<DoctorAvailability> findByDoctorAndDayAndTime(Doctor doctor, String day, java.time.LocalTime time);
 }
+

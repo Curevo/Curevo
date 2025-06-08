@@ -27,4 +27,6 @@ public class Customer {
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+
 }

@@ -1,13 +1,17 @@
 package com.certaint.curevo.service;
 
-import com.certaint.curevo.entity.*;
+import com.certaint.curevo.entity.Appointment;
+import com.certaint.curevo.entity.Customer;
+import com.certaint.curevo.entity.Doctor;
 import com.certaint.curevo.enums.AppointmentStatus;
 import com.certaint.curevo.repository.AppointmentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,45 +25,79 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorService doctorService;
     private final CustomerService customerService;
+    private final PaymentService paymentService;
 
-    public DoctorAvailability getAvailability(Long doctorId, String requestedDay, LocalTime requestedTime) {
-
-        DoctorAvailability availability = doctorAvailabilityService.getAvailabilityForSlot(
-                doctorId,
-                requestedDay,
-                requestedTime
-        );
-
-        return availability;
+    public List<LocalTime> getAvailableSlots(Long doctorId, LocalDate requestedDate) {
+        return doctorAvailabilityService.getAvailableSlotsForDoctorAndDate(doctorId, requestedDate);
     }
 
+    public List<Appointment> getAppointmentsByDoctorAndDate(Long doctorId, LocalDate date) {
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        if (doctor == null) {
+            throw new EntityNotFoundException("Doctor not found with ID: " + doctorId);
+        }
+        return appointmentRepository.findByDoctorAndAppointmentDate(doctor, date);
+    }
 
     @Transactional
     public Appointment bookAppointment(Appointment appointment, MultipartFile prescriptionFile) {
-        Long customerId = appointment.getCustomer().getCustomerId();
         Long doctorId = appointment.getDoctor().getDoctorId();
         LocalDate date = appointment.getAppointmentDate();
         LocalTime time = appointment.getAppointmentTime();
-        boolean exists = appointmentRepository.existsByCustomerCustomerIdAndDoctorDoctorIdAndAppointmentDateAndAppointmentTimeAndStatus(
-                customerId, doctorId, date, time, AppointmentStatus.BOOKED
+
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        if (doctor == null) {
+            throw new EntityNotFoundException("Doctor not found with ID: " + doctorId);
+        }
+        appointment.setDoctor(doctor);
+
+        Customer customer = null;
+        if (appointment.getCustomer() != null && appointment.getCustomer().getCustomerId() != null) {
+            customer = customerService.getCustomerById(appointment.getCustomer().getCustomerId());
+            if (customer == null) {
+                throw new EntityNotFoundException("Customer not found with ID: " + appointment.getCustomer().getCustomerId());
+            }
+            appointment.setCustomer(customer);
+        } else {
+            if (appointment.getName() == null || appointment.getName().trim().isEmpty() ||
+                    appointment.getPhone() == null || appointment.getPhone().trim().isEmpty()) {
+                throw new IllegalArgumentException("Customer details (name, phone) are required for non-registered bookings.");
+            }
+        }
+
+        List<LocalTime> availableSlots = doctorAvailabilityService.getAvailableSlotsForDoctorAndDate(doctorId, date);
+        if (!availableSlots.contains(time)) {
+            throw new IllegalArgumentException("Requested appointment time " + time + " is not available for doctor " + doctor.getName() + " on " + date);
+        }
+
+        boolean exists = appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(
+                doctor,
+                appointment.getAppointmentDate(),
+                appointment.getAppointmentTime(),
+                List.of(AppointmentStatus.PENDING_PAYMENT, AppointmentStatus.BOOKED, AppointmentStatus.COMPLETED)
         );
 
         if (exists) {
-            throw new IllegalStateException("You already have an appointment booked for this time slot.");
+            throw new IllegalStateException("This time slot is no longer available.");
         }
-        // Fetch and attach managed Doctor entity
-        Doctor doctor = doctorService.getDoctorById(doctorId);;
-        System.out.println("Doctor: " + doctor);
-        appointment.setDoctor(doctor);
 
+        appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
 
-        // Fetch and attach managed User entity
-        Customer customer = customerService.getCustomerById(customerId);
-        System.out.println("Customer: " + customer);
-        appointment.setCustomer(customer);
+        BigDecimal baseAmount = doctor.getFee();
+        if (baseAmount == null) {
+            baseAmount = BigDecimal.ZERO;
+        }
+        appointment.setBaseAmount(baseAmount);
 
+        // REMOVED: serviceCharge is not present in Appointment entity
+        // BigDecimal serviceCharge = new BigDecimal("50.00");
 
-        // Upload prescription image if present
+        BigDecimal extraCharge = new BigDecimal("25.00");
+        appointment.setExtraCharge(extraCharge);
+
+        // Note: totalAmount calculation now occurs within the Appointment entity via @PrePersist/@PreUpdate.
+        // That method in Appointment.java MUST be updated to remove the reference to 'serviceCharge'.
+
         if (prescriptionFile != null && !prescriptionFile.isEmpty()) {
             String prescriptionImageUrl = imageHostingService.uploadImage(prescriptionFile, "prescriptions");
             appointment.setPrescription(prescriptionImageUrl);
@@ -67,14 +105,29 @@ public class AppointmentService {
             appointment.setPrescription(null);
         }
 
-        // Save appointment to DB
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        paymentService.initializePaymentForAppointment(savedAppointment, savedAppointment.getTotalAmount());
+
+        return savedAppointment;
     }
 
-    public List<Appointment> getAllAppointments()
-    {
+    public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
 
+    public List<Appointment> getAppointmentsByCustomer(Customer customer) {
+        return appointmentRepository.findByCustomer(customer);
+    }
 
+    public Appointment getAppointmentByIdAndCustomer(Long appointmentId, Customer customer) {
+        return appointmentRepository.getAppointmentByIdAndCustomer(appointmentId, customer);
+    }
+
+    public Appointment updateAppointmentStatus(Long appointmentId, AppointmentStatus newStatus) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found with ID: " + appointmentId));
+        appointment.setStatus(newStatus);
+        return appointmentRepository.save(appointment);
+    }
 }
