@@ -41,62 +41,43 @@ public class AppointmentService {
 
     @Transactional
     public Appointment bookAppointment(Appointment appointment, MultipartFile prescriptionFile) {
-        Long doctorId = appointment.getDoctor().getDoctorId();
-        LocalDate date = appointment.getAppointmentDate();
-        LocalTime time = appointment.getAppointmentTime();
+        Long doctorId = appointment.getDoctor().getDoctorId(); // Use getDoctorId() as per instruction
 
         Doctor doctor = doctorService.getDoctorById(doctorId);
         if (doctor == null) {
             throw new EntityNotFoundException("Doctor not found with ID: " + doctorId);
         }
-        appointment.setDoctor(doctor);
+        appointment.setDoctor(doctor); // Attach managed Doctor entity
 
-        Customer customer = null;
-        if (appointment.getCustomer() != null && appointment.getCustomer().getCustomerId() != null) {
-            customer = customerService.getCustomerById(appointment.getCustomer().getCustomerId());
-            if (customer == null) {
-                throw new EntityNotFoundException("Customer not found with ID: " + appointment.getCustomer().getCustomerId());
+        Customer customerFromAppointment = appointment.getCustomer();
+        if (customerFromAppointment != null && customerFromAppointment.getCustomerId() != null) { // Use getCustomerId()
+            Customer managedCustomer = customerService.getCustomerById(customerFromAppointment.getCustomerId()); // Use getCustomerId()
+            if (managedCustomer == null) {
+                throw new EntityNotFoundException("Authenticated customer not found in database.");
             }
-            appointment.setCustomer(customer);
+            appointment.setCustomer(managedCustomer); // Set the managed Customer entity back to the appointment
         } else {
+            // For non-registered/walk-in users, basic details (name, phone) must be provided
             if (appointment.getName() == null || appointment.getName().trim().isEmpty() ||
                     appointment.getPhone() == null || appointment.getPhone().trim().isEmpty()) {
                 throw new IllegalArgumentException("Customer details (name, phone) are required for non-registered bookings.");
             }
+            // If no customer ID, customer remains null, and name/age/phone from appointment will be used.
         }
 
-        List<LocalTime> availableSlots = doctorAvailabilityService.getAvailableSlotsForDoctorAndDate(doctorId, date);
-        if (!availableSlots.contains(time)) {
-            throw new IllegalArgumentException("Requested appointment time " + time + " is not available for doctor " + doctor.getName() + " on " + date);
-        }
 
-        boolean exists = appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(
-                doctor,
-                appointment.getAppointmentDate(),
-                appointment.getAppointmentTime(),
-                List.of(AppointmentStatus.PENDING_PAYMENT, AppointmentStatus.BOOKED, AppointmentStatus.COMPLETED)
-        );
 
-        if (exists) {
-            throw new IllegalStateException("This time slot is no longer available.");
-        }
-
-        appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
-
-        BigDecimal baseAmount = doctor.getFee();
+        BigDecimal baseAmount = doctor.getFee(); // Use doctor.getFee() as per instruction
         if (baseAmount == null) {
             baseAmount = BigDecimal.ZERO;
         }
         appointment.setBaseAmount(baseAmount);
 
-        // REMOVED: serviceCharge is not present in Appointment entity
-        // BigDecimal serviceCharge = new BigDecimal("50.00");
 
         BigDecimal extraCharge = new BigDecimal("25.00");
         appointment.setExtraCharge(extraCharge);
+        appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
 
-        // Note: totalAmount calculation now occurs within the Appointment entity via @PrePersist/@PreUpdate.
-        // That method in Appointment.java MUST be updated to remove the reference to 'serviceCharge'.
 
         if (prescriptionFile != null && !prescriptionFile.isEmpty()) {
             String prescriptionImageUrl = imageHostingService.uploadImage(prescriptionFile, "prescriptions");
@@ -107,10 +88,12 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
+        // Initialize payment with the calculated total amount from the saved appointment
         paymentService.initializePaymentForAppointment(savedAppointment, savedAppointment.getTotalAmount());
 
         return savedAppointment;
     }
+
 
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();

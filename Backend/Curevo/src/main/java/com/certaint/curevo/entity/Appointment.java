@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.certaint.curevo.enums.AppointmentStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
@@ -65,6 +65,7 @@ public class Appointment {
 
     @Column(nullable = true)
     private String prescription;
+
 
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference("appointment-payment") 

@@ -31,10 +31,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
 
     List<Appointment> findByDoctorAndAppointmentDate(Doctor doctor, LocalDate appointmentDate);
 
-    boolean existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(Doctor doctor, LocalDate appointmentDate, LocalTime appointmentTime, List<AppointmentStatus> statuses);
 
-    List<Appointment> findByDoctorAndAppointmentDateAndStatusIn(Doctor doctor, LocalDate appointmentDate, List<AppointmentStatus> statuses);
-
-    // This method (or similar) is used in DoctorAvailabilityService for date range availability if implemented.
-    List<Appointment> findByDoctorAndAppointmentDateBetweenAndStatusIn(Doctor doctor, LocalDate startDate, LocalDate endDate, List<AppointmentStatus> statuses);
+    List<Appointment> findByDoctorAndAppointmentDateAndStatusIn(Doctor doctor, LocalDate date, List<AppointmentStatus> pendingPayment);
 }
