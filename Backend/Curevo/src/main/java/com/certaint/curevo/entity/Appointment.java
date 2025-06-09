@@ -32,11 +32,11 @@ public class Appointment {
     @Column(nullable = true)
     private String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
@@ -66,10 +66,6 @@ public class Appointment {
     @Column(nullable = true)
     private String prescription;
 
-
-    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("appointment-payment") 
-    private Payment payment;
 
     @PrePersist
     @PreUpdate

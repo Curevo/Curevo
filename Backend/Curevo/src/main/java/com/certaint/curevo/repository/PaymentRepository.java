@@ -1,5 +1,6 @@
 package com.certaint.curevo.repository;
 
+import com.certaint.curevo.entity.Appointment;
 import com.certaint.curevo.entity.Payment;
 import com.certaint.curevo.enums.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +13,7 @@ import java.util.Optional;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
 
-    List<Payment> findByAppointmentId(Long appointmentId);
+    Payment findByAppointmentId(Long appointmentId);
 
     List<Payment> findByOrderId(Long orderId);
 
@@ -22,4 +23,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByIdAndOrderId(Long paymentId, Long orderId);
 
+    Payment getPaymentByAppointment(Appointment appointment);
 }

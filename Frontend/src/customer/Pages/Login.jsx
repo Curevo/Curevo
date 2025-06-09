@@ -30,7 +30,7 @@ export default function Login() {
                 localStorage.setItem("role", decodedToken.role);
 
                 if (decodedToken.role === "ADMIN") {
-                    navigate("/admin-dashboard");
+                    navigate("/admin/home");
                 } else if (decodedToken.role === "DOCTOR") {
                     navigate("/doctor-dashboard");
                 } else if (decodedToken.role === "CUSTOMER") {
@@ -88,10 +88,6 @@ export default function Login() {
                 Log in
             </button>
 
-            {/* <div className="flex items-center justify-between mt-4 gap-2">
-                <button className="flex-1 bg-white text-black py-2 rounded-md shadow">Google</button>
-                <button className="flex-1 bg-white text-black py-2 rounded-md shadow">Apple</button>
-            </div> */}
 
             <div className="text-center text-sm mt-6">
                 Don’t have an account?{" "}

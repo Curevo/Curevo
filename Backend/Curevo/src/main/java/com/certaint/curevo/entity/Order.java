@@ -42,8 +42,6 @@ public class Order {
 
     // Payment
     private BigDecimal totalAmount;
-    private String paymentMethod;
-    private Boolean isPaid;
 
     // Status
     @Enumerated(EnumType.STRING)

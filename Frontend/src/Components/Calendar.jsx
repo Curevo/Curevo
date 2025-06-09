@@ -16,7 +16,6 @@ import {
 } from "date-fns";
 
 const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
-    // console.log("Calendar Component: availableSlotsPerDate received:", availableSlotsPerDate); // Keep for initial debugging if needed
 
     const today = new Date();
     const navigationMonthLimit = addMonths(today, 2);
@@ -102,7 +101,7 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                         textColorClass = "text-white";
                         borderColorClass = "border-red-500";
                         cursorClass = "cursor-not-allowed";
-                        slotIndicator = <span className="text-xs font-medium">Fully Booked</span>;
+                        // slotIndicator = <span className="text-xs font-medium">Fully Booked</span>;
                         isInteractive = false;
                     } else if (slotsAvailable > 0 && slotsAvailable < 4) {
                         bgColorClass = "bg-orange-400 hover:brightness-110";
@@ -110,14 +109,14 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                         borderColorClass = "border-orange-500";
                         cursorClass = "cursor-pointer";
                         isInteractive = true;
-                        slotIndicator = <span className="text-xs font-medium">{slotsAvailable} Slots</span>;
+                        // slotIndicator = <span className="text-xs font-medium">{slotsAvailable} Slots</span>;
                     } else { // slotsAvailable >= 4 (Green)
                         bgColorClass = "bg-green-500 hover:brightness-110";
                         textColorClass = "text-white";
                         borderColorClass = "border-green-600";
                         cursorClass = "cursor-pointer";
                         isInteractive = true;
-                        slotIndicator = <span className="text-xs font-medium">{slotsAvailable} Slots</span>;
+                        // slotIndicator = <span className="text-xs font-medium">{slotsAvailable} Slots</span>;
                     }
                 }
 
@@ -127,7 +126,7 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                 }
 
             } else {
-                // Dates from other months (padding days): transparent background, no interaction
+
                 bgColorClass = "bg-transparent"; // Make background transparent
                 textColorClass = "text-gray-400"; // Keep text grey for padding days
                 borderColorClass = "border-transparent"; // Transparent border
@@ -136,7 +135,6 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                 isInteractive = false;
             }
 
-            // Combine all determined dynamic classes
             dynamicClasses += ` ${bgColorClass} ${textColorClass} ${borderColorClass} ${cursorClass}`;
 
 
@@ -145,15 +143,14 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                 dynamicClasses += " ring-2 ring-blue-600 ring-offset-2";
             }
 
-            // console.log("  Final cellClasses for this date:", dynamicClasses); // Keep for final verification
-            // console.groupEnd();
+
 
             return (
                 <div
                     key={dateStr}
-                    // Only allow selection if the cell is interactive
+
                     onClick={() => isInteractive && onSelect(dateStr)}
-                    className={dynamicClasses} // Use the directly constructed string
+                    className={dynamicClasses}
                 >
                     {content}
                     {/* Display slot indicator only for dates within the current month */}
@@ -173,7 +170,7 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
             <div className="flex justify-between items-center py-3 px-2 border-b mb-3">
                 <button
                     onClick={handlePrevMonth}
-                    // Disable previous button if it's the current month (can't go further back)
+
                     disabled={isSameMonth(currentMonth, startOfMonth(today))}
                     className="px-4 py-2 bg-gray-200 text-sm rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -184,7 +181,7 @@ const Calendar = ({ availableSlotsPerDate, selectedDate, onSelect }) => {
                 </h2>
                 <button
                     onClick={handleNextMonth}
-                    // Disable next button if it reaches the lookahead limit
+
                     disabled={isSameMonth(currentMonth, startOfMonth(navigationMonthLimit))}
                     className="px-4 py-2 bg-gray-200 text-sm rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

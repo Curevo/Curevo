@@ -50,15 +50,12 @@ const useDoctorAvailability = (doctorId) => {
                     const doctorDayAvailability = processedAvailabilities[dayName];
                     const dateStr = format(currentDate, 'yyyy-MM-dd');
 
-                    // Crucial Change Here:
-                    // ONLY add an entry to generatedSlots if the doctor has a defined availability record for this day.
-                    // If no record (doctorDayAvailability is undefined), `availableSlotsPerDate[dateStr]`
-                    // will correctly be `undefined`, which the calendar can interpret as "Not Available".
+
                     if (doctorDayAvailability) {
                         generatedSlots[dateStr] = {
                             time: doctorDayAvailability.time,
                             maxAppointments: doctorDayAvailability.maxAppointments,
-                            dayOfWeek: getDay(currentDate) // Add dayOfWeek for potential future use
+                            dayOfWeek: getDay(currentDate)
                         };
                     }
 

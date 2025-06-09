@@ -67,15 +67,17 @@ public class AppointmentService {
 
 
 
-        BigDecimal baseAmount = doctor.getFee(); // Use doctor.getFee() as per instruction
+        BigDecimal baseAmount = doctor.getFee();
         if (baseAmount == null) {
             baseAmount = BigDecimal.ZERO;
         }
         appointment.setBaseAmount(baseAmount);
 
 
-        BigDecimal extraCharge = new BigDecimal("25.00");
+        BigDecimal extraCharge = new BigDecimal("10.00");
+        BigDecimal serviceCharge = new BigDecimal("30.00");
         appointment.setExtraCharge(extraCharge);
+        appointment.setServiceCharge(serviceCharge);
         appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
 
 
@@ -113,4 +115,27 @@ public class AppointmentService {
         appointment.setStatus(newStatus);
         return appointmentRepository.save(appointment);
     }
+    @Transactional
+    public Appointment updateAppointment(Long appointmentId, Appointment updatedAppointment) {
+        Appointment existingAppointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found with ID: " + appointmentId));
+
+        // Update relevant fields
+        existingAppointment.setName(updatedAppointment.getName());
+        existingAppointment.setAge(updatedAppointment.getAge());
+        existingAppointment.setPhone(updatedAppointment.getPhone());
+        existingAppointment.setAppointmentDate(updatedAppointment.getAppointmentDate());
+        existingAppointment.setAppointmentTime(updatedAppointment.getAppointmentTime());
+        existingAppointment.setStatus(updatedAppointment.getStatus());
+        existingAppointment.setBaseAmount(updatedAppointment.getBaseAmount());
+        existingAppointment.setServiceCharge(updatedAppointment.getServiceCharge());
+        existingAppointment.setExtraCharge(updatedAppointment.getExtraCharge());
+        existingAppointment.setPrescription(updatedAppointment.getPrescription());
+
+
+        existingAppointment.calculateTotalAmount();
+
+        return appointmentRepository.save(existingAppointment);
+    }
+
 }
