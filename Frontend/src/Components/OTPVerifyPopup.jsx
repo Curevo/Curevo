@@ -37,11 +37,10 @@ const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com'}) => {
         });
 
 
-        if (response.data === true) {
-            alert('OTP Verified!');
+        if (response.data.data === true) {
             navigate('/');
         } else {
-            alert('Invalid OTP. Try again.');
+            alert(response.data.message);
         }
 
     } catch (error) {

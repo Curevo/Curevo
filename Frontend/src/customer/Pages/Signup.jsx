@@ -56,7 +56,7 @@ export default function Signup() {
             setUserEmail(formData.email); // Set the dynamic email
             setOtpPopupOpen(true); // Show OTP popup
         } catch (error) {
-            console.error(error);
+            console.error(error.response?.data?.message || "Failed to create account. Please try again.");
             alert("Failed to create account. Please try again.");
         }
 

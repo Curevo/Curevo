@@ -22,20 +22,20 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // saveUser handles both creation and update, ensuring email/phone uniqueness
+
     @Transactional
     public User saveUser(User user) {
-        // Scenario 1: New User Creation (user.getId() is null)
+
         if (user.getId() == null) {
             if (userRepository.findByEmail(user.getEmail()).isPresent()) {
                 throw new DuplicateResourceException("Email '" + user.getEmail() + "' is already taken.");
             }
-            if (userRepository.findByPhone(user.getPhone()).isPresent()) {
-                throw new DuplicateResourceException("Phone number '" + user.getPhone() + "' is already taken.");
-            }
-            return userRepository.save(user); // Performs INSERT
+//            if (userRepository.findByPhone(user.getPhone()).isPresent()) {
+//                throw new DuplicateResourceException("Phone number '" + user.getPhone() + "' is already taken.");
+//            }
+            return userRepository.save(user);
         }
-        // Scenario 2: Existing User Update (user.getId() is not null)
+
         else {
             User existingUser = userRepository.findById(user.getId())
                     .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
@@ -56,11 +56,8 @@ public class UserService implements UserDetailsService {
                 }
             }
 
-            // Update allowed fields on the existing (managed) entity
             existingUser.setEmail(user.getEmail());
             existingUser.setPhone(user.getPhone());
-            // Password update is handled separately in DoctorService if it's coming from Doctor update form.
-            // If the user object here already has an encoded password, it will be saved.
 
             return userRepository.save(existingUser); // Performs UPDATE
         }
