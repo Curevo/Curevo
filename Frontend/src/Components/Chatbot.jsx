@@ -9,7 +9,6 @@ const Chatbot = () => {
     const [isTyping, setIsTyping] = useState(false);
     const chatEndRef = useRef(null);
 
-    // Scroll to the latest message
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);

@@ -44,4 +44,9 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("add/admin")
+    public ResponseEntity<User> createAdminUser(@RequestBody User user) {
+        User savedUser = userService.createAdminUser(user);
+        return ResponseEntity.ok(savedUser);
+    }
 }

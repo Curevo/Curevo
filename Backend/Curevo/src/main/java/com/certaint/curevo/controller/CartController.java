@@ -28,8 +28,7 @@ public class CartController {
     private final CustomerService customerService;
     private final JwtService jwtService;
 
-    // DTO for updating cart item quantity (can be in a separate DTO package/file)
-    // Example: com.certaint.curevo.dto.UpdateCartItemRequest.java
+
     public record UpdateCartItemRequest(int quantity, Long storeId) {}
 
     @PostMapping("/add")
@@ -134,7 +133,6 @@ public class CartController {
         }
 
         try {
-            // Call the service method with only customer and cartItemId
             cartItemService.removeItemFromCart(customer.get(), cartItemId);
 
             return ResponseEntity.ok(new ApiResponse<>(true, "Item removed from cart successfully", null));

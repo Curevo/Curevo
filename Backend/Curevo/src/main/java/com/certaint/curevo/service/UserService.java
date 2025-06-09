@@ -1,6 +1,7 @@
 package com.certaint.curevo.service;
 
 import com.certaint.curevo.entity.User;
+import com.certaint.curevo.enums.Role;
 import com.certaint.curevo.exception.DuplicateResourceException;
 import com.certaint.curevo.exception.UserNotFoundException;
 import com.certaint.curevo.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -33,6 +36,7 @@ public class UserService implements UserDetailsService {
 //            if (userRepository.findByPhone(user.getPhone()).isPresent()) {
 //                throw new DuplicateResourceException("Phone number '" + user.getPhone() + "' is already taken.");
 //            }
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(user);
         }
 
@@ -91,5 +95,14 @@ public class UserService implements UserDetailsService {
     }
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public User createAdminUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("Email '" + user.getEmail() + "' is already taken.");
+        }
+        user.setRole(Role.ADMIN);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 import Navbar from '../Components/Navbar'
 import Hero from '../Components/Hero'
 import ProductGrid from '../Components/products'
@@ -10,10 +10,22 @@ import ChatbotLauncher from '../../Components/ChatbotLauncher'
 
 
 const HomeStore = () => {
+    const [isNavbarCartModalOpen, setIsNavbarCartModalOpen] = useState(false);
+
+    const handleOpenCartModal = useCallback(() => {
+        setIsNavbarCartModalOpen(true);
+    }, []);
+
+    const handleCloseCartModal = useCallback(() => {
+        setIsNavbarCartModalOpen(false);
+    }, []);
     return (
         <>
             <ChatbotLauncher/>
-            <Navbar/>
+            <Navbar
+                isCartOpen={isNavbarCartModalOpen}
+                setIsCartOpen={setIsNavbarCartModalOpen}
+            />
             <Hero/>
             <ProductGrid/>
             <CareSection/>

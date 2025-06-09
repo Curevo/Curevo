@@ -9,7 +9,7 @@ export function useAxiosInstance() {
         console.log("Creating new Axios instance. Location context available:", !!locationContext);
         const instance = axios.create({
             baseURL: import.meta.env.VITE_BACKEND_URL || 'https://api.example.com/v1', // Provide a fallback for safety
-            timeout: 15000, // Overall request timeout
+            timeout: 60000, // Overall request timeout
         });
 
         instance.interceptors.request.use(async (config) => {

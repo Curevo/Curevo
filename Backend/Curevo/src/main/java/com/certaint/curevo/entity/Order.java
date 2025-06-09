@@ -2,12 +2,14 @@ package com.certaint.curevo.entity;
 
 
 import com.certaint.curevo.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +33,8 @@ public class Order {
 
     // Delivery details
     private String recipientName;
+    private String recipientPhone;
+    private String recipientEmail;
     private String deliveryInstructions;
     private String deliveryAddress;
     private Double deliveryLat;
@@ -46,6 +50,10 @@ public class Order {
     // Status
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<OrderItem> orderItems;
 
     // Timestamps
     private Instant placedAt;

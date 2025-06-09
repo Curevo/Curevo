@@ -132,4 +132,10 @@ public class CartItemService {
         cartItem.setAddedAt(Instant.now());
         return cartItemRepository.save(cartItem);
     }
+
+
+    public void clearCartForCustomer(Customer customer) {
+        cartItemRepository.deleteAllByCustomer(customer);
+    }
+
 }
