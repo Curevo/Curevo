@@ -25,6 +25,7 @@ import AppointmentManageAdmin from './Admin/Pages/AppointmentManageAdmin'
 import TermsAndConditions from './Components/TermsAndConditions'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import Licenses from './Components/Licenses'
+// import DeliveryDashboard from './DeliveryExecutive/DeliveryDashboard'
 
 const App = () => {
 
@@ -42,22 +43,36 @@ const App = () => {
         <Route path="/store/home" element={<HomeStore />} />
         <Route path="/store/products" element={<ProductStore />} />
         <Route path="/product/:productId/store/:storeId" element={<ProductDetailsPage />} />
+
+
+
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/otp" element={<VerifyOTP />} />
         <Route path="/doctor/:doctorId" element={<DoctorPreview />} />
         <Route path="/appointments/:doctorId" element={<Appointments />} />
+
+
+
         <Route path="/payment/appointment/:appointmentId" element={<PaymentGateway />} />
         <Route path="/payment/store/:orderId" element={<StorePaymentGateway />} />
         <Route path="/store/payment" element={<StorePaymentGateway />} />
+
+
+
         <Route path="/admin/home" element={<AdminLanding/>} />
         <Route path="/admin/products" element={<ProductManageAdmin/>} />
         <Route path="/admin/store" element={<StoreManageAdmin/>} />
         <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
         <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
+
+
+
         <Route path="/terms" element={<TermsAndConditions/>} />
         <Route path="/policies" element={<PrivacyPolicy/>} />
         <Route path="/licenses" element={<Licenses/>} />
 
+
+        {/* <Route path="/executive" element={<DeliveryDashboard />} /> */}
       </Routes>
   );
 

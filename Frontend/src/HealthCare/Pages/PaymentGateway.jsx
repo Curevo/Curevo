@@ -161,18 +161,18 @@ const PaymentGateway = () => {
                             </div>
                             <div className="flex justify-between border-b border-blue-400 pb-2">
                                 <span>Base Consultation Fee</span>
-                                <span>${baseAmount.toFixed(2)}</span>
+                                <span>₹{baseAmount.toFixed(2)}</span>
                             </div>
                             {extraCharge > 0 && (
                                 <div className="flex justify-between border-b border-blue-400 pb-2">
                                     <span>Extra Charge</span>
-                                    <span>${extraCharge.toFixed(2)}</span>
+                                    <span>₹{extraCharge.toFixed(2)}</span>
                                 </div>
                             )}
                             {serviceCharge > 0 && (
                                 <div className="flex justify-between border-b border-blue-400 pb-2">
                                     <span>Service Charge</span> {/* Changed from "Service" to "Service Charge" for clarity */}
-                                    <span>${serviceCharge.toFixed(2)}</span>
+                                    <span>₹{serviceCharge.toFixed(2)}</span>
                                 </div>
                             )}
                         </div>
@@ -180,15 +180,15 @@ const PaymentGateway = () => {
                         <div className="space-y-2 mb-8">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>${subtotalDisplay.toFixed(2)}</span>
+                                <span>₹{subtotalDisplay.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Tax</span>
-                                <span>${taxDisplay.toFixed(2)}</span>
+                                <span>₹{taxDisplay.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-lg font-bold">
                                 <span>Total Amount</span>
-                                <span>${totalAmount.toFixed(2)}</span>
+                                <span>₹{totalAmount.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
@@ -203,7 +203,7 @@ const PaymentGateway = () => {
                                 onChange={(e) => setAgreeTerms(e.target.checked)}
                             />
                             <span className="text-sm">
-                                I agree to the <a href="#" className="underline">Terms and Conditions</a> and <a href="#" className="underline">Privacy Policy</a>
+                                I agree to the <a href="/terms" className="underline">Terms and Conditions</a> and <a href="/policies" className="underline">Privacy Policy</a>
                             </span>
                         </label>
                     </div>
