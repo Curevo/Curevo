@@ -83,10 +83,7 @@ const CartButton = ({ productId, storeId, onGoToCart }) => {
         }
     };
 
-    /**
-     * Handles decreasing the quantity of the product in the cart.
-     * Updates 'inCart' and 'quantity' states based on the API response.
-     */
+
     const handleDecreaseQuantity = async () => {
         setLoading(true); // Start loading for decrease operation
         try {
@@ -114,9 +111,7 @@ const CartButton = ({ productId, storeId, onGoToCart }) => {
         }
     };
 
-    /**
-     * Calls the 'onGoToCart' callback to navigate to the cart.
-     */
+
     const handleGoToCart = () => {
         if (onGoToCart) {
             onGoToCart();

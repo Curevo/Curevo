@@ -1,5 +1,6 @@
 package com.certaint.curevo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,13 +17,12 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Link to the Order
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
-    // Link to the Product (if you have a Product entity)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -31,4 +31,10 @@ public class OrderItem {
     private BigDecimal unitPrice;
 
     private BigDecimal totalPrice;
+
+    @PrePersist
+    @PreUpdate
+    public void calculateTotalAmount() {
+        this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+    }
 }

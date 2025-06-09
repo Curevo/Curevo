@@ -358,7 +358,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                             <span>Total</span>
                                             <span>${cartSummary.subtotal.toFixed(2)}</span>
                                         </div>
-                                        <button
+                                        <button onClick={() => (window.location.href = "/orderDetails")}
                                             className="w-full py-2 sm:py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base transition-colors duration-200 hover:shadow-md"
                                         >
                                             Proceed to Checkout

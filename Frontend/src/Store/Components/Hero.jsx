@@ -14,7 +14,7 @@ const Hero = () => {
             <p className="mt-4 text-sm md:text-base text-gray-900 font-semibold ">
                 Personalized treatments made with Rx ingredients and supplements.
             </p>
-            <button className="mt-6 px-5 py-2 md:px-6 md:py-3 bg-white text-black rounded-full shadow-md hover:shadow-lg transition">
+            <button className="mt-6 px-5 py-2 md:px-6 md:py-3 bg-white text-black rounded-full shadow-md hover:shadow-lg transition" onClick={() => window.location.href = '/store/products'}>
                 Shop now
             </button>
             </div>

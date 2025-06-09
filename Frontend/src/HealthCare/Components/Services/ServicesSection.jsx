@@ -48,7 +48,7 @@ const services = [
 
     const ServicesSection = () => {
     return (
-        <section className="bg-[#f3f9fd] py-16 px-4 md:px-12">
+        <section className="bg-[white] py-16 px-4 md:px-12">
         <div className="max-w-7xl mx-auto">
             {/* Heading */}
             <div className="mb-10">
@@ -76,18 +76,19 @@ const services = [
             {services.map((service, index) => (
                 <div
                 key={index}
-                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex "
+                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex flex-row md:flex-row"
+                onClick={() => window.location.href = "/contact"}
                 >
-                <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-[30%] h-48 object-cover"
-                />
-                <div className="p-4">
-                    <p className="text-xs text-gray-500 mb-1">{service.subtitle}</p>
-                    <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                    <p className="text-sm text-gray-600">{service.description}</p>
-                </div>
+                    <img
+                        src={service.image}
+                        alt={service.title}
+                        className="w-48 h-auto object-cover"
+                    />
+                    <div className="p-4">
+                        <p className="text-xs text-gray-500 mb-1">{service.subtitle}</p>
+                        <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
+                        <p className="text-sm text-gray-600">{service.description}</p>
+                    </div>
                 </div>
             ))}
             </div>

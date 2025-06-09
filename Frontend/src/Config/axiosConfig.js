@@ -9,7 +9,7 @@ export function useAxiosInstance() {
         console.log("Creating new Axios instance. Location context available:", !!locationContext);
         const instance = axios.create({
             baseURL: import.meta.env.VITE_BACKEND_URL || 'https://api.example.com/v1', // Provide a fallback for safety
-            timeout: 15000, // Overall request timeout
+            timeout: 60000, // Overall request timeout
         });
 
         instance.interceptors.request.use(async (config) => {
@@ -21,12 +21,10 @@ export function useAxiosInstance() {
 
             let effectiveLocation = locationContext?.location;
 
-            // Check if location context is available and if we need to wait
             if (!effectiveLocation && locationContext && locationContext.isLoading) {
                 console.log("Axios Interceptor: Location not immediately available, context is loading. Waiting...");
                 try {
-                    // Timeout for waiting for the location within the interceptor
-                    const locationFetchTimeoutDuration = 7000; // 7 seconds
+                    const locationFetchTimeoutDuration = 7000;
 
                     effectiveLocation = await Promise.race([
                         locationContext.getAsyncLocation(),
@@ -37,7 +35,7 @@ export function useAxiosInstance() {
                     console.log("Axios Interceptor: Location obtained after waiting:", effectiveLocation);
                 } catch (locError) {
                     console.warn("Axios Interceptor: Failed to obtain location while waiting or timed out.", locError.message);
-                    effectiveLocation = null; // Ensure effectiveLocation is null if fetching failed
+                    effectiveLocation = null;
                 }
             } else if (!effectiveLocation && locationContext && locationContext.error) {
                 console.warn("Axios Interceptor: Location fetching previously failed with error:", locationContext.error.message);
@@ -52,14 +50,9 @@ export function useAxiosInstance() {
                 console.log("Axios Interceptor: Location headers added.", { lat: effectiveLocation.latitude, lon: effectiveLocation.longitude });
             } else {
                 console.warn("Axios Interceptor: Location not available or invalid. Proceeding without location headers.");
-                // OPTIONAL: Decide if request should be cancelled if location is critical
-                // e.g., if (isLocationCriticalForThisRequest(config)) {
-                //    throw new axios.Cancel(`Critical location data missing for ${config.url}`);
-                // }
             }
             return config;
         }, (error) => {
-            // Handle errors from the request interceptor setup itself (less common)
             console.error("Axios Interceptor: Error in request interceptor setup", error);
             return Promise.reject(error);
         });
@@ -72,9 +65,7 @@ export function useAxiosInstance() {
                 } else if (error.response?.status === 401 || error.response?.status === 403) {
                     console.warn("Axios Interceptor: Auth error, redirecting to login.");
                     localStorage.removeItem('token');
-                    // Consider using React Router's navigation methods if available
-                    // For example, if using react-router: history.push('/login');
-                    if (typeof window !== 'undefined') { // Ensure window is available (not in SSR without window)
+                    if (typeof window !== 'undefined') {
                         window.location.href = '/login';
                     }
                 }

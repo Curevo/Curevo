@@ -19,26 +19,25 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrementing primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private BigDecimal amount; // Use BigDecimal for currency to avoid precision issues
+    private BigDecimal amount;
 
 
-    @Enumerated(EnumType.STRING) // Specifies that the Enum should be stored as a String in the database
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private PaymentStatus status; // Using the PaymentStatus Enum
+    private PaymentStatus status;
 
     @Column(length = 50)
-    private String method; // E.g., "CREDIT_CARD", "UPI", "NET_BANKING", "CASH"
+    private String method;
 
-    @OneToOne(fetch = FetchType.EAGER) // Consider LAZY if Appointment/Order details aren't always needed with Payment
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "appointment_id", nullable = true)
-    @JsonBackReference("appointment-payment") // Prevents infinite recursion during serialization
     private Appointment appointment;
 
-    @OneToOne(fetch = FetchType.EAGER) // Consider LAZY if Appointment/Order details aren't always needed with Payment
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = true)
     private Order order;
 
@@ -48,7 +47,6 @@ public class Payment {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Lifecycle callbacks to set createdAt and updatedAt timestamps automatically
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

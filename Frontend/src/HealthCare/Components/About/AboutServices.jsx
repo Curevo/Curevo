@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 const AboutServices = () => {
     const [animate, setAnimate] = useState(false);
     return (
-        <section className="bg-[#f3f9fc] py-16 px-6">
+        <section className="bg-[white] py-16 px-6">
         <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-10">
             {/* Text Content */}
             <div className="w-full lg:w-1/2 text-center lg:text-left">
@@ -21,7 +21,7 @@ const AboutServices = () => {
                 confidence and clarity.
             </p>
                 <button
-                    onClick={() => (window.location.href = "/contact")}
+                    onClick={() => (window.location.href = "/doctors")}
                     onMouseEnter={() => setAnimate(true)}
                     onAnimationEnd={() => setAnimate(false)}
                     className="flex items-center justify-between px-4 py-2 rounded-full bg-[#f3f9ff] hover:bg-blue-600 hover:text-[#f3f9ff] hover:border-blue-600 duration-300 text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg h-fit w-fit"

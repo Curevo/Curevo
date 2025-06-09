@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { FaArrowLeft, FaCreditCard, FaWallet, FaHospital, FaSpinner } from 'react-icons/fa';
+import { useAxiosInstance } from '@/Config/axiosConfig.js';
+import { FaArrowLeft, FaCreditCard, FaWallet, FaSpinner } from 'react-icons/fa';
 import { SiNetlify } from 'react-icons/si';
 import { RiNetflixFill } from 'react-icons/ri';
 
 const StorePaymentGateway = () => {
+    const axios = useAxiosInstance();
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [cartItems, setCartItems] = useState([]);
@@ -12,6 +13,8 @@ const StorePaymentGateway = () => {
     const [error, setError] = useState(null);
     const [orderSummary, setOrderSummary] = useState({
         subtotal: 0,
+        platformFee: 10, // Hardcoded platform fee
+        deliveryFee: 0,
         tax: 0,
         total: 0
     });
@@ -19,26 +22,26 @@ const StorePaymentGateway = () => {
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                // Replace with your Spring Boot API endpoint
-                const response = await axios.get('http://localhost:8080/api/cart', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                
-                setCartItems(response.data.items);
-                
-                // Calculate order summary
-                const subtotal = response.data.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const tax = subtotal * 0.05; // 5% tax
-                const total = subtotal + tax;
-                
+                const response = await axios.get('/api/cart');
+
+                const fetchedItems = response.data.data.items || [];
+                setCartItems(fetchedItems);
+
+                const rawSubtotal = response.data.data.subtotal || fetchedItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+                const platformFee = 10; // Hardcoded platform fee
+
+                const deliveryFee = rawSubtotal < 300 ? 50 : 0;
+                const tax = rawSubtotal * 0.05; // 5% tax
+                const total = rawSubtotal + tax + platformFee + deliveryFee;
+
                 setOrderSummary({
-                    subtotal,
+                    subtotal: rawSubtotal,
+                    platformFee,
+                    deliveryFee,
                     tax,
                     total
                 });
-                
+
                 setLoading(false);
             } catch (err) {
                 setError(err.message);
@@ -48,7 +51,18 @@ const StorePaymentGateway = () => {
         };
 
         fetchCartItems();
-    }, []);
+    }, [axios]);
+
+    const handlePlaceOrder = async () => {
+        try {
+            await axios.post('/api/order/create');
+            alert('Order placed successfully!');
+            // You might want to redirect the user or clear the cart here
+        } catch (err) {
+            console.error('Error placing order:', err);
+            alert('Failed to place order. Please try again.');
+        }
+    };
 
     if (loading) {
         return (
@@ -70,73 +84,74 @@ const StorePaymentGateway = () => {
 
     return (
         <div className="min-h-screen bg-blue-600 flex flex-col md:flex-row p-10">
-            {/* Left Section - Order Summary */}
             <div className="w-full md:w-1/2 lg:w-2/4 relative bg-blue-600 text-white p-6 md:p-10">
-                {/* Background Image with overlay */}
                 <div className="absolute inset-0 bg-blue-600 opacity-70 z-0">
                     <div
                         className="w-full h-full bg-cover rounded-t-[30px] md:rounded-l-[30px] bg-center opacity-20"
                         style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
                     ></div>
                 </div>
-                
-                {/* Content */}
+
                 <div className="relative z-10 flex flex-col h-full">
-                    {/* Go Back Button */}
                     <div className="flex justify-end">
                         <button onClick={() => window.history.back()} className="flex items-center text-white hover:text-blue-200 transition">
                             <FaArrowLeft className="mr-2" />
                             Go Back
                         </button>
                     </div>
-                    
-                    {/* Logo */}
+
                     <div className="mt-4 mb-8 flex items-center">
                         <img
-                            src="/curevo-bright.png"
+                            src="/Assets/curevo-bright.png"
                             alt="Curevo logo"
                             className="h-10 w-auto"
                         />
                         <h1 className="text-2xl font-semibold ml-2"></h1>
                     </div>
-                    
-                    {/* Order Details */}
+
                     <div className="flex-grow">
                         <h2 className="text-xl font-semibold mb-6">Your Consultation</h2>
-                        
+
                         <div className="space-y-4 mb-8">
                             {cartItems.map((item) => (
                                 <div key={item.id} className="flex justify-between border-b border-blue-400 pb-2">
                                     <span>
-                                        {item.name}
+                                        {item.product?.name}
                                         {item.quantity > 1 && ` (×${item.quantity})`}
                                     </span>
-                                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                    <span>₹{(item.product?.price * item.quantity).toFixed(2)}</span>
                                 </div>
                             ))}
                         </div>
-                        
+
                         <div className="space-y-2 mb-8">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>${orderSummary.subtotal.toFixed(2)}</span>
+                                <span>₹{orderSummary.subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Platform Fee</span>
+                                <span>₹{orderSummary.platformFee.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Delivery Fee</span>
+                                <span>₹{orderSummary.deliveryFee.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Tax (5%)</span>
-                                <span>${orderSummary.tax.toFixed(2)}</span>
+                                <span>₹{orderSummary.tax.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-lg font-bold">
                                 <span>Total</span>
-                                <span>${orderSummary.total.toFixed(2)}</span>
+                                <span>₹{orderSummary.total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    {/* Terms and Conditions */}
+
                     <div className="mt-auto">
                         <label className="flex items-start">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 className="mt-1 mr-2"
                                 checked={agreeTerms}
                                 onChange={(e) => setAgreeTerms(e.target.checked)}
@@ -148,13 +163,11 @@ const StorePaymentGateway = () => {
                     </div>
                 </div>
             </div>
-            
-            {/* Right Section - Payment Methods */}
+
             <div className="w-full md:w-1/2 lg:w-2/4 bg-white p-6 md:p-8 flex items-center justify-center rounded-b-[10px] md:rounded-r-[30px]">
                 <div className="max-w-md mx-auto">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Payment Method</h2>
-                    
-                    {/* Payment Method Selection */}
+
                     <div className="grid grid-cols-2 gap-3 mb-8">
                         <button
                             onClick={() => setPaymentMethod('card')}
@@ -185,26 +198,24 @@ const StorePaymentGateway = () => {
                             UPI
                         </button>
                     </div>
-                    
-                    {/* Payment Form */}
+
                     <div className="mb-6">
                         {paymentMethod === 'card' && (
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="1234 5678 9012 3456" 
+                                    <input
+                                        type="text"
+                                        placeholder="1234 5678 9012 3456"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
-                                
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {/* Month Dropdown */}
-                                            <select 
+                                            <select
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                             >
                                                 <option value="">MM</option>
@@ -213,9 +224,8 @@ const StorePaymentGateway = () => {
                                                     return <option key={month} value={month}>{month}</option>;
                                                 })}
                                             </select>
-                                            
-                                            {/* Year Dropdown */}
-                                            <select 
+
+                                            <select
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                             >
                                                 <option value="">YY</option>
@@ -226,30 +236,30 @@ const StorePaymentGateway = () => {
                                             </select>
                                         </div>
                                     </div>
-                                    
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="123" 
+                                        <input
+                                            type="text"
+                                            placeholder="123"
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Card Holder Name</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="John Doe" 
+                                    <input
+                                        type="text"
+                                        placeholder="John Doe"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
-                                
+
                                 <div className="flex items-start">
-                                    <input 
-                                        type="checkbox" 
-                                        id="save-card" 
+                                    <input
+                                        type="checkbox"
+                                        id="save-card"
                                         className="mt-1 mr-2"
                                     />
                                     <label htmlFor="save-card" className="text-sm text-gray-700">
@@ -258,7 +268,7 @@ const StorePaymentGateway = () => {
                                 </div>
                             </div>
                         )}
-                        
+
                         {paymentMethod === 'netbanking' && (
                             <div className="space-y-4">
                                 <div>
@@ -272,45 +282,45 @@ const StorePaymentGateway = () => {
                                         <option value="other">Other Bank</option>
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="As per bank records" 
+                                    <input
+                                        type="text"
+                                        placeholder="As per bank records"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Enter account number" 
+                                    <input
+                                        type="text"
+                                        placeholder="Enter account number"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Bank's IFSC code" 
+                                    <input
+                                        type="text"
+                                        placeholder="Bank's IFSC code"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
-                                
+
                                 <div className="flex items-start">
-                                    <input 
-                                        type="checkbox" 
-                                        id="save-bank" 
+                                    <input
+                                        type="checkbox"
+                                        id="save-bank"
                                         className="mt-1 mr-2"
                                     />
                                     <label htmlFor="save-bank" className="text-sm text-gray-700">
                                         Save this bank account for future payments
                                     </label>
                                 </div>
-                                
+
                                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                                     <div className="flex">
                                         <div className="flex-shrink-0">
@@ -327,7 +337,7 @@ const StorePaymentGateway = () => {
                                 </div>
                             </div>
                         )}
-                        
+
                         {paymentMethod === 'wallet' && (
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Select Wallet</label>
@@ -339,13 +349,13 @@ const StorePaymentGateway = () => {
                                 </select>
                             </div>
                         )}
-                        
+
                         {paymentMethod === 'upi' && (
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
-                                <input 
-                                    type="text" 
-                                    placeholder="yourname@upi" 
+                                <input
+                                    type="text"
+                                    placeholder="yourname@upi"
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4"
                                 />
                                 <p className="text-sm text-gray-500">Or</p>
@@ -355,15 +365,15 @@ const StorePaymentGateway = () => {
                             </div>
                         )}
                     </div>
-                    
-                    {/* Pay Now Button */}
-                    <button 
+
+                    <button
+                        onClick={handlePlaceOrder}
                         disabled={!agreeTerms}
                         className={`w-full py-3 rounded-lg font-medium ${agreeTerms ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'} transition`}
                     >
-                        Pay ${orderSummary.total.toFixed(2)}
+                        Pay ₹{orderSummary.total.toFixed(2)}
                     </button>
-                    
+
                     <p className="text-xs text-gray-500 mt-4 text-center">
                         Your payment is secured with 256-bit encryption
                     </p>

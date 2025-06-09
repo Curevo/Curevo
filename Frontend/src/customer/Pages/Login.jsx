@@ -30,7 +30,7 @@ export default function Login() {
                 localStorage.setItem("role", decodedToken.role);
 
                 if (decodedToken.role === "ADMIN") {
-                    navigate("/admin-dashboard");
+                    navigate("/admin/home");
                 } else if (decodedToken.role === "DOCTOR") {
                     navigate("/doctor-dashboard");
                 } else if (decodedToken.role === "CUSTOMER") {
@@ -51,12 +51,12 @@ export default function Login() {
 
 
     return (
-        <div className="flex h-screen bg-[#2d2d44]">
+        <div className="flex h-screen bg-blue-900">
         <LeftPanel />
         <div className="w-full lg:w-1/2 flex justify-center items-center">
             <form 
                 onSubmit={handleLogin}
-                className="w-full max-w-md p-8 bg-[#1e1e2f] rounded-[30px] text-white shadow-lg"
+                className="w-full max-w-md p-8 bg-blue-950 rounded-[30px] text-white shadow-lg"
             >
             <h2 className="text-2xl font-bold mb-6">Log in</h2>
 
@@ -83,15 +83,11 @@ export default function Login() {
 
             <button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 transition rounded-md py-2 text-white font-semibold mb-4"
+                className="w-full bg-blue-500 hover:bg-blue-700 transition rounded-md py-2 text-white font-semibold mb-4"
             >
                 Log in
             </button>
 
-            <div className="flex items-center justify-between mt-4 gap-2">
-                <button className="flex-1 bg-white text-black py-2 rounded-md shadow">Google</button>
-                <button className="flex-1 bg-white text-black py-2 rounded-md shadow">Apple</button>
-            </div>
 
             <div className="text-center text-sm mt-6">
                 Don’t have an account?{" "}

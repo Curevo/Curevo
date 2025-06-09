@@ -6,10 +6,12 @@ import InfoCards from "../Components/Home/InfoCards"
 import WellBeingSection from "../Components/Home/WellBeingSection"
 import NavbarHome from "../Components/NavbarHome"
 import StatsSection from "../Components/StatsSection"
+import ChatbotLauncher from '../../Components/ChatbotLauncher'
 
 const Home = () => {
   return (
     <>
+        <ChatbotLauncher/>
         <NavbarHome/>
         <HeroHome/>
         <InfoCards/>

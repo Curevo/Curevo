@@ -27,8 +27,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
-    @Value("${FRONTEND_URL:http://localhost:5173}")
-    private String frontendUrl;
+
 
     // Public endpoints - no JWT filter, permit all those listed
     @Bean
@@ -44,7 +43,8 @@ public class SecurityConfig {
                         "/api/customers/verify-otp",
                         "/api/customers/add",
                         "/api/chat",
-                        "/api/doctors/add",
+                        "/",
+                        "/healthz",
                         "/api/doctors",
                         "/api/products",
                         "/api/products/**"
@@ -71,10 +71,10 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -86,7 +86,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(frontendUrl);
+        config.addAllowedOrigin("https://curevo.vercel.app");
+        config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
@@ -94,6 +95,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 
 }

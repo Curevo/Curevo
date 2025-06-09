@@ -28,67 +28,73 @@ public class PaymentController {
     private final PaymentService paymentService;
 
 
-    private final AppointmentService appointmentService; // Needed to link payments to appointments
+    private final AppointmentService appointmentService;
 
 
-    private final JwtService jwtService; // For user authentication/authorization
+    private final JwtService jwtService;
 
 
-    private final CustomerService customerService; // For getting customer from email
+    private final CustomerService customerService;
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<ApiResponse<List<Payment>>> getPaymentsByAppointmentId(
+    public ResponseEntity<ApiResponse<Payment>> getPaymentsByAppointmentId(
             @PathVariable Long appointmentId,
-            HttpServletRequest httpRequest) { // Using HttpServletRequest to get header
+            @RequestHeader("Authorization") String authHeader) { // Using HttpServletRequest to get header
 
-        // 1. Authenticate and get customer
-        String authHeader = httpRequest.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(false, "Authorization token is missing or invalid.", null));
-        }
 
-        String jwt = authHeader.substring(7);
-        String customerEmail = jwtService.extractEmail(jwt);
-
-        if (customerEmail == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(false, "Could not extract email from token.", null));
-        }
-
-        Optional<Customer> customerOptional = customerService.getByEmail(customerEmail);
-        if (customerOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(false, "Authenticated customer not found.", null));
-        }
-        Customer customer = customerOptional.get();
+        Customer customer = getAuthenticatedCustomer(authHeader).get();
 
         try {
 
             Appointment appointment = appointmentService.getAppointmentByIdAndCustomer(appointmentId, customer);
 
 
-            List<Payment> payments = paymentService.getPaymentsByAppointmentId(appointment.getId());
+            Payment payment = paymentService.getPaymentsByAppointmentId(appointment.getId());
 
-            return ResponseEntity.ok(new ApiResponse<>(true, "Payments for appointment retrieved successfully.", payments));
+            return ResponseEntity.ok(new ApiResponse<>(true, "Payments for appointment retrieved successfully.", payment));
         } catch (EntityNotFoundException e) {
-            // This exception is thrown if the appointment is not found or does not belong to the customer
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
-            // Catch any other unexpected errors
-            e.printStackTrace(); // Log the error for debugging
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "An unexpected error occurred: " + e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("process/appointment/{appointmentId}")
+    public ResponseEntity<ApiResponse<Payment>> processPaymentForAppointment(
+            @PathVariable Long appointmentId,
+            @RequestHeader("Authorization") String authHeader) {
+
+        Optional<Customer> customerOpt = getAuthenticatedCustomer(authHeader);
+
+        if (customerOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(false, "Unauthorized: Customer not found", null));
+        }
+
+        Customer customer = customerOpt.get();
+
+        try {
+            Appointment appointment = appointmentService.getAppointmentByIdAndCustomer(appointmentId, customer);
+
+            Payment payment = paymentService.processPayment(appointment);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Payment processed successfully.", payment));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false, "An unexpected error occurred: " + e.getMessage(), null));
         }
     }
 
 
-    private Optional<Customer> getAuthenticatedCustomer(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Optional.empty();
-        }
+
+    private Optional<Customer> getAuthenticatedCustomer(String authHeader) {
 
         String jwt = authHeader.substring(7);
         String customerEmail = jwtService.extractEmail(jwt);
