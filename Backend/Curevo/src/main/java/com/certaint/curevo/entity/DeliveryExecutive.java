@@ -28,7 +28,7 @@ public class DeliveryExecutive {
 
     private String vehicleType;
 
-    private Instant updatedAt;  // Combined timestamp for location and profile updates
+    private Instant updatedAt;
 
-    private Instant createdAt;  // When the executive record was created
+    private Instant createdAt;
 }

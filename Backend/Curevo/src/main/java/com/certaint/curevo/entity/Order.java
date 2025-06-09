@@ -26,10 +26,6 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    // Store fulfilling the order
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
 
     // Delivery details
     private String recipientName;
@@ -45,11 +41,11 @@ public class Order {
     private Boolean prescriptionVerified;
 
     // Payment
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount=BigDecimal.ZERO;
 
     // Status
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatus status= OrderStatus.PENDING;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference

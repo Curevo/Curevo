@@ -1,25 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useAxiosInstance } from '@/Config/axiosConfig.js';
 import { FaArrowLeft, FaCreditCard, FaWallet, FaSpinner } from 'react-icons/fa';
-import { SiNetlify } from 'react-icons/si';
-import { RiNetflixFill } from 'react-icons/ri';
+import { SiNetlify } from 'react-icons/si'; // Assuming this is for UPI, adjust if needed
+import { RiNetflixFill } from 'react-icons/ri'; // Assuming this is for Netbanking, adjust if needed
+import { useNavigate } from 'react-router-dom';
 
 const StorePaymentGateway = () => {
     const axios = useAxiosInstance();
+    const navigate = useNavigate();
+
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [customerDetails, setCustomerDetails] = useState(null); // State to hold customer details from session storage
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderSummary, setOrderSummary] = useState({
         subtotal: 0,
-        platformFee: 10, // Hardcoded platform fee
+        platformFee: 10,
         deliveryFee: 0,
         tax: 0,
         total: 0
     });
 
     useEffect(() => {
+        // Retrieve customer details from session storage
+        const savedCustomerData = sessionStorage.getItem('customerFormData');
+        if (savedCustomerData) {
+            try {
+                setCustomerDetails(JSON.parse(savedCustomerData));
+            } catch (e) {
+                console.error("Failed to parse customer data from sessionStorage:", e);
+                sessionStorage.removeItem('customerFormData'); // Clear corrupted data
+            }
+        }
+
         const fetchCartItems = async () => {
             try {
                 const response = await axios.get('/api/cart');
@@ -27,9 +43,14 @@ const StorePaymentGateway = () => {
                 const fetchedItems = response.data.data.items || [];
                 setCartItems(fetchedItems);
 
-                const rawSubtotal = response.data.data.subtotal || fetchedItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-                const platformFee = 10; // Hardcoded platform fee
+                // Use the subtotal provided by the backend.
+                // Fallback to manual calculation if backend subtotal is not present, though it should be.
+                const rawSubtotal = response.data.data.subtotal !== undefined
+                    ? response.data.data.subtotal
+                    : fetchedItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
+                const platformFee = 10;
+                // Delivery fee logic: 50 if subtotal is less than 300, else 0.
                 const deliveryFee = rawSubtotal < 300 ? 50 : 0;
                 const tax = rawSubtotal * 0.05; // 5% tax
                 const total = rawSubtotal + tax + platformFee + deliveryFee;
@@ -44,6 +65,8 @@ const StorePaymentGateway = () => {
 
                 setLoading(false);
             } catch (err) {
+                // This error (e.g., 404 Not Found) typically means your backend /api/cart endpoint
+                // is not running or not configured to respond correctly.
                 setError(err.message);
                 setLoading(false);
                 console.error('Error fetching cart items:', err);
@@ -51,16 +74,76 @@ const StorePaymentGateway = () => {
         };
 
         fetchCartItems();
-    }, [axios]);
+    }, [axios]); // Depend on axios instance
 
     const handlePlaceOrder = async () => {
+        if (!agreeTerms) {
+            alert('Please agree to the Terms and Conditions and Privacy Policy.');
+            return;
+        }
+
+        if (!customerDetails) {
+            alert('Customer details are missing. Please go back and fill the registration form.');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        function dataURLtoBlob(dataUrl) {
+            const arr = dataUrl.split(',');
+            const mimeMatch = arr[0].match(/:(.*?);/);
+            if (!mimeMatch) {
+                throw new Error('Invalid data URL');
+            }
+            const mime = mimeMatch[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }
+
+        function dataURLtoFile(dataUrl, filename) {
+            const blob = dataURLtoBlob(dataUrl);
+            return new File([blob], filename, { type: blob.type });
+        }
+
+
+
         try {
-            await axios.post('/api/order/create');
+
+            const formData = new FormData();
+
+            const order = {
+                name: customerDetails.name,
+                phone: customerDetails.phone,
+                email: customerDetails.email,
+                instructions: customerDetails.instructions,
+                address: customerDetails.address,
+                lat: customerDetails.location.lat,
+                lng: customerDetails.location.lng,
+                totalAmount: 500
+            };
+
+            const orderBlob = new Blob([JSON.stringify(order)], { type: 'application/json' });
+            formData.append('order', orderBlob);
+            const prescriptionDataUrl = customerDetails.prescription;
+            if (prescriptionDataUrl) {
+                const prescriptionFile = dataURLtoFile(prescriptionDataUrl, 'prescription.jpg');
+                formData.append('prescription', prescriptionFile);
+            }
+
+            await axios.post('/api/orders/create', formData);
+
             alert('Order placed successfully!');
-            // You might want to redirect the user or clear the cart here
+            sessionStorage.removeItem('customerFormData');
         } catch (err) {
-            console.error('Error placing order:', err);
-            alert('Failed to place order. Please try again.');
+            console.error('Error placing order:', err.response ? err.response.data : err.message);
+            alert(`Failed to place order. Please try again. Backend Error: ${err.response?.data?.message || err.message}`);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -75,8 +158,13 @@ const StorePaymentGateway = () => {
     if (error) {
         return (
             <div className="min-h-screen bg-blue-600 flex items-center justify-center text-white">
-                <div className="bg-red-500 p-4 rounded-lg">
-                    Error loading cart items: {error}
+                <div className="bg-red-500 p-4 rounded-lg text-center">
+                    <p className="font-bold mb-2">Error loading cart items:</p>
+                    <p>{error}</p>
+                    <p className="mt-2">
+                        Please ensure your backend API at `/api/cart` is running and accessible,
+                        and returning a `data.data` object with `items` and `subtotal`.
+                    </p>
                 </div>
             </div>
         );
@@ -113,15 +201,19 @@ const StorePaymentGateway = () => {
                         <h2 className="text-xl font-semibold mb-6">Your Consultation</h2>
 
                         <div className="space-y-4 mb-8">
-                            {cartItems.map((item) => (
-                                <div key={item.id} className="flex justify-between border-b border-blue-400 pb-2">
-                                    <span>
-                                        {item.product?.name}
-                                        {item.quantity > 1 && ` (×${item.quantity})`}
-                                    </span>
-                                    <span>₹{(item.product?.price * item.quantity).toFixed(2)}</span>
-                                </div>
-                            ))}
+                            {cartItems.length > 0 ? (
+                                cartItems.map((item) => (
+                                    <div key={item.id} className="flex justify-between border-b border-blue-400 pb-2">
+                                        <span>
+                                            {item.product?.name}
+                                            {item.quantity > 1 && ` (×${item.quantity})`}
+                                        </span>
+                                        <span>₹{(item.product?.price * item.quantity).toFixed(2)}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No items in cart. (Displayed for reference, actual cart fetched by backend)</p>
+                            )}
                         </div>
 
                         <div className="space-y-2 mb-8">
@@ -180,7 +272,7 @@ const StorePaymentGateway = () => {
                             onClick={() => setPaymentMethod('netbanking')}
                             className={`flex items-center justify-center p-4 rounded-lg border ${paymentMethod === 'netbanking' ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200'}`}
                         >
-                            <RiNetflixFill className="mr-2" />
+                            <RiNetflixFill className="mr-2" /> {/* Changed icon to one that fits "Netbanking" better if possible, or just keep it consistent */}
                             Netbanking
                         </button>
                         <button
@@ -194,7 +286,7 @@ const StorePaymentGateway = () => {
                             onClick={() => setPaymentMethod('upi')}
                             className={`flex items-center justify-center p-4 rounded-lg border ${paymentMethod === 'upi' ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200'}`}
                         >
-                            <SiNetlify className="mr-2" />
+                            <SiNetlify className="mr-2" /> {/* Changed icon to one that fits "UPI" better if possible, or just keep it consistent */}
                             UPI
                         </button>
                     </div>
@@ -368,10 +460,10 @@ const StorePaymentGateway = () => {
 
                     <button
                         onClick={handlePlaceOrder}
-                        disabled={!agreeTerms}
-                        className={`w-full py-3 rounded-lg font-medium ${agreeTerms ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'} transition`}
+                        disabled={!agreeTerms || isSubmitting}
+                        className={`w-full py-3 rounded-lg font-medium ${agreeTerms && !isSubmitting ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'} transition`}
                     >
-                        Pay ₹{orderSummary.total.toFixed(2)}
+                        {isSubmitting ? 'Processing...' : `Pay ₹${orderSummary.total.toFixed(2)}`}
                     </button>
 
                     <p className="text-xs text-gray-500 mt-4 text-center">
