@@ -2,21 +2,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
+import Sidebar from "./Components/Sidebar";
+import Header from "./Components/Header";
 
 // Dashboard
-import SummaryCards from "./components/SummaryCards";
-import ClientStats from "./components/ClientStats";
-import RevenueChart from "./components/PendingOrders";
-import RecentEmails from "./components/RecentEmails";
-import FormationStatus from "./components/FormationStatus";
-import TodoList from "./components/TodoList";
-import DeliveryStatusCard from "./components/DeliveryStatusCard";
+import SummaryCards from "./Components/SummaryCards";
+import ClientStats from "./Components/ClientStats";
+import RevenueChart from "./Components/PendingOrders";
+import RecentEmails from "./Components/RecentEmails";
+import FormationStatus from "./Components/FormationStatus";
+import TodoList from "./Components/TodoList";
+import DeliveryStatusCard from "./Components/DeliveryStatusCard";
 
 // Delivered section
-import DeliveredHeader from "./components/DeliveredHeader";
-import DeliveredTable from "./components/DeliveredTable";
+import DeliveredHeader from "./Components/DeliveredHeader";
+import DeliveredTable from "./Components/DeliveredTable";
 
 export default function DeliveryDashboard() {
   const [view, setView] = useState("dashboard");
