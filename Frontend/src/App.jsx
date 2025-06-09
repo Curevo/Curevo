@@ -28,7 +28,7 @@ import Licenses from './Components/Licenses'
 
 // import DeliveryDashboard from './DeliveryExecutive/DeliveryDashboard'
 
-import OrderDetails from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
+import CustomerDetailsAtOrder from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
 // import OrderDetails from "@/customer/Pages/OrderDetails.jsx";
 
 
@@ -76,7 +76,7 @@ const App = () => {
         <Route path="/terms" element={<TermsAndConditions/>} />
         <Route path="/policies" element={<PrivacyPolicy/>} />
         <Route path="/licenses" element={<Licenses/>} />
-        <Route path="/orderDetails" element={<OrderDetails />} />
+        <Route path="/orderDetails" element={<CustomerDetailsAtOrder />} />
 
 
          {/*<Route path="/executive" element={<DeliveryDashboard />} /> */}
