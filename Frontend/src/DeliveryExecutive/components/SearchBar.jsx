@@ -1,5 +1,5 @@
+// SearchBar.jsx
 import React, { useRef, useEffect } from "react";
-import "../Delivery.css"
 
 export default function SearchBar({ onClose }) {
   const ref = useRef(null);
@@ -16,9 +16,12 @@ export default function SearchBar({ onClose }) {
   }, [onClose]);
 
   return (
-    <div ref={ref} className="searchbar-container">
+    <div
+      ref={ref}
+      className="flex items-center w-[280px] px-3 py-1.5 bg-white border border-[#cbd5e1] rounded-[24px] shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+    >
       <svg
-        className="searchbar-icon"
+        className="flex-shrink-0 mr-2"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         width="20"
@@ -31,7 +34,7 @@ export default function SearchBar({ onClose }) {
       </svg>
       <input
         type="text"
-        className="searchbar-input"
+        className="flex-1 border-none outline-none text-sm text-[#1e293b] placeholder-[#94a3b8]"
         placeholder="Search..."
         autoFocus
       />

@@ -30,8 +30,9 @@
 // If the fetch fails or no visitId is passed, the sampleVisit data will display.
 
 
+// AppointmentDetails.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from '@/Config/axiosConfig.js';
 import {
   FiX,
   FiArrowLeft,
@@ -48,23 +49,16 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
   const [visit, setVisit] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Minimal sample to show if fetch fails or no visitId
   const sampleVisit = {
     id: "#0000",
     avatarUrl: "/default-avatar.png",
     doctorName: "Dr. Sample",
     specialization: "General Practice",
-    patient: {
-      phone: "+1 (555) 000-0000",
-      email: "patient@example.com",
-    },
+    patient: { phone: "+1 (555) 000-0000", email: "patient@example.com" },
     reason: "Sample reason for visit.",
     diagnosis: ["N/A"],
     preferredPharmacy: ["N/A"],
-    bookingInfo: {
-      date: "01 Jan 2020, 10:00 AM",
-      type: "In-person",
-    },
+    bookingInfo: { date: "01 Jan 2020, 10:00 AM", type: "In-person" },
     schedule: [
       {
         datetime: "01 Jan 2020, 10:00 AM",
@@ -82,24 +76,11 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
       setLoading(false);
       return;
     }
-
-    const fetchVisit = async () => {
-      try {
-        const res = await axios.get(
-          "https://your-api.com/api/visit-details",
-          { params: { visitId } }
-        );
-        // Expect: { visit: { … } }
-        setVisit(res.data.visit);
-      } catch (err) {
-        console.error("Error fetching visit details:", err);
-        setVisit(sampleVisit);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVisit();
+    axios
+      .get("https://your-api.com/api/visit-details", { params: { visitId } })
+      .then((res) => setVisit(res.data.visit || sampleVisit))
+      .catch((_) => setVisit(sampleVisit))
+      .finally(() => setLoading(false));
   }, [visitId]);
 
   if (loading) {
@@ -113,8 +94,8 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
   const v = visit || sampleVisit;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-2 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full sm:max-w-lg md:max-w-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -136,22 +117,20 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
           </div>
         </div>
 
-        <div className="p-4 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           {/* Doctor & Patient */}
           <section className="space-y-3">
             <h3 className="text-base font-medium text-gray-700">Doctor & Patient</h3>
-            <div className="flex items-start space-x-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
               <img
                 src={v.avatarUrl}
                 alt={v.doctorName}
                 className="w-16 h-16 rounded-full object-cover shadow"
               />
               <div className="flex-1 space-y-1">
-                <div className="flex items-center space-x-2">
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    {v.doctorName}
-                  </h4>
-                  <div className="flex items-center text-gray-500 space-x-3 ml-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+                  <h4 className="text-lg font-semibold text-gray-800">{v.doctorName}</h4>
+                  <div className="flex items-center text-gray-500 space-x-3 mt-1 sm:mt-0">
                     <div className="flex items-center space-x-1 text-xs">
                       <FiPhone size={14} />
                       <span>{v.patient.phone}</span>
@@ -170,7 +149,7 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
                 </div>
 
                 {/* Diagnose & Pharmacy */}
-                <div className="grid grid-cols-2 gap-4 mt-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-1 text-gray-600 text-xs">
                       <FiCheckCircle size={14} />
@@ -206,7 +185,7 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
           {/* Booking Info */}
           <section className="space-y-3">
             <h3 className="text-base font-medium text-gray-700">Booking Info</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start space-x-2">
                 <FiCalendar className="mt-1 text-gray-500" size={16} />
                 <div>
@@ -217,7 +196,7 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
               <div className="flex items-start space-x-2">
                 <FaWhatsapp className="mt-1 text-green-500" size={16} />
                 <div>
-                  <div className="text-xs font-semibold text-gray-600">Appointment Type</div>
+                  <div className="text-xs font-semibold text-gray-600">Type</div>
                   <div className="text-xs text-gray-800">{v.bookingInfo.type}</div>
                 </div>
               </div>
@@ -229,7 +208,7 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
             <h3 className="text-base font-medium text-gray-700">Planning Schedule</h3>
             <div className="space-y-4">
               {v.schedule.map((item, idx) => (
-                <div key={idx} className="flex space-x-3">
+                <div key={idx} className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                   <div className="flex flex-col items-center">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
                     {idx < v.schedule.length - 1 && (
@@ -237,11 +216,11 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
                     )}
                   </div>
                   <div className="bg-white border border-gray-200 rounded-md p-3 flex-1 shadow-sm">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
                       <span className="text-xs text-gray-500">{item.datetime}</span>
                       <span className="text-xs text-blue-600 font-semibold">{item.title}</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-600">
                       <div>
                         <div className="font-medium text-gray-700">Doctor</div>
                         <div>{item.doctor}</div>
@@ -276,3 +255,4 @@ export default function AppointmentDetails({ visitId = null, onClose = () => {} 
     </div>
   );
 }
+

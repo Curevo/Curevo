@@ -100,7 +100,11 @@ export default function NavbarHome() {
                     className="text-black hover:text-gray-700 transition"
                     aria-label="User Profile"
                 >
-                    <UserIcon className="h-8 w-8" />
+                    <UserIcon
+  className="h-8 w-8 cursor-pointer hover:text-gray-600 transition-colors"
+  onClick={() => (window.location.href = "../../customer/pages/UserProfile.jsx")}
+/>
+
                 </button>
                 {/* You would add your dropdown menu here, conditionally rendered */}
             </div>

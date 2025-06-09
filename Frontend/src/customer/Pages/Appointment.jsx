@@ -20,9 +20,10 @@
 
 // Customize the catch block or loading states as needed.
 
+// Appointment.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import ActiveAppointmentSlider from "./Active_appointment";
+import axios from '@/Config/axiosConfig.js';
+import ActiveAppointmentSlider from "./Active_Appointment";
 import AppointmentHistory from "./Appointment_history";
 
 export default function Appointment({ customerId = "12345" }) {
@@ -33,7 +34,6 @@ export default function Appointment({ customerId = "12345" }) {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Fetch active appointments
         const [actRes, histRes] = await Promise.all([
           axios.get("https://your-api.com/api/active-appointments", {
             params: { customerId },
@@ -42,10 +42,8 @@ export default function Appointment({ customerId = "12345" }) {
             params: { customerId },
           }),
         ]);
-
-        // Expect actRes.data.appointments and histRes.data.visits
-        setActiveAppointments(actRes.data.appointments);
-        setVisitHistory(histRes.data.visits);
+        setActiveAppointments(actRes.data.appointments || []);
+        setVisitHistory(histRes.data.visits || []);
       } catch (err) {
         console.error("Failed to load appointments:", err);
         setActiveAppointments([]);
@@ -54,31 +52,32 @@ export default function Appointment({ customerId = "12345" }) {
         setLoading(false);
       }
     };
-
     fetchAll();
   }, [customerId]);
 
-  const handleReschedule = (appointmentId) => {
-    console.log("Reschedule clicked for", appointmentId);
-    // open reschedule UI…
-  };
-
   if (loading) {
-    return <div className="p-8 text-center">Loading appointments…</div>;
+    return (
+      <div className="px-4 sm:px-6 lg:px-8 py-12 text-center text-gray-600">
+        Loading appointments…
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen space-y-12">
+    <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen space-y-12">
       {/* Active Appointments */}
       <section>
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
           Active Appointments
         </h1>
         {activeAppointments.length > 0 ? (
-          <ActiveAppointmentSlider
-            appointments={activeAppointments}
-            onReschedule={handleReschedule}
-          />
+          <div className="-mx-4 sm:mx-0">
+            {/* allow horizontal scroll on xs */}
+            <ActiveAppointmentSlider
+              appointments={activeAppointments}
+              onReschedule={(id) => console.log("Reschedule clicked for", id)}
+            />
+          </div>
         ) : (
           <p className="text-gray-500">No active appointments.</p>
         )}
@@ -86,11 +85,13 @@ export default function Appointment({ customerId = "12345" }) {
 
       {/* Appointment History */}
       <section>
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
           Appointment History
         </h1>
         {visitHistory.length > 0 ? (
-          <AppointmentHistory visits={visitHistory} />
+          <div className="space-y-6">
+            <AppointmentHistory visits={visitHistory} />
+          </div>
         ) : (
           <p className="text-gray-500">No past appointments.</p>
         )}

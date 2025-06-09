@@ -1,5 +1,5 @@
+// ExecDropdown.jsx
 import React from "react";
-import "../Delivery.css"
 import {
   FaUserCircle,
   FaTruck,
@@ -11,39 +11,50 @@ import {
 
 export default function ExecDropdown({ setView }) {
   return (
-    <div className="dropdown-menu">
-      <div className="dropdown-item">
-        <FaUserCircle className="dropdown-icon" />
-        <span>Profile</span>
+    <div className="w-60 bg-white border border-gray-200 rounded-lg shadow-md py-2 font-sans">
+      {/* Profile */}
+      <div className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+        <FaUserCircle className="mr-3 text-lg text-gray-600" />
+        <span className="text-sm text-gray-800">Profile</span>
       </div>
-      <div className="dropdown-item">
-        <FaTruck className="dropdown-icon" />
-        <span>Current Orders</span>
+
+      {/* Current Orders */}
+      <div className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+        <FaTruck className="mr-3 text-lg text-gray-600" />
+        <span className="text-sm text-gray-800">Current Orders</span>
       </div>
+
+      {/* Delivery History */}
       <div
-        className="dropdown-item"
+        className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
         onClick={() => setView("delivered")}
       >
-        <FaHistory className="dropdown-icon" />
-        <span>Delivery History</span>
+        <FaHistory className="mr-3 text-lg text-gray-600" />
+        <span className="text-sm text-gray-800">Delivery History</span>
       </div>
 
-      <hr className="dropdown-divider" />
+      {/* Divider */}
+      <hr className="my-2 border-t border-gray-200" />
 
-      <div className="dropdown-item">
-        <FaCog className="dropdown-icon" />
-        <span>Account Settings</span>
-      </div>
-      <div className="dropdown-item">
-        <FaHandsHelping className="dropdown-icon" />
-        <span>Support</span>
+      {/* Account Settings */}
+      <div className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+        <FaCog className="mr-3 text-lg text-gray-600" />
+        <span className="text-sm text-gray-800">Account Settings</span>
       </div>
 
-      <hr className="dropdown-divider" />
+      {/* Support */}
+      <div className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+        <FaHandsHelping className="mr-3 text-lg text-gray-600" />
+        <span className="text-sm text-gray-800">Support</span>
+      </div>
 
-      <div className="dropdown-item logout">
-        <FaSignOutAlt className="dropdown-icon" />
-        <span>Logout</span>
+      {/* Divider */}
+      <hr className="my-2 border-t border-gray-200" />
+
+      {/* Logout */}
+      <div className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+        <FaSignOutAlt className="mr-3 text-lg text-red-600" />
+        <span className="text-sm text-red-600">Logout</span>
       </div>
     </div>
   );
