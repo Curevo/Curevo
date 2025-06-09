@@ -35,7 +35,7 @@ const WellBeingSection = () => {
                         onClick={() => (window.location.href = "/about")}
                         onMouseEnter={() => setAnimate(true)}
                         onAnimationEnd={() => setAnimate(false)}
-                        className="flex items-center justify-between px-4 py-1 rounded-full bg-[#f3f9ff] text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg h-fit w-fit"
+                        className="flex items-center justify-between px-4 py-1 rounded-full bg-[white] text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg h-fit w-fit"
                     >
                         <p className="text-base font-bold">More about us</p>
                         <div className="ml-3 h-9 w-9 flex items-center justify-center rounded-full bg-neutral-900 border border-neutral-200 overflow-hidden">

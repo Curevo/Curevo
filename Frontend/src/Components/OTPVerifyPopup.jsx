@@ -82,10 +82,10 @@ const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com'}) => {
             </div>
 
             <p className="text-sm text-gray-500 mb-4">
-                Didn’t get a code?{' '}
-                <button className="text-blue-600 hover:underline" onClick={() => alert('Resend logic here')}>
+                OTP will expire in 2 minutes
+                {/* <button className="text-blue-600 hover:underline" onClick={() => alert('Resend logic here')}>
                 resend
-                </button>
+                </button> */}
             </p>
 
             <button

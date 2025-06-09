@@ -63,12 +63,12 @@ export default function Signup() {
     };
 
     return (
-        <div className="flex h-screen bg-[#2d2d44]">
+        <div className="flex h-screen bg-blue-900">
             <LeftPanel />
             <div className="w-full lg:w-1/2 flex justify-center items-center">
                 <form
                     onSubmit={handleSignup}
-                    className="w-full max-w-xl p-8 bg-[#1e1e2f] rounded-[30px] text-white shadow-lg"
+                    className="w-full max-w-xl p-8 bg-blue-950 rounded-[30px] text-white shadow-lg"
                 >
                     <h2 className="text-2xl font-bold mb-6">Create an account</h2>
 
@@ -119,7 +119,7 @@ export default function Signup() {
                         />
                         <span>
                             I agree to the{" "}
-                            <a href="#" className="text-blue-400 underline">
+                            <a href="/terms" className="text-blue-400 underline">
                                 Terms & Conditions
                             </a>
                         </span>
@@ -127,19 +127,19 @@ export default function Signup() {
 
                     <button
                         type="submit"
-                        className="w-full bg-purple-600 hover:bg-purple-700 transition rounded-md py-2 text-white font-semibold mb-4"
+                        className="w-full bg-blue-500 hover:bg-blue-700 transition rounded-md py-2 text-white font-semibold mb-4"
                     >
                         Create account
                     </button>
 
-                    <div className="flex items-center justify-between mt-4 gap-2">
+                    {/* <div className="flex items-center justify-between mt-4 gap-2">
                         <button className="flex-1 bg-white text-black py-2 rounded-md shadow">
                             Google
                         </button>
                         <button className="flex-1 bg-white text-black py-2 rounded-md shadow">
                             Apple
                         </button>
-                    </div>
+                    </div> */}
 
                     <div className="text-center text-sm mt-6">
                         Already have an account?{" "}
