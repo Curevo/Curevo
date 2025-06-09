@@ -18,7 +18,7 @@ const About = () => {
         <WhyChooseUs/>
         <StatsSection/>
         <AboutServices/>
-        <DoctorsPreview/>
+        {/* <DoctorsPreview/> */}
         <HealthFooter/>
         <FooterHome/>
     </>

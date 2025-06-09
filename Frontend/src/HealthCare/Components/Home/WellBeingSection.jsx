@@ -5,7 +5,7 @@ import { useState } from "react";
 const WellBeingSection = () => {
     const [animate, setAnimate] = useState(false);
     return (
-        <section className="bg-[#f2f8fc] py-8 md:py-36 px-4 md:px-12">
+        <section className="bg-[white] py-8 md:py-36 px-4 md:px-12">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
             {/* Left Image */}
             <div>
@@ -17,7 +17,7 @@ const WellBeingSection = () => {
             </div>
 
             {/* Right Content */}
-            <div className="text-center md:text-left">
+            <div className="text-left md:text-left">
                 <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                     Dedicated to Your Well-Being
                 </h2>

@@ -16,7 +16,7 @@ export default function HeroHome() {
             <div className="absolute top-0 w-[90%] h-full flex items-center px-6 md:px-12">
                 <div className="text-white max-w-7xl absolute bottom-10 text-shadow-lg">
                     <button
-                    onClick={() => (window.location.href = "/appointments")}
+                    onClick={() => (window.location.href = "/doctors")}
                     onMouseEnter={() => setAnimate(true)}
                     onAnimationEnd={() => setAnimate(false)}
                     className="flex items-center justify-between px-4 py-1 rounded-full bg-neutral-200 text-neutral-900 font-medium text-lg h-fit w-fit mb-5"

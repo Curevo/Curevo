@@ -63,7 +63,7 @@ export default function NavbarHome() {
 
                 {/* Make Appointment Button */}
                 <button
-                onClick={() => (window.location.href = '/appointments')}
+                onClick={() => (window.location.href = '/doctors')}
                 onMouseEnter={() => setAnimate(true)}
                 onAnimationEnd={() => setAnimate(false)}
                 className="flex items-center px-4 py-1 rounded-full bg-[#f3f9ff] text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg"
@@ -137,7 +137,7 @@ export default function NavbarHome() {
                 </>
             )}
             <button
-                onClick={() => (window.location.href = '/appointments')}
+                onClick={() => (window.location.href = '/doctors')}
                 className="w-full border border-black px-4 py-2 rounded-full"
             >
                 Make an Appointment

@@ -68,7 +68,7 @@ const DoctorsPage = () => {
     }, []);
 
     return (
-        <section className="bg-[#f3f9fc] py-16 px-6">
+        <section className="bg-[white] py-16 px-6">
             <div className="max-w-7xl mx-auto flex flex-col items-center">
                 <h2 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Our Doctors</h2>
 

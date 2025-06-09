@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 const WhyChooseUs = () => {
     const [animate, setAnimate] = useState(false);
     return (
-        <section className="bg-[#f1f9fc] px-4 py-12 md:px-16">
+        <section className="bg-[white] px-4 py-12 md:px-16">
         <div className="max-w-7xl mx-auto">
             {/* Heading */}
             <div className="mb-8">
@@ -58,7 +58,7 @@ const WhyChooseUs = () => {
                 </p>
                 </div>
                 <button
-                    onClick={() => (window.location.href = "/contact")}
+                    onClick={() => (window.location.href = "/doctors")}
                     onMouseEnter={() => setAnimate(true)}
                     onAnimationEnd={() => setAnimate(false)}
                     className="flex items-center justify-between px-4 py-2 rounded-full bg-[#f3f9ff] hover:bg-blue-600 hover:text-[#f3f9ff] hover:border-blue-600 duration-300 text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg h-fit w-fit"
