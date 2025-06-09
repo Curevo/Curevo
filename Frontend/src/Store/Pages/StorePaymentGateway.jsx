@@ -93,7 +93,7 @@ const StorePaymentGateway = () => {
                     {/* Logo */}
                     <div className="mt-4 mb-8 flex items-center">
                         <img
-                            src="/curevo-bright.png"
+                            src="/Assets/curevo-bright.png"
                             alt="Curevo logo"
                             className="h-10 w-auto"
                         />
@@ -111,7 +111,7 @@ const StorePaymentGateway = () => {
                                         {item.name}
                                         {item.quantity > 1 && ` (×${item.quantity})`}
                                     </span>
-                                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                                 </div>
                             ))}
                         </div>
@@ -119,15 +119,15 @@ const StorePaymentGateway = () => {
                         <div className="space-y-2 mb-8">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>${orderSummary.subtotal.toFixed(2)}</span>
+                                <span>₹{orderSummary.subtotal.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Tax (5%)</span>
-                                <span>${orderSummary.tax.toFixed(2)}</span>
+                                <span>₹{orderSummary.tax.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-lg font-bold">
                                 <span>Total</span>
-                                <span>${orderSummary.total.toFixed(2)}</span>
+                                <span>₹{orderSummary.total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
