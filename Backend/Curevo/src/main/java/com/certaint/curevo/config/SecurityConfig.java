@@ -44,7 +44,8 @@ public class SecurityConfig {
                         "/api/customers/verify-otp",
                         "/api/customers/add",
                         "/api/chat",
-                        "/api/doctors/add",
+                        "/",
+                        "/healthz",
                         "/api/doctors",
                         "/api/products",
                         "/api/products/**"
@@ -94,6 +95,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 
 }
