@@ -141,7 +141,7 @@ export default function ProductGrid() {
     return (
         <section className="py-12 px-5 sm:px-8 lg:px-24">
             <h2 className="text-3xl font-bold text-gray-800 mb-8">
-                Recent <span className="text-green-600">products</span>
+                <span className="text-blue-500">products</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {products.map((product) => (
@@ -215,7 +215,7 @@ export default function ProductGrid() {
                     <button
                         onClick={() => fetchProducts(false)}
                         disabled={loading}
-                        className="px-6 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition disabled:opacity-50"
+                        className="px-6 py-3 bg-blue-500 text-white rounded-2xl hover:bg-blue-700 transition disabled:opacity-50"
                     >
                         {loading ? "Loading..." : "Load More"}
                     </button>

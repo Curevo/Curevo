@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function InfoCards() {
     return (
-        <section className="bg-[#f3f9ff] py-10 px-4 md:px-16 font-sans">
+        <section className="bg-[white] py-10 px-4 md:px-16 font-sans">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
             {/* Card 1 */}
             <div className="bg-[#3366cc] text-white rounded-lg overflow-hidden">

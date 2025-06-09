@@ -14,7 +14,7 @@ const HealthFooter = () => {
                     Whether you need a consultation, treatment plan, or simply someone
                     to answer your health questions, we’re just a click away.
                 </p>
-                <button className="flex items-center gap-2 border border-white rounded-full px-6 py-2 hover:bg-white hover:text-[#3163C7] transition">
+                <button className="flex items-center gap-2 border border-white rounded-full px-6 py-2 hover:bg-white hover:text-[#3163C7] transition" onClick={() => window.location.href = '/doctors'}>
                     Meet Our Doctors
                     <span className="text-sm">↗</span>
                 </button>
@@ -33,7 +33,7 @@ const HealthFooter = () => {
                     <div className="bg-white text-black px-6 py-3 rounded w-full text-center font-medium">
                     #healthandwellness
                     </div>
-                    <button className="bg-[#0A2E73] hover:bg-[#021845] text-white px-6 py-3 rounded w-full text-center transition">
+                    <button className="bg-[#0A2E73] hover:bg-[#021845] text-white px-6 py-3 rounded w-full text-center transition" onClick={() => window.location.href = '/doctors'}>
                     Make an Appointment →
                     </button>
                 </div>

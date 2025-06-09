@@ -4,21 +4,21 @@ import { FaFacebookF, FaInstagram, FaXTwitter, FaLinkedinIn, FaYoutube } from "r
 const Footer = () => {
     return (
         <footer className="bg-gradient-to-b from-white to-blue-200 pt-12 pb-6 px-6 md:px-16 ">
-        <div className="max-w-full px-8 sm:px-10 mx-auto flex flex-col md:flex-row md:justify-between gap-12">
+        <div className="max-w-full px-8 sm:px-10 mx-auto flex flex-col md:flex-row md:justify-around gap-12">
             
             {/* Subscribe and Socials */}
-            <div>
-            <div className="flex space-x-3 mt-6">
-                <img src="/Assets/Curevo-logo.png" className='w-48' alt="" />
+            <div className="flex flex-col">
+            <div className="flex space-x-2 mt-6">
+                <img src="/Assets/Curevo-logo.png" className='w-32' alt="" />
             </div>
-            <div className="flex justify-between space-x-3 mt-6 ">
-                <div className="bg-[#47C0B0] text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
+            <div className="flex justify-left space-x-6 mt-6 ">
+                <div className="bg-blue-500 text-white p-2 rounded-md hover:bg-[#47C0B0] duration-300 cursor-pointer">
                 <FaFacebookF size={18} />
                 </div>
-                <div className="bg-[#47C0B0] text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
+                <div className="bg-blue-500 text-white p-2 rounded-md hover:bg-[#47C0B0] duration-300 cursor-pointer">
                 <FaInstagram size={18} />
                 </div>
-                <div className="bg-[#47C0B0] text-white p-2 rounded-md hover:bg-blue-500 duration-300 cursor-pointer">
+                <div className="bg-blue-500 text-white p-2 rounded-md hover:bg-[#47C0B0] duration-300 cursor-pointer">
                 <FaXTwitter size={18} />
                 </div>
             </div>
