@@ -61,10 +61,10 @@ export default function UserProfile() {
   };
 
   return (
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-md font-sans text-gray-900">
+      <div className="relative max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-md font-sans text-gray-900">
         {toast && (
             <div
-                className={`fixed top-4 right-4 px-4 py-2 rounded shadow-md text-white ${
+                className={`fixed top-14 right-4 px-4 py-2 rounded shadow-md text-white ${
                     toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
                 }`}
             >
@@ -77,12 +77,12 @@ export default function UserProfile() {
           <p className="text-sm text-gray-500">Manage your profile, track activities, and customize settings.</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="mb-8">
+        <form onSubmit={handleSubmit} className="mb-8 space-y-6">
           <h2 className="text-xl font-medium mb-1">Personal Information</h2>
           <p className="text-sm text-gray-500 mb-4">Provide your information so that your account can operate correctly.</p>
 
-          <div className="flex flex-wrap gap-6">
-            <div className="flex-shrink-0 w-40 text-center">
+          <div className="flex flex-col md:flex-row md:items-start gap-6">
+            <div className="flex-shrink-0 w-full md:w-40 text-center">
               <img
                   src={user?.image|| '/default-avatar.png'}
                   alt="Profile"
@@ -93,7 +93,7 @@ export default function UserProfile() {
               </button>
             </div>
 
-            <div className="flex-1 grid grid-cols-2 gap-4">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm mb-1">Name *</label>
                 <input
@@ -132,7 +132,7 @@ export default function UserProfile() {
                     className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-sm"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-sm mb-1">Address *</label>
                 <input
                     type="text"
@@ -171,7 +171,7 @@ export default function UserProfile() {
 
         <hr className="border-t border-gray-200 my-6" />
 
-        <section>
+        <section className="mb-6">
           <h2 className="text-xl font-medium mb-1">Two-Factor Authentication</h2>
           <p className="text-sm text-gray-500 mb-3">Add an extra layer of security to your account. It is highly recommended.</p>
           <button
