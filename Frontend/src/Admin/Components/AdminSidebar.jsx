@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
     UserPen,
+    ContactRound,
     Pill,
+    PackageSearch,
     Mails,
     CalendarHeart,
     Store,
@@ -24,6 +26,8 @@ const Sidebar = () => {
         { icon: <CalendarHeart size={20} />, label: "Appointments", path: "/admin/appointments" },
         { icon: <Store size={20} />, label: "Store Management", path: "/admin/store" },
         { icon: <Hospital size={20} />, label: "Clinic Management", path: "/admin/clinics" },
+        { icon: <ContactRound size={20} />, label: "Captains Management", path: "/admin/captains" },
+        { icon: <PackageSearch size={20} />, label: "Order Management", path: "/admin/orders" },
         { icon: <HelpCircle size={20} />, label: "Help", path: "/admin/help" },
     ];
 

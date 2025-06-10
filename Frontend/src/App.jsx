@@ -28,6 +28,8 @@ import Licenses from './Components/Licenses'
 
 import OrderDetails from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
 import DeliveryExecutiveRegister from './Components/DeliveryExecutiveRegister.jsx'
+import DeliveryExecManageAdmin from './Admin/Pages/DeliveryExecManageAdmin.jsx'
+import OrderManageAdmin from './Admin/Pages/OrderManageAdmin.jsx'
 
 
 
@@ -69,6 +71,8 @@ const App = () => {
                   <Route path="/admin/store" element={<StoreManageAdmin/>} />
                   <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
                   <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
+                  <Route path="/admin/captains" element={<DeliveryExecManageAdmin/>} />
+                  <Route path="/admin/orders" element={<OrderManageAdmin/>} />
 
 
 
