@@ -26,7 +26,7 @@
 // Or transform res.data appropriately.
 
 import React, { useState, useEffect } from "react";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import {
   FiX,
   FiClipboard,
@@ -111,6 +111,7 @@ export default function ActiveAppointmentSlider({
 }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const axios = useAxiosInstance();
 
   useEffect(() => {
     axios

@@ -13,7 +13,7 @@
 
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import {
   FiX,
   FiClipboard,
@@ -27,6 +27,7 @@ import { FaShippingFast } from "react-icons/fa";
 export default function OrderDetails({ orderId = null, onClose = () => {} }) {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const axios = useAxiosInstance();
 
   // Sample fallback if API & prop both missing
   const sampleOrder = {

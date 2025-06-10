@@ -22,14 +22,15 @@
 
 // Appointment.jsx
 import React, { useState, useEffect } from "react";
-import axios from '@/Config/axiosConfig.js';
-import ActiveAppointmentSlider from "./Active_Appointment";
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
+import ActiveAppointmentSlider from "./Active_appointment";
 import AppointmentHistory from "./Appointment_history";
 
 export default function Appointment({ customerId = "12345" }) {
   const [activeAppointments, setActiveAppointments] = useState([]);
   const [visitHistory, setVisitHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const axios = useAxiosInstance();
 
   useEffect(() => {
     const fetchAll = async () => {
