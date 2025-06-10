@@ -14,7 +14,7 @@
 // MyOrders.jsx
 import React, { useState, useEffect } from "react";
 import { FiTruck, FiCheckCircle, FiClock, FiPackage } from "react-icons/fi";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import OrderDetails from "./OrderDetails";
 
 export default function MyOrders() {
@@ -24,6 +24,7 @@ export default function MyOrders() {
   const [previous, setPrevious] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const axios = useAxiosInstance();
 
   useEffect(() => {
     const fetchOrders = async () => {

@@ -32,7 +32,7 @@
 
 // AppointmentDetails.jsx
 import React, { useState, useEffect } from "react";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import {
   FiX,
   FiArrowLeft,
@@ -48,6 +48,7 @@ import { FaWhatsapp } from "react-icons/fa";
 export default function AppointmentDetails({ visitId = null, onClose = () => {} }) {
   const [visit, setVisit] = useState(null);
   const [loading, setLoading] = useState(true);
+   const axios = useAxiosInstance();
 
   const sampleVisit = {
     id: "#0000",

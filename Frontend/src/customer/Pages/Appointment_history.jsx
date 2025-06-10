@@ -29,7 +29,7 @@
 
 // AppointmentHistory.jsx
 import React, { useState, useEffect } from "react";
-import axios from '@/Config/axiosConfig.js';
+import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import AppointmentDetails from "./AppointmentDetails";
 import {
   FiTruck,
@@ -42,6 +42,7 @@ export default function AppointmentHistory({ customerId = "12345" }) {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVisitId, setSelectedVisitId] = useState(null);
+  const axios = useAxiosInstance();
 
   useEffect(() => {
     const fetchHistory = async () => {
