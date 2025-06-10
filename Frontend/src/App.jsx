@@ -2,7 +2,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Signup from './customer/Pages/Signup'
 import Login from './customer/Pages/Login'
-import UserProfile from './customer/pages/UserProfile'
+import UserProfile from "./customer/pages/UserProfile.jsx";
 import ProductGrid from './Store/Components/products'
 import HomeStore from './Store/Pages/HomeStore'
 import ProductStore from './Store/Pages/ProductStore'
@@ -25,7 +25,7 @@ import AppointmentManageAdmin from './Admin/Pages/AppointmentManageAdmin'
 import TermsAndConditions from './Components/TermsAndConditions'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import Licenses from './Components/Licenses'
-
+import CustomerDashboard from './customer/Pages/CustomerDashboard'
 import OrderDetails from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
 import DeliveryExecutiveRegister from './Components/DeliveryExecutiveRegister.jsx'
 import DeliveryExecManageAdmin from './Admin/Pages/DeliveryExecManageAdmin.jsx'
@@ -76,10 +76,11 @@ const App = () => {
 
 
 
-                  <Route path="/terms" element={<TermsAndConditions/>} />
-                  <Route path="/policies" element={<PrivacyPolicy/>} />
-                  <Route path="/licenses" element={<Licenses/>} />
-                  <Route path="/orderDetails" element={<OrderDetails />} />
+                <Route path="/terms" element={<TermsAndConditions/>} />
+                <Route path="/policies" element={<PrivacyPolicy/>} />
+                <Route path="/licenses" element={<Licenses/>} />
+                <Route path="/orderDetails" element={<OrderDetails />} />
+                <Route path="/CustomerDashboard" element={<CustomerDashboard />} />
 
 
                   <Route path="/Delivery/signup" element={<DeliveryExecutiveRegister />} />
