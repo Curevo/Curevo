@@ -186,7 +186,7 @@ const StoresManagement = () => {
                 <h1 className="text-2xl font-bold text-gray-800">Manage Stores</h1>
                 <button
                     onClick={openAddModal}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
                     disabled={loading}
                 >
                     <PlusCircle size={18} />
@@ -222,14 +222,14 @@ const StoresManagement = () => {
                                 <div className="flex space-x-2 ml-4">
                                     <button
                                         onClick={() => openEditModal(store)}
-                                        className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-100 transition"
+                                        className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-100 transition cursor-pointer"
                                         aria-label={`Edit ${store.name}`}
                                     >
                                         <Edit3 size={20} />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteStore(store.storeId)} // Assuming storeId for deletion
-                                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100 transition" // Styled as clinic/doctor page
+                                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100 transition cursor-pointer" // Styled as clinic/doctor page
                                         aria-label={`Delete ${store.name}`}
                                     >
                                         <Trash2 size={20} /> {/* Added Trash2 icon */}
@@ -251,7 +251,7 @@ const StoresManagement = () => {
                             </h2>
                             <button
                                 onClick={() => { setShowStoreModal(false); resetFormData(); }}
-                                className="text-gray-500 hover:text-gray-700"
+                                className="text-gray-500 hover:text-gray-700 cursor-pointer"
                             >
                                 <X size={24} />
                             </button>
@@ -281,12 +281,12 @@ const StoresManagement = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
                                 <input
                                     type="text"
-                                    name="phoneNumber" // Changed 'name' from "phone" to "phoneNumber"
+                                    name="phoneNumber"
                                     value={currentStore.phoneNumber}
                                     onChange={handleInputChange}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Phone number"
-                                    disabled={loading} // Keep disabled state based on loading
+                                    disabled={loading}
                                     required
                                 />
                             </div>
@@ -351,15 +351,15 @@ const StoresManagement = () => {
                         <div className="flex justify-end space-x-3">
                             <button
                                 onClick={() => { setShowStoreModal(false); resetFormData(); }}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition cursor-pointer"
                                 disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                                disabled={loading || !currentStore.name || !currentStore.phone || !currentStore.address || !currentStore.latitude || !currentStore.longitude}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
+                                disabled={loading || !currentStore.name || !currentStore.phoneNumber || !currentStore.address || !currentStore.latitude || !currentStore.longitude}
                             >
                                 {loading ? 'Saving...' : (modalMode === 'add' ? 'Add Store' : 'Update Store')}
                             </button>
