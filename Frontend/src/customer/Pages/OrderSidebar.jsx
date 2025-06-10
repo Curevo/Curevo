@@ -74,8 +74,8 @@ export default function OrderSidebar({
       )}
 
       {/* ── 3) DESKTOP SIDEBAR ── */}
-      <aside className={classNameWrapper}>
-        <div className="flex flex-col h-full p-6 bg-white shadow">
+      <aside className={`${classNameWrapper} hidden md:flex fixed top-0 left-0 h-screen max-h-screen w-64`}>
+        <div className="flex flex-col h-full max-h-screen overflow-y-auto p-6 bg-white shadow">
           <h2 className="text-2xl font-bold text-blue-600 mb-8">Curevo</h2>
           <nav className="flex-1 space-y-4">
             {items.map(({ label, icon, view }) => (

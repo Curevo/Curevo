@@ -1,39 +1,26 @@
 // CustomerDashboard.jsx
 import React, { useState } from "react";
-import Sidebar from "./OrderSidebar";        
-import AccountSettings from "./CustomerProfile";
+import Sidebar from "./OrderSidebar"; 
+import UserProfile from "../pages/UserProfile";
 import MyOrders from "./MyOrders";
 import AppointmentList from "./Appointment";
 
 export default function CustomerDashboard() {
-  // which view the sidebar has selected
   const [view, setView] = useState("Account");
-
-  // render the main content based on `view`
-  const renderContent = () => {
-    switch (view) {
-      case "Account":
-        return <AccountSettings />;
-      case "My Orders":
-        return <MyOrders />;
-      case "Appointment":
-        return <AppointmentList />;
-      default:
-        return <AccountSettings />;
-    }
-  };
-
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <aside className="hidden md:block md:w-64 bg-white shadow-lg">
-        {/* Pass setView so sidebar buttons can change view */}
-        <Sidebar onChangeView={setView} activeView={view} />
-      </aside>
+    <div className="flex min-h-screen">
+      {/* Sidebar always mounted; desktop version hidden via classNameWrapper */}
+      <Sidebar
+        classNameWrapper="hidden md:block md:w-1/5 min-w-[200px]"
+        onChangeView={setView}
+        activeView={view}
+      />
 
-      {/* Main */}
-      <main className="flex-1 min-w-0 bg-gray-50 p-8 overflow-y-auto">
-        {renderContent()}
+      {/* Main content grows to fill remaining width */}
+      <main className="flex-1 pt-12 md:pt-8 md:ml-64 overflow-y-auto">
+        {view === "Account" && <UserProfile />}
+        {view === "My Orders" && <MyOrders />}
+        {view === "Appointment" && <AppointmentList />}
       </main>
     </div>
   );
