@@ -78,25 +78,39 @@ export default function UserProfile() {
 
     const formData = new FormData();
 
+    // Construct the customer JSON data without the 'phone' field
     const customerData = {
       name: user.name,
       age: user.age ? parseInt(user.age, 10) : null,
       address: user.address,
     };
 
-    if (initialPhoneValue === null && user.phone.trim() !== '') {
-      customerData.phone = user.phone;
-    }
-
+    // Append the customer JSON data as a Blob
     formData.append('customer', new Blob([JSON.stringify(customerData)], { type: 'application/json' }));
 
+    // Conditionally append the phone number as a separate @RequestPart
+    // This will only send the 'phone' part if it was initially null AND a new value is entered.
+    // The backend's 'required = false' for phone handles cases where it's not sent.
+    if (initialPhoneValue === null && user.phone.trim() !== '') {
+      formData.append('phone', user.phone);
+    }
+
+    // Append the image file if selected
     if (selectedImage) {
       formData.append('image', selectedImage);
     }
 
     try {
-      await axios.put(`/api/customers/update/${user.customerId}`, formData);
+      await axios.put(`/api/customers/update/${user.customerId}`, formData, {
+        headers: {
+          // FormData automatically sets the correct 'multipart/form-data' header,
+          // but it's good practice to be aware of it for debugging.
+          // 'Content-Type': 'multipart/form-data'
+        }
+      });
       showToast('Profile updated successfully!', 'success');
+
+      // If the phone was initially null and is now set, update initialPhoneValue
       if (initialPhoneValue === null && user.phone.trim() !== '') {
         setInitialPhoneValue(user.phone);
       }

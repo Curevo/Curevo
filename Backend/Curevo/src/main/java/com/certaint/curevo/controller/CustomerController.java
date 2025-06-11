@@ -62,8 +62,9 @@ public class CustomerController {
     public ResponseEntity<ApiResponse<Customer>> updateCustomer(
             @PathVariable Long id,
             @RequestPart("customer") Customer customer,
+            @RequestPart(value = "phone", required = false) String phone,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        Optional<Customer> updatedCustomer = customerService.updateCustomer(id, customer,image);
+        Optional<Customer> updatedCustomer = customerService.updateCustomer(id, customer,phone, image);
         return updatedCustomer.map(value -> ResponseEntity.ok(new ApiResponse<>(true, "Customer updated successfully", value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(false, "Customer not found", null)));
     }

@@ -104,19 +104,20 @@ public class CustomerService {
     }
 
     @Transactional
-    public Optional<Customer> updateCustomer(Long id, Customer customer,MultipartFile image) {
+    public Optional<Customer> updateCustomer(Long id, Customer customer,String phone, MultipartFile image) {
         Optional<Customer> existingCustomerOpt = customerRepository.findById(id);
         if (existingCustomerOpt.isPresent()) {
             Customer existingCustomer = existingCustomerOpt.get();
             existingCustomer.setName(customer.getName());
             existingCustomer.setAge(customer.getAge());
             existingCustomer.setAddress(customer.getAddress());
-            if(existingCustomer.getUser().getPhone() != null && !existingCustomer.getUser().getPhone().isEmpty()) {
-                existingCustomer.getUser().setPhone(customer.getUser().getPhone());
+
+            if (phone != null && !phone.isEmpty() &&
+                    (existingCustomer.getUser().getPhone() == null || existingCustomer.getUser().getPhone().isEmpty())) {
+                existingCustomer.getUser().setPhone(phone);
             }
 
             if(image != null && !image.isEmpty()) {
-
                     imageHostingService.deleteImage(existingCustomer.getImage());
                     String imageUrl = imageHostingService.uploadImage(image,"customers");
                     existingCustomer.setImage(imageUrl);
