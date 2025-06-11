@@ -5,6 +5,7 @@ import com.certaint.curevo.enums.DeliveryExecutiveStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -12,4 +13,6 @@ public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecu
     Optional<DeliveryExecutive> findFirstByStatus(DeliveryExecutiveStatus deliveryExecutiveStatus);
 
     DeliveryExecutive getDeliveryExecutiveByUserEmail(String email);
+
+    List<DeliveryExecutive> findByStatus(DeliveryExecutiveStatus deliveryExecutiveStatus);
 }

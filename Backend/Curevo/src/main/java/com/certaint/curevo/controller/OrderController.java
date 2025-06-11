@@ -45,9 +45,11 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping
-    public ResponseEntity<List<Order>> getAll() {
-        return ResponseEntity.ok(orderService.findAll());
+    @GetMapping("/get-all")
+    public ResponseEntity<ApiResponse<List<Order>>> getAll() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Orders retrieved successfully", orderService.findAll())
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -143,6 +145,11 @@ public class OrderController {
             return Optional.empty();
         }
         return customerService.getByEmail(customerEmail);
+    }
+    @PostMapping("/verify-prescription/{Id}")
+    public ApiResponse<Boolean> verifyPrescription(@PathVariable Long Id) {
+        Boolean status = orderService.verifyPrescription(Id);
+        return new ApiResponse<>(true, "Prescription verified", status);
     }
 
 }

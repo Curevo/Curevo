@@ -1,6 +1,7 @@
 package com.certaint.curevo.entity;
 
 import com.certaint.curevo.enums.DeliveryExecutiveStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,11 @@ public class DeliveryExecutive {
 
     @Enumerated(EnumType.STRING)
     private DeliveryExecutiveStatus status=DeliveryExecutiveStatus.NOT_VERIFIED;
+
+    @OneToOne(mappedBy = "executive", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // This side manages the serialization
+    private ExecutiveDocument executiveDocument;
+
 
     private String image;
 

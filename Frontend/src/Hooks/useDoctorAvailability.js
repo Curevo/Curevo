@@ -22,7 +22,7 @@ const useDoctorAvailability = (doctorId) => {
         const fetchDoctorData = async () => {
             try {
                 setIsLoading(true);
-                const response = await axios.get(`/api/doctors/${doctorId}`);
+                const response = await axios.get(`/api/doctors/get/${doctorId}`);
                 const data = response.data.data;
                 setDoctorDetails(data); // Set the full doctor details
 

@@ -55,8 +55,14 @@ const Chatbot = () => {
 
             // Determine intent based on current conversational mode
             if (activeConversationalMode === 'findDoctorBySpecialty') {
-                payload.intent = 'find_doctor_by_specialty';
-                payload.specialty = messageToSend.toUpperCase(); // Assume direct specialty input
+                // If user types a specialization from the list, it's a specialty query
+                if (specializations.map(s => s.toLowerCase()).includes(messageToSend.toLowerCase())) {
+                    payload.intent = 'find_doctor_by_specialty';
+                    payload.specialty = messageToSend.toUpperCase();
+                } else { // If user types something else, assume it's a doctor's name
+                    payload.intent = 'find_doctor_by_name';
+                    payload.doctor_name = messageToSend;
+                }
             } else if (activeConversationalMode === 'findDoctorByName') {
                 payload.intent = 'find_doctor_by_name';
                 payload.doctor_name = messageToSend; // Assume direct doctor name input
@@ -170,7 +176,8 @@ const Chatbot = () => {
         switch (action) {
             case 'findDoctor':
                 sendMessage("Find a doctor");
-                setActiveConversationalMode('initial_doctor_query');
+                // The backend response will set the mode to 'findDoctorBySpecialty' or 'prompt_doctor_name'
+                // No need to explicitly set it here to 'initial_doctor_query'
                 break;
             case 'generalHealth':
                 setMessages((prev) => [
@@ -320,7 +327,7 @@ const Chatbot = () => {
                         className="flex-1 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-500"
                         placeholder={
                             activeConversationalMode === 'findDoctorBySpecialty'
-                                ? "Or type a doctor's name..."
+                                ? "Type specialization or doctor's name..." // Updated placeholder
                                 : (activeConversationalMode === 'findDoctorByName'
                                         ? "e.g., 'Dr. Smith'..."
                                         : (activeConversationalMode === 'general_health' ? "Tell us your symptoms or health concern..." : "Type your message...")
@@ -328,8 +335,8 @@ const Chatbot = () => {
                         }
                         aria-label="Chat input"
                         rows="2"
-                        // Disable send if in specialization mode and no specialty selected/typed
-                        disabled={activeConversationalMode === 'findDoctorBySpecialty' && specializations.length > 0 && !input.trim()}
+                        // Removed disabled condition based on specializations.length
+                        // It should always be enabled to allow typing
                     />
                     <button
                         onClick={() => sendMessage()}

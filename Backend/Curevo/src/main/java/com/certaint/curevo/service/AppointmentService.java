@@ -138,4 +138,17 @@ public class AppointmentService {
         return appointmentRepository.save(existingAppointment);
     }
 
+    public boolean completeAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found with ID: " + id));
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException("Appointment cannot be completed unless it is pending payment.");
+        }
+
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        appointmentRepository.save(appointment);
+
+        return true;
+    }
 }

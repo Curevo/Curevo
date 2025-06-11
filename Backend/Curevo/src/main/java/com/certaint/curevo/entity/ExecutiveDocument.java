@@ -1,6 +1,7 @@
 package com.certaint.curevo.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class ExecutiveDocument {
 
     @OneToOne
     @JoinColumn(name = "executive_id", nullable = false, unique = true)
+    @JsonBackReference
     private DeliveryExecutive executive;
 
     private String aadharNumber;

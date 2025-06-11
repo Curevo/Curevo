@@ -179,4 +179,19 @@ public class AppointmentController {
             return new ApiResponse<>(false, "Something went wrong: " + ex.getMessage(), null);
         }
     }
+
+    @PutMapping("/complete/{id}")
+    public ApiResponse<Boolean> completeAppointment(@PathVariable Long id) {
+        try {
+            boolean completed = appointmentService.completeAppointment(id);
+            return new ApiResponse<>(true, "Appointment completed successfully", completed);
+        } catch (Exception ex) {
+            System.err.println("Error completing appointment: " + ex.getMessage());
+            ex.printStackTrace();
+            return new ApiResponse<>(false, "Something went wrong: " + ex.getMessage(), null);
+
+        }
+    }
+
+
 }

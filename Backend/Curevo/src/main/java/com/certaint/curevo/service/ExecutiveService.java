@@ -446,4 +446,9 @@ public class ExecutiveService {
         return activeOrders;
     }
 
+    public List<DeliveryExecutive> getNotVerifiedExecutives() {
+        List<DeliveryExecutive> notVerifiedExecutives = executiveRepo.findByStatus(NOT_VERIFIED);
+
+        return notVerifiedExecutives;
+    }
 }

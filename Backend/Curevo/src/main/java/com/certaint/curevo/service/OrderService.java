@@ -80,6 +80,7 @@ public class OrderService {
         // If any product requires a prescription, update the order status
         if (needsVerification) {
             order.setStatus(OrderStatus.NEEDS_VERIFICATION);
+            order.setPrescriptionVerified(false);
             repository.save(order);
         }
 
@@ -91,6 +92,30 @@ public class OrderService {
 
         // Return the saved Order
         return order;
+    }
+
+    public Boolean verifyPrescription(Long orderId) {
+        Optional<Order> orderOpt = repository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            return false;
+        }
+
+        Order order = orderOpt.get();
+        if (order.getStatus() != OrderStatus.NEEDS_VERIFICATION) {
+            return false;
+        }
+
+        // Upload the prescription file
+        String imgUrl = imageHostingService.deleteImage(order.getPrescriptionUrl());
+        System.out.println("Deleted the image from the previous URL: " + imgUrl);
+        order.setPrescriptionUrl(null);
+        order.setPrescriptionUrl(imgUrl);
+        order.setStatus(OrderStatus.VERIFIED);
+        order.setPrescriptionVerified(true);
+        System.out.println("Eveyrhting working fine");
+        repository.save(order);
+
+        return true;
     }
 
 

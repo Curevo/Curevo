@@ -34,7 +34,11 @@ public class ChatService {
             "sick", "health", "injury", "infection", "rash", "curevo", "disease", "medication", "treatment"
     );
 
-    private static final Pattern DOCTOR_NAME_PATTERN = Pattern.compile("(dr\\.?\\s+([a-z]+(?:\\s+[a-z]+)*)|doctor\\s+([a-z]+(?:\\s+[a-z]+)*))", Pattern.CASE_INSENSITIVE);
+    // Updated regex to be a bit more flexible for names, including "dr" or "doctor" prefixes
+    private static final Pattern DOCTOR_NAME_PATTERN = Pattern.compile(
+            "(?:dr\\.?|doctor)\\s+([a-zA-Z]+(?:\\s+[a-zA-Z]+)*)", Pattern.CASE_INSENSITIVE
+    );
+
 
     public Map<String, Object> processUserQuery(Map<String, Object> payload) {
         String userMessage = (String) payload.get("message");
@@ -48,10 +52,34 @@ public class ChatService {
                 case "initial_doctor_query":
                     return createPromptSpecialtyOrName();
                 case "find_doctor_by_specialty":
-                    String specialtyString = (String) payload.get("specialty");
-                    return handleFindDoctorBySpecialty(specialtyString);
+                    // IMPORTANT CHANGE HERE: Handle both specialty string and potential doctor name
+                    String inputForSpecialtyMode = userMessage; // Use userMessage directly here
+
+                    // 1. Try to extract doctor's name first if in findDoctorBySpecialty mode
+                    Optional<String> doctorNameFromInput = extractDoctorName(inputForSpecialtyMode);
+                    if (doctorNameFromInput.isPresent()) {
+                        System.out.println("ChatService: Detected doctor name '" + doctorNameFromInput.get() + "' in find_doctor_by_specialty mode.");
+                        return handleFindDoctorByName(doctorNameFromInput.get());
+                    }
+
+                    // 2. If no doctor name found, assume it's a specialty string
+                    // Normalize the input string to match enum values
+                    String normalizedSpecialtyInput = inputForSpecialtyMode.toUpperCase().replace(" ", "_");
+                    System.out.println("ChatService: Attempting to find doctor by specialty: " + normalizedSpecialtyInput + " in find_doctor_by_specialty mode.");
+                    return handleFindDoctorBySpecialty(normalizedSpecialtyInput);
+
                 case "find_doctor_by_name":
-                    String doctorName = (String) payload.get("doctor_name");
+                    String doctorName = (String) payload.get("doctor_name"); // This might be null if not explicitly set by frontend
+                    // If payload.doctor_name is not set by frontend (e.g., direct user type), extract from message
+                    if (doctorName == null || doctorName.isEmpty()) {
+                        Optional<String> extractedName = extractDoctorName(userMessage);
+                        if (extractedName.isPresent()) {
+                            doctorName = extractedName.get();
+                        } else {
+                            // Fallback if no name found, though frontend should prevent this for findDoctorByName intent
+                            return createTextResponse("Please provide a valid doctor's name.");
+                        }
+                    }
                     return handleFindDoctorByName(doctorName);
                 case "general_health_query":
                     String healthAdvice = deepSeekService.getHealthResponse(userMessage);
@@ -82,7 +110,7 @@ public class ChatService {
                             }
                         } catch (IllegalArgumentException e) {
                             // If extracted string didn't match an enum (shouldn't happen often if extractSpecialtyFromHealthAdvice is careful)
-                            System.out.println("ChatService: Locally extracted specialization '" + extractedSpecialization.get() + "' did not match an enum.");
+                            System.out.println("ChatService: Locally extracted specialization '" + extractedSpecialization.get() + "' did not match an enum. Error: " + e.getMessage());
                             return createTextResponse(healthAdvice + "\n\nI couldn't find a direct match for a specialist based on that. Can I help with anything else?");
                         }
                     } else {
@@ -96,25 +124,29 @@ public class ChatService {
         }
 
 
-        // 1. Prioritize direct doctor name extraction from raw message
+        // 1. Prioritize direct doctor name extraction from raw message (for 'general_query' intent or no intent)
         Optional<String> doctorNameFromNLU = extractDoctorName(lowerQuery);
         if (doctorNameFromNLU.isPresent()) {
+            System.out.println("ChatService: Detected doctor name '" + doctorNameFromNLU.get() + "' from general query.");
             return handleFindDoctorByName(doctorNameFromNLU.get());
         }
 
         // 2. Prioritize specialization extraction from raw message (e.g., "find a dermatologist")
         Optional<String> specialtyStringFromNLU = extractSpecialty(lowerQuery);
         if (specialtyStringFromNLU.isPresent()) {
+            System.out.println("ChatService: Detected specialization '" + specialtyStringFromNLU.get() + "' from general query.");
             return handleFindDoctorBySpecialty(specialtyStringFromNLU.get());
         }
 
         // 3. Check for general health keywords (if no doctor-finding intent detected)
         if (isGeneralHealthRelated(lowerQuery)) {
             payload.put("intent", "general_health_query");
+            System.out.println("ChatService: Detected general health keywords. Recursing with general_health_query intent.");
             return processUserQuery(payload); // Recursive call to re-process with explicit intent
         }
 
         // 4. Default response if nothing matches
+        System.out.println("ChatService: No specific intent detected. Returning default response.");
         return createTextResponse("I'm only able to assist with general health questions, or help you find doctors by specialization or name. Please rephrase your query or use the quick actions.");
     }
 
@@ -158,8 +190,8 @@ public class ChatService {
     private Optional<String> extractDoctorName(String query) {
         Matcher matcher = DOCTOR_NAME_PATTERN.matcher(query);
         if (matcher.find()) {
-            String name = matcher.group(2) != null ? matcher.group(2) : matcher.group(3);
-            return Optional.of(name.trim());
+            // Group 1 captures the name after "dr." or "doctor"
+            return Optional.of(matcher.group(1).trim());
         }
         return Optional.empty();
     }
@@ -173,7 +205,7 @@ public class ChatService {
         if (query.contains("oncologist") || query.contains("oncology") || query.contains("cancer")) return Optional.of("ONCOLOGY");
         if (query.contains("orthopedics") || query.contains("orthopedic") || query.contains("bones") || query.contains("joints")) return Optional.of("ORTHOPEDICS");
         if (query.contains("pediatrician") || query.contains("pediatrics") || query.contains("child")) return Optional.of("PEDIATRICS");
-        if (query.contains("general medicine") || query.contains("gp") || query.contains("family doctor")) return Optional.of("GENERAL_MEDICINE");
+        if (query.contains("general medicine") || query.contains("gp") || query.contains("family doctor") || query.contains("general practice")) return Optional.of("GENERAL_PRACTICE"); // Added general practice
         if (query.contains("gynecologist") || query.contains("gynecology") || query.contains("women's health")) return Optional.of("GYNECOLOGY");
         if (query.contains("psychiatrist") || query.contains("psychiatry") || query.contains("mental health")) return Optional.of("PSYCHIATRY");
         if (query.contains("radiologist") || query.contains("radiology") || query.contains("x-ray") || query.contains("mri")) return Optional.of("RADIOLOGY");
@@ -234,6 +266,7 @@ public class ChatService {
                 );
             }
         } catch (IllegalArgumentException e) {
+            System.out.println("ChatService: Invalid specialization string encountered: " + specialtyString + ". Error: " + e.getMessage());
             return createTextResponse("I don't recognize that specialization. Please select from the provided options or try a different one.");
         }
     }

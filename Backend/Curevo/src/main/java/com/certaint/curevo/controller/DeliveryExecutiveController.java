@@ -1,5 +1,6 @@
 package com.certaint.curevo.controller;
 
+import com.azure.core.annotation.Get;
 import com.certaint.curevo.dto.ApiResponse;
 import com.certaint.curevo.dto.DeliveryExecutiveDTO;
 import com.certaint.curevo.entity.DeliveryExecutive;
@@ -23,7 +24,6 @@ public class DeliveryExecutiveController {
     private final ExecutiveService executiveService;
     private final DeliveryExecutiveRepository executiveRepo;
 
-    // --- Public Registration and Update Endpoints ---
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Boolean>> registerDeliveryExecutive(
@@ -53,7 +53,7 @@ public class DeliveryExecutiveController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<DeliveryExecutive>> update(
             @PathVariable Long id,
             @RequestPart("executive") DeliveryExecutiveDTO executiveDTO,
@@ -66,7 +66,7 @@ public class DeliveryExecutiveController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<ApiResponse<DeliveryExecutive>> getById(@PathVariable Long id) {
         return executiveRepo.findById(id)
                 .map(executive -> ResponseEntity.ok(new ApiResponse<>(true, "Delivery Executive found.", executive)))
@@ -169,5 +169,10 @@ public class DeliveryExecutiveController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(false, "Failed to retrieve active orders: " + e.getMessage(), null));
         }
+    }
+    @GetMapping("/get-non-verified")
+    public ResponseEntity<ApiResponse<List<DeliveryExecutive>>> getNotVerifiedExecutives() {
+        List<DeliveryExecutive> notVerifiedExecutives = executiveService.getNotVerifiedExecutives();
+        return ResponseEntity.ok(new ApiResponse<>(true, "List of not verified Delivery Executives retrieved successfully.", notVerifiedExecutives));
     }
 }

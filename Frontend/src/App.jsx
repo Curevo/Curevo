@@ -29,6 +29,8 @@ import DeliveryExecutiveRegister from './Components/DeliveryExecutiveRegister.js
 import OrderPage from "@/customer/Pages/OrderPage.jsx";
 import AppointmentPage from "@/customer/Pages/AppointmentPage.jsx";
 import AccountPage from "@/customer/Pages/AccountPage.jsx";
+import OrderManagement from "./Admin/Pages/OrderManageAdmin.jsx"
+import ExecutiveManagement from "./Admin/Pages/DeliveryExecManageAdmin.jsx"
 
 
 
@@ -73,6 +75,8 @@ const App = () => {
                   <Route path="/admin/store" element={<StoreManageAdmin/>} />
                   <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
                   <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
+                  <Route path="/admin/orders" element={<OrderManagement/>} />
+                  <Route path="/admin/captains" element={<ExecutiveManagement/>} />
 
 
 

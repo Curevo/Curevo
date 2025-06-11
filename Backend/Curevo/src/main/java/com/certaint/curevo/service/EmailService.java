@@ -228,7 +228,7 @@ public class EmailService {
                 + "Best regards,\nThe Curevo Team";
 
         try {
-            mailjetEmailService.sendEmail(fromName, fromEmail, toEmail, executiveName, subject, textContent, htmlContent);
+            mailjetEmailService.sendEmail(fromEmail, fromName, toEmail, executiveName, subject, textContent, htmlContent);
             logger.info("Executive rejection email sent to {}", toEmail);
         } catch (MailjetException e) {
             logger.error("Failed to send executive rejection email to {}", toEmail, e);

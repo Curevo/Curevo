@@ -1,105 +1,203 @@
 // eslint-disable-next-line no-unused-vars
 import { useState } from 'react';
 
-const OrderCard = ({ order, onClick }) => {
+// OrderCard component for displaying a summarized item in the list
+const OrderCard = ({ orderItem, onClick }) => {
+    if (!orderItem || !orderItem.product) {
+        return null;
+    }
+
     return (
-        <div 
-        className="w-full h-10 flex items-center border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors px-4"
-        onClick={onClick}
+        <div
+            className="w-full h-16 flex items-center border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors px-4 py-2"
+            onClick={onClick}
         >
-        <img 
-            src={order.product.image} 
-            alt={order.product.name} 
-            className="w-8 h-8 rounded-md object-cover mr-3"
-        />
-        <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{order.product.name}</p>
-            <p className="text-xs text-gray-500">{order.product.category}</p>
-        </div>
+            <img
+                src={orderItem.product.image}
+                alt={orderItem.product.name}
+                className="w-10 h-10 rounded-lg object-cover mr-4 shadow-sm"
+            />
+            <div className="flex-1 min-w-0">
+                <p className="text-base font-semibold text-gray-800 truncate">{orderItem.product.name}</p>
+                <p className="text-sm text-gray-500">{orderItem.product.category}</p>
+            </div>
+            <span className="text-sm font-medium text-gray-700 ml-auto">Qty: {orderItem.quantity}</span>
         </div>
     );
-    };
+};
 
-    const OrderDetailsModal = ({ order, onClose, onApprove, onReject }) => {
+// OrderDetailsModal component for showing detailed information and approval action
+const OrderDetailsModal = ({ order, onClose, onApprove }) => {
     if (!order) return null;
 
+    // Determine if any item in the order requires a prescription
+    const hasPrescriptionRequiredItem = order.orderItems.some(item => item.product?.prescriptionRequired);
+    const prescriptionUploaded = order.prescriptionUrl;
+    const prescriptionVerifiedStatus = order.prescriptionVerified; // true, false, or null
+
+    // Determine if the "Approve Prescription" button should be shown
+    const showApproveButton = (hasPrescriptionRequiredItem && prescriptionUploaded && (prescriptionVerifiedStatus === false || prescriptionVerifiedStatus === null)) ||
+        (hasPrescriptionRequiredItem && !prescriptionUploaded);
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Order Details</h3>
-                <button 
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-500"
-                >
-                <span className="sr-only">Close</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                </button>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                <img 
-                    src={order.product.image} 
-                    alt={order.product.name} 
-                    className="w-16 h-16 rounded-md object-cover"
-                />
-                <div>
-                    <h4 className="text-sm font-medium text-gray-900">{order.product.name}</h4>
-                    <p className="text-sm text-gray-500">{order.product.category}</p>
-                    <p className="text-sm text-gray-500">{order.store.name}</p>
-                </div>
-                </div>
-
-                <div className="border-t border-gray-200 pt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Customer Information</h4>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                    <p className="text-xs text-gray-500">Name</p>
-                    <p className="text-sm">{order.customer.name}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto transform scale-95 animate-fade-in-up">
+                <div className="p-6 sm:p-8">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-2xl font-bold text-gray-900">Order Details #{order.id}</h3>
+                        <button
+                            onClick={onClose}
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <span className="sr-only">Close</span>
+                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
-                    <div>
-                    <p className="text-xs text-gray-500">Email</p>
-                    <p className="text-sm">{order.customer.email}</p>
-                    </div>
-                    <div>
-                    <p className="text-xs text-gray-500">Phone</p>
-                    <p className="text-sm">{order.customer.phone}</p>
-                    </div>
-                </div>
-                </div>
 
-                <div className="border-t border-gray-200 pt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Prescription</h4>
-                <img 
-                    src={order.prescription} 
-                    alt="Prescription" 
-                    className="w-full rounded-md border border-gray-200"
-                />
+                    <div className="space-y-6">
+                        {/* Customer Information */}
+                        <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 className="text-base font-semibold text-gray-800 mb-3 border-b pb-2">Customer Information</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                                <div>
+                                    <p className="text-gray-500">Name</p>
+                                    <p className="font-medium text-gray-900">{order.customer?.name}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500">Email</p>
+                                    <p className="font-medium text-gray-900">{order.customer?.user?.email}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500">Phone</p>
+                                    <p className="font-medium text-gray-900">{order.customer?.user?.phone}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500">Delivery Address</p>
+                                    <p className="font-medium text-gray-900">{order.deliveryAddress}</p>
+                                </div>
+                                <div className="col-span-1 sm:col-span-2">
+                                    <p className="text-gray-500">Delivery Instructions</p>
+                                    <p className="font-medium text-gray-900">{order.deliveryInstructions || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Ordered Items List */}
+                        <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 className="text-base font-semibold text-gray-800 mb-3 border-b pb-2">Ordered Items</h4>
+                            <ul className="space-y-4">
+                                {order.orderItems?.length > 0 ? (
+                                    order.orderItems.map(item => (
+                                        <li key={item.id} className="flex items-center space-x-4 border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                                            <img
+                                                src={item.product?.image}
+                                                alt={item.product?.name}
+                                                className="w-16 h-16 rounded-md object-cover flex-shrink-0 shadow-sm"
+                                            />
+                                            <div className="flex-1">
+                                                <p className="text-base font-medium text-gray-900">{item.product?.name}</p>
+                                                <p className="text-sm text-gray-600">{item.product?.category}</p>
+                                                <p className="text-sm text-gray-600">Qty: {item.quantity} @ ₹{item.unitPrice?.toFixed(2)}</p>
+                                                <p className="text-sm font-semibold text-gray-800">Total: ₹{item.totalPrice?.toFixed(2)}</p>
+                                                {item.product?.prescriptionRequired && (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">
+                                                        Prescription Required
+                                                    </span>
+                                                )}
+                                                {/* Display store if available within inventory */}
+                                                {item.product?.inventories?.[0]?.store?.name && (
+                                                    <p className="text-xs text-gray-500 mt-1">Store: {item.product.inventories[0].store.name}</p>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center">No items found for this order.</p>
+                                )}
+                            </ul>
+                            <div className="mt-4 pt-4 border-t border-gray-200 text-right">
+                                <p className="text-lg font-bold text-gray-900">
+                                    Order Total: ₹{(order.orderItems?.reduce((acc, item) => acc + (item.totalPrice || 0), 0) || 0).toFixed(2)}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Prescription Section */}
+                        <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <h4 className="text-base font-semibold text-gray-800 mb-3 border-b pb-2">Prescription</h4>
+                            {hasPrescriptionRequiredItem ? (
+                                prescriptionUploaded && (prescriptionVerifiedStatus === false || prescriptionVerifiedStatus === null) ? (
+                                    <>
+                                        <img
+                                            src={order.prescriptionUrl}
+                                            alt="Customer Prescription"
+                                            className="w-full max-h-96 object-contain rounded-md border border-gray-200 mb-4"
+                                        />
+                                        <div className="text-center py-2 rounded-md font-medium text-sm bg-orange-100 text-orange-800">
+                                            <p>Status: <span className="font-bold">Awaiting Verification</span></p>
+                                        </div>
+                                    </>
+                                ) : hasPrescriptionRequiredItem && prescriptionVerifiedStatus === true ? (
+                                    <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-sm text-center">
+                                        <div className="flex items-center justify-center">
+                                            <svg className="h-6 w-6 text-green-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p className="text-sm text-green-800 font-medium">Prescription has been **Verified**.</p>
+                                        </div>
+                                    </div>
+                                ) : ( // No prescription uploaded but required
+                                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow-sm text-center">
+                                        <div className="flex items-center justify-center">
+                                            <svg className="h-6 w-6 text-yellow-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <p className="text-sm text-yellow-800 font-medium">No prescription uploaded for items requiring it. Admin will follow up.</p>
+                                        </div>
+                                    </div>
+                                )
+                            ) : ( // No items in order require prescription
+                                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg shadow-sm text-center">
+                                    <div className="flex items-center justify-center">
+                                        <svg className="h-6 w-6 text-blue-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p className="text-sm text-blue-800 font-medium">No prescription required for this order.</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Action button: Approve (Conditional) */}
+                    {showApproveButton ? (
+                        <div className="mt-8 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => onApprove(order.id)}
+                                className="px-6 py-3 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 ease-in-out"
+                            >
+                                Approve Prescription
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="mt-8 text-center text-gray-600 font-medium">
+                            {hasPrescriptionRequiredItem && prescriptionVerifiedStatus === true ? (
+                                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                    <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    Prescription Verified
+                                </span>
+                            ) : (
+                                <p>This order does not require prescription verification or has already been reviewed.</p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-                <button
-                type="button"
-                onClick={onReject}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                Reject
-                </button>
-                <button
-                type="button"
-                onClick={onApprove}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                Approve
-                </button>
-            </div>
-            </div>
-        </div>
         </div>
     );
 };

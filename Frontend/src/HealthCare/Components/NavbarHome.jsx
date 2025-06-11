@@ -102,7 +102,7 @@ export default function NavbarHome() {
                 >
                     <UserIcon
   className="h-8 w-8 cursor-pointer hover:text-gray-600 transition-colors"
-  onClick={() => (window.location.href = "/user-profile")}
+  onClick={() => (window.location.href = "/my-profile")}
 />
 
                 </button>
