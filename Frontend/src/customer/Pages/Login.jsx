@@ -25,7 +25,12 @@ export default function Login() {
             if (token) {
                 const decodedToken = jwtDecode(token);
 
-                // Store token and role for later use
+                if(localStorage.getItem("token") !== null){
+                    // Clear previous token and role if they exist
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("role");
+                }
+
                 localStorage.setItem("token", token);
                 localStorage.setItem("role", decodedToken.role);
 

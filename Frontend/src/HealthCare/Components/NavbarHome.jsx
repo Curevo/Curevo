@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import { Menu, X, ArrowUpRight} from 'lucide-react';
-import { UserIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react';
+import { Menu, X, ArrowUpRight, CircleUserRound } from 'lucide-react';
 import { useAxiosInstance } from '@/Config/axiosConfig.js';
-import { jwtDecode } from "jwt-decode"; // <--- THIS WAS THE MISSING IMPORT!
+import { jwtDecode } from "jwt-decode";
 
 export default function NavbarHome() {
     const axios = useAxiosInstance();
@@ -11,10 +10,9 @@ export default function NavbarHome() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const checkAuthStatus = async () => { // Changed function name for clarity
+        const checkAuthStatus = async () => {
             const token = localStorage.getItem('token');
 
-            // 1. Client-side token existence check
             if (!token) {
                 console.log("NavbarHome: No token found. User not logged in.");
                 setIsLoggedIn(false);
@@ -22,46 +20,50 @@ export default function NavbarHome() {
             }
 
             try {
-                // 2. Client-side token decode and expiration check
                 const decodedToken = jwtDecode(token);
-                const currentTime = Date.now() / 1000; // Current time in seconds
+                const currentTime = Date.now() / 1000;
 
-                // if (decodedToken.exp < currentTime) {
-                //     console.log("NavbarHome: Token expired. User not logged in.");
-                //     setIsLoggedIn(false);
-                //     // Axios config should handle clearing token on auth errors.
-                //     return;
-                // }
+                // Check for token expiration client-side first
+                if (decodedToken.exp < currentTime) {
+                    console.log("NavbarHome: Token expired client-side. User not logged in.");
+                    setIsLoggedIn(false);
+                    localStorage.removeItem('token'); // Clear expired token
+                    return;
+                }
 
-                // 4. Backend validation if client-side checks pass
+                // Also check if the role is 'CUSTOMER' for this specific navbar's display logic
+                if (decodedToken.role !== "CUSTOMER") {
+                    console.log("NavbarHome: User is logged in but not a 'CUSTOMER'. Displaying as logged out.");
+                    setIsLoggedIn(false); // Treat as logged out for customer-specific display
+                    return;
+                }
+
                 console.log("NavbarHome: Client-side token valid and role is 'CUSTOMER'. Verifying with backend...");
                 const response = await axios.get('/api/auth/check-status');
 
-                if (response.status === 200  && decodedToken.role === "CUSTOMER" ) {
+                if (response.status === 200) {
                     console.log("NavbarHome: Backend confirmed authentication status (200 OK).");
                     setIsLoggedIn(true);
                 } else {
                     console.log(`NavbarHome: Backend check failed with status: ${response.status}. User not logged in.`);
                     setIsLoggedIn(false);
-                    // Axios config should handle clearing token on auth errors.
                 }
             } catch (error) {
                 console.error("NavbarHome: Authentication check failed (decode error or backend call):", error);
                 setIsLoggedIn(false);
-                // Axios config should handle clearing token on auth errors.
             }
         };
 
-        checkAuthStatus(); // Call the renamed function
-    }, [axios]); // Keep axios in dependencies
+        checkAuthStatus();
+    }, [axios]);
 
     return (
-        <header className="bg-[white] top-0 z-50 font-sans">
+        <header className="bg-white top-0 z-50 font-sans shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-4">
+                <div className="flex justify-between items-center py-3.5">
                     {/* Logo */}
                     <div
-                        className="flex items-center space-x-4 cursor-pointer"
+                        className="flex items-center space-x-3 cursor-pointer"
                         onClick={() => (window.location.href = '/')}
                     >
                         <img
@@ -73,24 +75,24 @@ export default function NavbarHome() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-6 text-black font-medium">
-                        <a href="/store/home">Store</a>
-                        <a href="/services">Services</a>
-                        <a href="/doctors">Doctors</a>
-                        <a href="/about">About us</a>
-                        <a href="/contact">Contact</a>
+                        <a href="/store/home" className="hover:text-blue-600 transition-colors">Store</a>
+                        <a href="/services" className="hover:text-blue-600 transition-colors">Services</a>
+                        <a href="/doctors" className="hover:text-blue-600 transition-colors">Doctors</a>
+                        <a href="/about" className="hover:text-blue-600 transition-colors">About us</a>
+                        <a href="/contact" className="hover:text-blue-600 transition-colors">Contact</a>
 
-                        {/* Make Appointment Button */}
+                        {/* Make Appointment Button - White to Black on Hover */}
                         <button
                             onClick={() => (window.location.href = '/doctors')}
                             onMouseEnter={() => setAnimate(true)}
-                            onAnimationEnd={() => setAnimate(false)} // Keep onAnimationEnd for original behavior
-                            onMouseLeave={() => setAnimate(false)} // Added to reset animation on mouse leave
-                            className="flex items-center px-4 py-1 rounded-full bg-[white] text-neutral-900 border-neutral-900 border-[1px] font-medium text-lg"
+                            onAnimationEnd={() => setAnimate(false)}
+                            onMouseLeave={() => setAnimate(false)}
+                            className="flex items-center px-5 py-2 rounded-full bg-white text-neutral-900 border border-neutral-900 font-semibold text-base shadow-sm hover:bg-neutral-900 hover:text-white transition-all duration-300 ease-in-out group"
                         >
-                            <p className="text-base font-bold">Make an Appointment</p>
-                            <div className="ml-3 h-9 w-9 flex items-center justify-center rounded-full bg-neutral-900 overflow-hidden">
+                            <span className="mr-2">Make an Appointment</span>
+                            <div className="h-7 w-7 flex items-center justify-center rounded-full bg-neutral-900 overflow-hidden group-hover:bg-white transition-colors duration-300">
                                 <div className={animate ? 'animate-arrowLoop' : ''}>
-                                    <ArrowUpRight className="text-[white]" />
+                                    <ArrowUpRight className="text-white group-hover:text-neutral-900 transition-colors duration-300" size={20} />
                                 </div>
                             </div>
                         </button>
@@ -100,27 +102,26 @@ export default function NavbarHome() {
                             <>
                                 <button
                                     onClick={() => (window.location.href = '/signup')}
-                                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
+                                    className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 font-semibold text-base hover:bg-gray-100 transition-all duration-200"
                                 >
                                     Sign Up
                                 </button>
                                 <button
                                     onClick={() => (window.location.href = '/login')}
-                                    className="text-sm font-semibold text-black border border-black px-4 py-1 rounded-full hover:bg-black hover:text-white transition"
+                                    className="px-5 py-2 rounded-full bg-gray-800 text-white font-semibold text-base hover:bg-gray-900 transition-all duration-200"
                                 >
                                     Login
                                 </button>
                             </>
-                        ): (
+                        ) : (
                             // Show Profile Icon when logged in (Desktop)
-                            <div className="relative">
+                            <div className="relative ml-2">
                                 <button
-                                    // Removed console.log, now navigates directly
                                     onClick={() => (window.location.href = "/my-profile")}
-                                    className="text-black hover:text-gray-700 transition"
+                                    className="text-gray-700 hover:text-blue-600 transition-colors"
                                     aria-label="User Profile"
                                 >
-                                    <UserIcon className="h-8 w-8 cursor-pointer hover:text-gray-600 transition-colors" />
+                                    <CircleUserRound className="h-9 w-9 cursor-pointer" />
                                 </button>
                             </div>
                         )}
@@ -128,7 +129,7 @@ export default function NavbarHome() {
 
                     {/* Mobile Menu Toggle */}
                     <div className="md:hidden">
-                        <button onClick={() => setMenuOpen(!menuOpen)}>
+                        <button onClick={() => setMenuOpen(!menuOpen)} className="text-gray-700 hover:text-gray-900 transition-colors">
                             {menuOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
                     </div>
@@ -137,22 +138,22 @@ export default function NavbarHome() {
 
             {/* Mobile Menu */}
             {menuOpen && (
-                <div className="md:hidden bg-white px-6 py-4 space-y-4 text-center border-t">
-                    <a href="/store/home" className="block">Store</a>
-                    <a href="/services" className="block">Services</a>
-                    <a href="/doctors" className="block">Doctors</a>
-                    <a href="/about">About Us</a>
-                    <a href="/contact">Contact</a>
+                <div className="md:hidden bg-white px-6 py-4 space-y-4 text-center border-t shadow-md">
+                    <a href="/store/home" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Store</a>
+                    <a href="/services" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Services</a>
+                    <a href="/doctors" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Doctors</a>
+                    <a href="/about" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">About Us</a>
+                    <a href="/contact" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Contact</a>
                     {!isLoggedIn ? (
                         <>
-                            <a href="/signup" className="block border border-black px-4 py-2 rounded-full">
+                            <a href="/signup" className="block w-full px-5 py-2 mt-4 rounded-full border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition">
                                 Sign Up
                             </a>
-                            <a href="/login" className="block border border-black px-4 py-2 rounded-full">
+                            <a href="/login" className="block w-full px-5 py-2 mt-2 rounded-full bg-gray-800 text-white font-semibold hover:bg-gray-900 transition">
                                 Login
                             </a>
                         </>
-                    ): (
+                    ) : (
                         // Show Profile Icon when logged in (Mobile)
                         <div className="flex justify-center mt-4">
                             <button
@@ -160,19 +161,20 @@ export default function NavbarHome() {
                                     window.location.href = "/my-profile";
                                     setMenuOpen(false); // Close mobile menu after clicking
                                 }}
-                                className="text-black hover:text-gray-700 transition"
+                                className="text-gray-700 hover:text-blue-600 transition-colors"
                                 aria-label="User Profile"
                             >
-                                <UserIcon className="h-8 w-8 cursor-pointer hover:text-gray-600 transition-colors" />
+                                <CircleUserRound className="h-9 w-9 cursor-pointer" />
                             </button>
                         </div>
                     )}
                     <button
                         onClick={() => {
                             window.location.href = '/doctors';
-                            setMenuOpen(false); // Close mobile menu after clicking
+                            setMenuOpen(false);
                         }}
-                        className="w-full border border-black px-4 py-2 rounded-full"
+                        // Mobile button also updated to white-to-black hover
+                        className="w-full px-5 py-2 mt-4 rounded-full bg-white text-neutral-900 border border-neutral-900 font-semibold shadow-sm hover:bg-neutral-900 hover:text-white transition"
                     >
                         Make an Appointment
                     </button>
