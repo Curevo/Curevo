@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -43,12 +44,9 @@ public class CustomerController {
         String userEmail = authentication.getName();
 
         Optional<Customer> customer = customerService.getByEmail(userEmail);
-        if (customer.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(false, "Customer not found", null));
-        }
+        return customer.map(value -> ResponseEntity.ok(new ApiResponse<>(true, "Customer retrieved", value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, "Customer not found", null)));
 
-        return ResponseEntity.ok(new ApiResponse<>(true, "Customer retrieved", customer.get()));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -59,5 +57,14 @@ public class CustomerController {
                     .body(new ApiResponse<>(false, "Customer not found or could not be deleted", null));
         }
         return ResponseEntity.ok(new ApiResponse<>(true, "Customer deleted successfully", "Deleted"));
+    }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponse<Customer>> updateCustomer(
+            @PathVariable Long id,
+            @RequestPart("customer") Customer customer,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        Optional<Customer> updatedCustomer = customerService.updateCustomer(id, customer,image);
+        return updatedCustomer.map(value -> ResponseEntity.ok(new ApiResponse<>(true, "Customer updated successfully", value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, "Customer not found", null)));
     }
 }

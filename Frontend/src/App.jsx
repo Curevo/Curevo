@@ -31,6 +31,7 @@ import AppointmentPage from "@/customer/Pages/AppointmentPage.jsx";
 import AccountPage from "@/customer/Pages/AccountPage.jsx";
 import OrderManagement from "./Admin/Pages/OrderManageAdmin.jsx"
 import ExecutiveManagement from "./Admin/Pages/DeliveryExecManageAdmin.jsx"
+import ResetPassword from "./customer/Pages/ResetPassword.jsx"
 
 
 
@@ -50,6 +51,7 @@ const App = () => {
                   <Route path="/store/home" element={<HomeStore />} />
                   <Route path="/store/products" element={<ProductStore />} />
                   <Route path="/product/:productId/store/:storeId" element={<ProductDetailsPage />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
 
 
 

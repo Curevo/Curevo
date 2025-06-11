@@ -103,4 +103,25 @@ public class CustomerService {
                 .orElseThrow(() -> new UserNotFoundException("Customer not found with id: " + id));
     }
 
+    @Transactional
+    public Optional<Customer> updateCustomer(Long id, Customer customer,MultipartFile image) {
+        Optional<Customer> existingCustomerOpt = customerRepository.findById(id);
+        if (existingCustomerOpt.isPresent()) {
+            Customer existingCustomer = existingCustomerOpt.get();
+            existingCustomer.setName(customer.getName());
+            existingCustomer.setAge(customer.getAge());
+            existingCustomer.setAddress(customer.getAddress());
+
+            if(image != null && !image.isEmpty()) {
+
+                    imageHostingService.deleteImage(existingCustomer.getImage());
+                    String imageUrl = imageHostingService.uploadImage(image,"customers");
+                    existingCustomer.setImage(imageUrl);
+            }
+
+            return Optional.of(customerRepository.save(existingCustomer));
+        } else {
+            throw new UserNotFoundException("Customer not found with id: " + id);
+        }
+    }
 }

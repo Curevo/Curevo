@@ -132,11 +132,10 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void resetPassword(String email, String otp, String newPassword) {
+    public void resetPassword(String email, String newPassword) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found for password reset."));
-
 
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);

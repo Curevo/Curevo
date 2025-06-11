@@ -31,9 +31,11 @@ export default function Login() {
 
                 if (decodedToken.role === "ADMIN") {
                     navigate("/admin/home");
-                } else if (decodedToken.role === "DOCTOR") {
-                    navigate("/doctor-dashboard");
-                } else if (decodedToken.role === "CUSTOMER") {
+                }
+                // else if (decodedToken.role === "DOCTOR") {
+                //     navigate("/doctor-dashboard");
+                // }
+                else if (decodedToken.role === "CUSTOMER") {
                     navigate("/");
                 }else if (decodedToken.role === "DELIVERY_EXECUTIVE") {
                     navigate("/delivery-executive/home");

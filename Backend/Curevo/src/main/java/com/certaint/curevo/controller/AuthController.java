@@ -6,6 +6,7 @@ import com.certaint.curevo.dto.AuthResponse;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.repository.UserRepository;
 import com.certaint.curevo.security.JwtService;
+import com.certaint.curevo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
 
     @PostMapping("/login")
@@ -54,6 +56,29 @@ public class AuthController {
     @GetMapping("/check-status")
     public ResponseEntity<ApiResponse<String>> checkAuthStatus() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Authenticated", "Token is valid"));
+    }
+    @PostMapping("/password-initiate")
+    public ResponseEntity<ApiResponse<String>> initiatePasswordReset(@RequestParam String email) {
+        userService.initiatePasswordReset(email);
+        ApiResponse<String> response = new ApiResponse<>(true, "Password reset initiated. Please check your email for the OTP.", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/validate-otp")
+    public ResponseEntity<ApiResponse<Boolean>> validateOtp(@RequestParam String email, @RequestParam String otp) {
+        boolean isValid = userService.validateOtp(email, otp);
+        ApiResponse<Boolean> response = new ApiResponse<>(isValid, "OTP validation successful.", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword
+    ) {
+        userService.resetPassword(email, newPassword);
+        ApiResponse<String> response = new ApiResponse<>(true, "Password reset successfully.", null);
+        return ResponseEntity.ok(response);
     }
 
 
