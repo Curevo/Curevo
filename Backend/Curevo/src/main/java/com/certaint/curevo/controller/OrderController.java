@@ -3,21 +3,15 @@ package com.certaint.curevo.controller;
 
 
 import com.certaint.curevo.dto.ApiResponse;
-import com.certaint.curevo.dto.CartResponse;
 import com.certaint.curevo.dto.OrderRequestDTO;
 import com.certaint.curevo.entity.CartItem;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.Order;
 import com.certaint.curevo.entity.Payment;
 import com.certaint.curevo.enums.PaymentStatus;
-import com.certaint.curevo.repository.CartItemRepository;
 import com.certaint.curevo.security.JwtService;
-import com.certaint.curevo.service.CartItemService;
-import com.certaint.curevo.service.CustomerService;
-import com.certaint.curevo.service.OrderService;
-import com.certaint.curevo.service.PaymentService;
+import com.certaint.curevo.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +31,7 @@ public class OrderController {
     private final CustomerService customerService;
     private final PaymentService paymentService;
     private final CartItemService cartItemService;
+    private final ExecutiveService executiveService;
 
     @PostMapping
     public ResponseEntity<Order> create(@RequestBody Order order) {
@@ -74,7 +69,7 @@ public class OrderController {
 
         Customer customer = optCustomer.get();
 
-        // 👇 Convert DTO to Entity
+        // Convert DTO to Entity
         Order order = new Order();
         order.setCustomer(customer);
         order.setDeliveryAddress(orderRequestDTO.getAddress());
@@ -84,31 +79,26 @@ public class OrderController {
         order.setDeliveryInstructions(orderRequestDTO.getInstructions());
         order.setDeliveryLat(orderRequestDTO.getLat());
         order.setDeliveryLng(orderRequestDTO.getLng());
+
         List<CartItem> cartItems = cartItemService.getCartItemsByCustomer(customer);
 
-        BigDecimal subtotalBigDecimal = cartItems.stream()
+        BigDecimal subtotal = cartItems.stream()
                 .map(item -> item.getProduct().getPrice().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-
-
-        // 👇 Calculate amounts
+        // Calculate amounts
         BigDecimal minimumOrderAmount = BigDecimal.valueOf(300);
         BigDecimal platformFee = BigDecimal.TEN;
-        BigDecimal deliveryCharges = BigDecimal.ZERO;
-
-        if (subtotalBigDecimal.compareTo(minimumOrderAmount) < 0) {
-            deliveryCharges = BigDecimal.valueOf(50);
-        }
-        BigDecimal totalAmount = subtotalBigDecimal
-                .add(platformFee)
-                .add(deliveryCharges);
+        BigDecimal deliveryCharges = subtotal.compareTo(minimumOrderAmount) < 0 ? BigDecimal.valueOf(50) : BigDecimal.ZERO;
+        BigDecimal totalAmount = subtotal.add(platformFee).add(deliveryCharges);
+        totalAmount = subtotal.multiply(BigDecimal.valueOf(0.18)); // 18% GST
 
         order.setTotalAmount(totalAmount);
+
+        // Save Order
         Order newOrder = orderService.createOrder(customer, order, prescriptionFile);
 
-
-        // 👇 Create Payment
+        // Create Payment
         Payment payment = new Payment();
         payment.setOrder(newOrder);
         payment.setAmount(newOrder.getTotalAmount());
@@ -117,8 +107,16 @@ public class OrderController {
 
         Payment savedPayment = paymentService.createPayment(payment);
 
-        return new ApiResponse<>(true, "Order and Payment created successfully", savedPayment);
+        // 💥 Assign Order to Executive AFTER Payment Success
+        try {
+            executiveService.assignOrder(newOrder);
+        } catch (RuntimeException e) {
+            return new ApiResponse<>(true, "Order created and payment completed, but no executive available at the moment", savedPayment);
+        }
+
+        return new ApiResponse<>(true, "Order and Payment created and assigned successfully", savedPayment);
     }
+
 
     @GetMapping("/me")
     public ApiResponse<List<Order>> getAllByCustomer(

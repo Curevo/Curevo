@@ -20,15 +20,28 @@ public class DeliveryExecutive {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private Double currentLat;
-    private Double currentLng;
-
     @Enumerated(EnumType.STRING)
-    private DeliveryExecutiveStatus status;
+    private DeliveryExecutiveStatus status=DeliveryExecutiveStatus.NOT_VERIFIED;
+
+    private String image;
+
+    private String name;
 
     private String vehicleType;
 
     private Instant updatedAt;
 
     private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }

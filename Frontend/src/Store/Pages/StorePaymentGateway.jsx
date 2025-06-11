@@ -136,6 +136,7 @@ const StorePaymentGateway = () => {
             }
 
             await axios.post('/api/orders/create', formData);
+            navigate("/my-orders");
 
             alert('Order placed successfully!');
             sessionStorage.removeItem('customerFormData');

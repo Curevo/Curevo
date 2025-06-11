@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useAxiosInstance} from '@/Config/axiosConfig.js';
-import { Enable2StepModal } from './Enable2StepModal';
-import { Verify2StepModal } from './Verify2StepModal';
+import { Enable2StepModal } from './Enable2StepModal.jsx';
+import { Verify2StepModal } from './Verify2StepModal.jsx';
 // import ResetPassword from './ResetPassword';
 
 export default function UserProfile() {

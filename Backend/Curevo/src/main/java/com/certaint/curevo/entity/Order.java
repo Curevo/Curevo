@@ -1,6 +1,5 @@
 package com.certaint.curevo.entity;
 
-
 import com.certaint.curevo.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -26,7 +25,6 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-
     // Delivery details
     private String recipientName;
     private String recipientPhone;
@@ -38,14 +36,14 @@ public class Order {
 
     // Prescription
     private String prescriptionUrl;
-    private Boolean prescriptionVerified;
+    private Boolean prescriptionVerified=true;
 
     // Payment
-    private BigDecimal totalAmount=BigDecimal.ZERO;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     // Status
     @Enumerated(EnumType.STRING)
-    private OrderStatus status= OrderStatus.PENDING;
+    private OrderStatus status = OrderStatus.PENDING;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -54,4 +52,17 @@ public class Order {
     // Timestamps
     private Instant placedAt;
     private Instant updatedAt;
+
+    // Automatically set timestamps
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        this.placedAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 }

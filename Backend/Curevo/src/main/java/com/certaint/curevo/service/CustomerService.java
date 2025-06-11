@@ -76,7 +76,7 @@ public class CustomerService {
 
         String otp = otpService.generateOtp(email);
         cacheService.cacheCustomerData(email, customerDTO);
-        emailService.sendOtpEmail(email, otp, customerDTO.getName());
+        emailService.sendCustomerRegistrationOtpEmail(email, otp, customerDTO.getName());
 
         System.out.println(customerDTO.getUser().getPassword());
         return TRUE;
@@ -94,7 +94,8 @@ public class CustomerService {
         }
 
         Boolean saved = saveCustomer(customerDTO);
-        cacheService.evictCachedData(email); // Clean up cache
+        cacheService.evictCachedData(email);
+        emailService.sendCustomerRegistrationSuccessEmail(email, customerDTO.getName());
         return saved;
     }
     public Customer getCustomerById(Long id) {

@@ -26,6 +26,7 @@ public class ExecutiveDocument {
     private String bankAccountNumber;
     private String bankIFSC;
     private String bankName;
+    private String vehicleNumber;
 
     private Instant submittedAt;
 }

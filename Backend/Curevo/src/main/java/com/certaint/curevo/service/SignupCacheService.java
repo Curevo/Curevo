@@ -1,6 +1,7 @@
 package com.certaint.curevo.service;
 
 import com.certaint.curevo.dto.CustomerDTO;
+import com.certaint.curevo.dto.DeliveryExecutiveDTO;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ public class SignupCacheService {
 
     private final Cache<String, CustomerDTO> customerCache;
     private final Cache<String, String> otpCache;
+    private final Cache<String, DeliveryExecutiveDTO> deliveryExecutiveCache;
+    private final Cache<String, String> deliveryOtpCache;
 
     public SignupCacheService() {
         this.customerCache = Caffeine.newBuilder()
@@ -20,6 +23,14 @@ public class SignupCacheService {
                 .build();
 
         this.otpCache = Caffeine.newBuilder()
+                .expireAfterWrite(3, TimeUnit.MINUTES)
+                .maximumSize(1000)
+                .build();
+        this.deliveryExecutiveCache=Caffeine.newBuilder()
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .maximumSize(1000)
+                .build();
+        this.deliveryOtpCache = Caffeine.newBuilder()
                 .expireAfterWrite(2, TimeUnit.MINUTES)
                 .maximumSize(1000)
                 .build();
@@ -31,6 +42,12 @@ public class SignupCacheService {
 
     public CustomerDTO getCachedCustomerData(String email) {
         return customerCache.getIfPresent(email);
+    }
+    public void cacheDeliveryExecutiveData(String email, DeliveryExecutiveDTO deliveryExecutiveDTO) {
+        deliveryExecutiveCache.put(email, deliveryExecutiveDTO);
+    }
+    public DeliveryExecutiveDTO getCachedDeliveryExecutiveData(String email) {
+        return deliveryExecutiveCache.getIfPresent(email);
     }
 
     public void cacheOtp(String email, String otp) {
@@ -44,5 +61,18 @@ public class SignupCacheService {
     public void evictCachedData(String email) {
         customerCache.invalidate(email);
         otpCache.invalidate("otp:" + email);
+        deliveryExecutiveCache.invalidate(email);
+    }
+
+    public void cacheOtpForDelivery(String assignmentId, String otp) {
+        deliveryOtpCache.put("delivery_otp:" + assignmentId, otp);
+    }
+
+    public String getCachedOtpForDelivery(String assignmentId) {
+        return deliveryOtpCache.getIfPresent("delivery_otp:" + assignmentId);
+    }
+
+    public void evictCachedOtpForDelivery(String assignmentId) {
+        deliveryOtpCache.invalidate("delivery_otp:" + assignmentId);
     }
 }

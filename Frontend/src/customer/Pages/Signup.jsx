@@ -153,6 +153,7 @@ export default function Signup() {
                 isOpen={isOtpPopupOpen}
                 onClose={() => setOtpPopupOpen(false)}
                 email={userEmail}
+                userType="customer"
             />
 
         </div>

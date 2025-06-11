@@ -28,8 +28,24 @@ public class DeliveryAssignment {
     @Enumerated(EnumType.STRING)
     private DeliveryAssignmentStatus status;
 
+    @Column(nullable = false, updatable = false) // assignedAt should not be updatable manually
     private Instant assignedAt;
+
+    @Column(nullable = false)
     private Instant updatedAt;
-    private Instant estimatedArrival;
-    private Instant actualDelivery;
+
+
+    private Instant actualDelivery; // This records when the delivery was actually completed
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        assignedAt = now; // Set assignedAt only on creation
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now(); // Update updatedAt on every modification
+    }
 }

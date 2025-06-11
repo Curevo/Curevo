@@ -2,7 +2,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Signup from './customer/Pages/Signup'
 import Login from './customer/Pages/Login'
-import UserProfile from "./customer/pages/UserProfile.jsx";
 import ProductGrid from './Store/Components/products'
 import HomeStore from './Store/Pages/HomeStore'
 import ProductStore from './Store/Pages/ProductStore'
@@ -25,11 +24,11 @@ import AppointmentManageAdmin from './Admin/Pages/AppointmentManageAdmin'
 import TermsAndConditions from './Components/TermsAndConditions'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import Licenses from './Components/Licenses'
-import CustomerDashboard from './customer/Pages/CustomerDashboard'
 import OrderDetails from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
 import DeliveryExecutiveRegister from './Components/DeliveryExecutiveRegister.jsx'
-import DeliveryExecManageAdmin from './Admin/Pages/DeliveryExecManageAdmin.jsx'
-import OrderManageAdmin from './Admin/Pages/OrderManageAdmin.jsx'
+import OrderPage from "@/customer/Pages/OrderPage.jsx";
+import AppointmentPage from "@/customer/Pages/AppointmentPage.jsx";
+import AccountPage from "@/customer/Pages/AccountPage.jsx";
 
 
 
@@ -52,10 +51,13 @@ const App = () => {
 
 
 
-                  <Route path="/userprofile" element={<UserProfile />} />
                   <Route path="/otp" element={<VerifyOTP />} />
                   <Route path="/doctor/:doctorId" element={<DoctorPreview />} />
                   <Route path="/appointments/:doctorId" element={<Appointments />} />
+                  <Route path="/my-orders" element={<OrderPage />} />
+                  <Route path ="/my-appointments" element={<AppointmentPage />} />
+                  <Route path ="/my-profile" element={<AccountPage />} />
+
 
 
 
@@ -71,19 +73,16 @@ const App = () => {
                   <Route path="/admin/store" element={<StoreManageAdmin/>} />
                   <Route path="/admin/clinics" element={<ClinicManageAdmin/>} />
                   <Route path="/admin/appointments" element={<AppointmentManageAdmin/>} />
-                  <Route path="/admin/captains" element={<DeliveryExecManageAdmin/>} />
-                  <Route path="/admin/orders" element={<OrderManageAdmin/>} />
 
 
 
-                <Route path="/terms" element={<TermsAndConditions/>} />
-                <Route path="/policies" element={<PrivacyPolicy/>} />
-                <Route path="/licenses" element={<Licenses/>} />
-                <Route path="/orderDetails" element={<OrderDetails />} />
-                <Route path="/CustomerDashboard" element={<CustomerDashboard />} />
+                  <Route path="/terms" element={<TermsAndConditions/>} />
+                  <Route path="/policies" element={<PrivacyPolicy/>} />
+                  <Route path="/licenses" element={<Licenses/>} />
+                  <Route path="/orderDetails" element={<OrderDetails />} />
 
 
-                  <Route path="/Delivery/signup" element={<DeliveryExecutiveRegister />} />
+                  <Route path="/executive/signup" element={<DeliveryExecutiveRegister />} />
 
             </Routes>
       );

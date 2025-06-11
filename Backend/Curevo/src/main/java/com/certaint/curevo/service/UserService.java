@@ -24,6 +24,8 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
+    private final EmailService emailService;
 
 
     @Transactional
@@ -104,5 +106,43 @@ public class UserService implements UserDetailsService {
         user.setRole(Role.ADMIN);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public void initiatePasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for password reset."));
+
+        String otp = otpService.generateOtp(email);
+
+        String userName = user.getEmail();
+        emailService.sendPasswordResetOtpEmail(email, otp, userName);
+    }
+
+    public boolean validateOtp(String email, String otp) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for OTP validation."));
+
+        boolean isValid = otpService.validateOtp(email, otp);
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid or expired OTP.");
+        }
+
+        return true;
+    }
+
+    @Transactional
+    public void resetPassword(String email, String otp, String newPassword) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for password reset."));
+
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        // Clear OTP from cache
+        otpService.clearOtp(email);
     }
 }
