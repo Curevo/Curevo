@@ -1,7 +1,7 @@
 // src/pages/AccountPage.jsx
 import React from 'react';
-import OrderSidebar from '../components/DashboardSidebar'; // Path to your sidebar
-import UserProfile from '../components/UserProfile';
+import OrderSidebar from '../Components/DashboardSidebar'; // Path to your sidebar
+import UserProfile from '../Components/UserProfile';
 
 export default function AccountPage() {
     // This highlights 'Account' in your sidebar
