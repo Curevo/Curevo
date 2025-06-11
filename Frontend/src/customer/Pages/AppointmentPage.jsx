@@ -1,7 +1,7 @@
 // src/pages/AppointmentPage.jsx
 import React from 'react';
-import OrderSidebar from '../components/DashboardSidebar.jsx'; // Path to your sidebar
-import Appointment from '../components/Appointment';
+import OrderSidebar from '../Components/DashboardSidebar.jsx'; // Path to your sidebar
+import Appointment from '../Components/Appointment';
 
 export default function AppointmentPage() {
     // This tells the sidebar which item should be highlighted
