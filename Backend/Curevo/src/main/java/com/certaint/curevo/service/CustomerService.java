@@ -39,7 +39,7 @@ public class CustomerService {
         // 1. Create and save the User
         User user = new User();
         user.setEmail(customerDTO.getUser().getEmail());
-        user.setPassword(passwordEncoder.encode(customerDTO.getUser().getPassword()));
+        user.setPassword(customerDTO.getUser().getPassword());
         user.setRole(Role.valueOf("CUSTOMER"));
 
         User savedUser = userService.saveUser(user);
