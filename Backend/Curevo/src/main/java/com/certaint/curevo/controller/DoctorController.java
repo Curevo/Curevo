@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -28,8 +30,14 @@ public class DoctorController {
         Doctor savedDoctor = doctorService.saveDoctor(doctor,image);
         return ResponseEntity.ok(new ApiResponse<>(true, "Doctor saved successfully", savedDoctor));
     }
+//    @GetMapping("/specializations/all")
+//    public ApiResponse<List<String>> getAllSpecializations() {
+//        return Arrays.stream(Specialization.values())
+//                .map(Enum::name) // Get the string name of each enum constant
+//                .collect(Collectors.toList());
+//    }
 
-    @GetMapping
+    @GetMapping("/get/paging")
     public ResponseEntity<ApiResponse<Page<Doctor>>> getAllDoctors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -62,7 +70,7 @@ public class DoctorController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Specializations retrieved successfully", specializations));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<String>> deleteDoctor(@PathVariable Long id) {
         try {
             doctorService.deleteDoctor(id);
@@ -76,7 +84,7 @@ public class DoctorController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<Doctor>> updateDoctor(
             @PathVariable Long id,
             @RequestPart Doctor doctor,
@@ -93,7 +101,7 @@ public class DoctorController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<ApiResponse<Doctor>> getDoctorById(@PathVariable Long id) {
         try {
             Doctor doctor = doctorService.getDoctorById(id);

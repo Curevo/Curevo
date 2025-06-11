@@ -276,16 +276,9 @@ const DoctorProfiles = () => {
         if (doctorFormData.imageFile) {
             formData.append('image', doctorFormData.imageFile);
         } else if (modalMode === 'edit' && doctorFormData.imageUrlPreview && !doctorFormData.imageFile) {
-            // If editing and no new file, but there was an existing image, you might need to
-            // indicate to the backend to keep the existing image or handle it based on your backend logic.
-            // For now, if imageFile is null, it means no new image is uploaded.
-            // Your backend's update method should handle this gracefully (e.g., keep existing image if no new file is sent).
-            // No explicit action needed here unless your backend expects a specific flag.
+
         } else if (modalMode === 'edit' && !doctorFormData.imageUrlPreview && !doctorFormData.imageFile) {
-            // If editing and both imageUrlPreview and imageFile are empty, means image was cleared.
-            // You might want to send a flag or null image to backend to clear it.
-            // For now, sending no image file implies no change or clear if backend interprets it.
-            // Your backend's `updateDoctor` method needs to properly handle `MultipartFile imageFile` being null.
+
         }
 
 
@@ -298,7 +291,7 @@ const DoctorProfiles = () => {
                 // Add the new doctor to the list
                 setDoctors(prev => [...prev, response.data.data]);
             } else { // modalMode === "edit"
-                response = await axios.put(`${ADD_DELETE_API_URL}/${doctorFormData.doctorId}`, formData, {
+                response = await axios.put(`/api/doctors/update/${doctorFormData.doctorId}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 // Update the doctor in the list
@@ -320,7 +313,7 @@ const DoctorProfiles = () => {
 
     const deleteDoctor = async (id) => {
         try {
-            const response = await axios.delete(`${ADD_DELETE_API_URL}/${id}`);
+            const response = await axios.delete(`/api/doctors/delete/${id}`);
             if (response.data.success) {
                 setDoctors(doctors.filter(doctor => doctor.doctorId !== id));
             } else {

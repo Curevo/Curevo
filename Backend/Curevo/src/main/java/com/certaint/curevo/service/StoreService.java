@@ -39,6 +39,21 @@ public class StoreService {
     public List<StoreDistanceInfo> getStoresWithDistancesWithinRadius(double lat, double lon, double radiusKm) {
         return storeRepository.findStoresWithinRadius(lat, lon, radiusKm);
     }
+    public Store updateStore(Long storeId, Store updatedStore) {
+        Store existingStore = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found with id: " + storeId));
+
+        // Update fields (adapt as needed)
+        existingStore.setName(updatedStore.getName());
+        existingStore.setAddress(updatedStore.getAddress());
+        existingStore.setLatitude(updatedStore.getLatitude());
+        existingStore.setLongitude(updatedStore.getLongitude());
+        existingStore.setPhoneNumber(updatedStore.getPhoneNumber());
+
+
+        return storeRepository.save(existingStore);
+    }
+
     public List<Store> getStoresByIds(List<Long> storeIds) {
         return storeRepository.findAllById(storeIds);
     }

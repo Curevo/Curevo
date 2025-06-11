@@ -20,7 +20,7 @@ const DoctorsPage = () => {
         try {
             setLoading(true);
             const currentPage = reset ? 0 : page;
-            const url = isSearching ? '/api/doctors/search' : `/api/doctors`;
+            const url = isSearching ? '/api/doctors/search' : `/api/doctors/get/paging`;
             const response = await axios.get(url, {
                 params: {
                     page: currentPage,

@@ -44,4 +44,11 @@ public class StoreController {
         ApiResponse<String> response = new ApiResponse<>(true, "Store deleted successfully", null);
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Store>> updateStore(@PathVariable Long id, @RequestBody Store store) {
+        Store updatedStore = storeService.updateStore(id, store);
+        ApiResponse<Store> response = new ApiResponse<>(true, "Store updated successfully", updatedStore);
+        return ResponseEntity.ok(response);
+    }
+
 }

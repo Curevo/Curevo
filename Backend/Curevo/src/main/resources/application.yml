@@ -50,3 +50,6 @@ server:
   port: 8080
   tomcat:
     max-swallow-size: 50MB
+github:
+  api:
+    key: ${GITHUB_AI_API_KEY}

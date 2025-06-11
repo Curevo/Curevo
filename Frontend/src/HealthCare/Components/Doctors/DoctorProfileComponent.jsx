@@ -22,7 +22,7 @@ const DoctorProfileComponent = () => {
             try {
                 // Use the authenticated axios instance
                 // The endpoint is correctly structured as `/api/doctors/{id}`
-                const response = await axios.get(`/api/doctors/${doctorId}`);
+                const response = await axios.get(`/api/doctors/get/${doctorId}`);
                 // Access data from response.data.data as per your JSON structure
                 setDoctor(response.data.data);
                 setLoading(false);
