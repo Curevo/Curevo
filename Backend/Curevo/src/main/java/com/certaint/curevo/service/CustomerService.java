@@ -48,7 +48,7 @@ public class CustomerService {
         customer.setUser(savedUser);
         customer.setName(customerDTO.getName());
 
-        Customer savedCustomer = customerRepository.save(customer);
+        customerRepository.save(customer);
         return TRUE;
     }
 

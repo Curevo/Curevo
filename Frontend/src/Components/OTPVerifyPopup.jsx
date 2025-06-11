@@ -51,7 +51,7 @@ const OTPVerifyPopup = ({ isOpen, onClose, email = 'you@example.com', userType }
             });
 
             if (response.data.success === true) {
-                navigate('/');
+                navigate('/login');
             } else {
 
                 alert(response.data.message || 'OTP verification failed. Please check the code.');

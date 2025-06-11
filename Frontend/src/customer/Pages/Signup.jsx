@@ -1,19 +1,17 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {useAxiosInstance} from '@/Config/axiosConfig.js';
 import { Link, useNavigate } from "react-router-dom";
 import LeftPanel from "../../Components/LeftPanel";
-import OTPVerifyPopup from '@/Components/OTPVerifyPopup';
-
+import OTPVerifyPopup from '@/Components/OTPVerifyPopup'; // Assuming this component exists
 
 export default function Signup() {
     const navigate = useNavigate();
     const axios = useAxiosInstance();
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
+    // State for OTP popup
     const [isOtpPopupOpen, setOtpPopupOpen] = useState(false);
     const [userEmail, setUserEmail] = useState('');
-
+    const [isSubmitting, setIsSubmitting] = useState(false); // New state for loading indicator
 
     const [formData, setFormData] = useState({
         name: "",
@@ -33,16 +31,27 @@ export default function Signup() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true); // Disable button and show loading
 
         if (!formData.termsAccepted) {
-            alert("Please accept the terms and conditions.");
+            alert("Please accept the terms and conditions to create an account.");
+            setIsSubmitting(false);
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match.");
+            alert("Passwords do not match. Please re-enter.");
+            setIsSubmitting(false);
             return;
         }
+
+        // Basic password strength check (optional, but good practice)
+        if (formData.password.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            setIsSubmitting(false);
+            return;
+        }
+
 
         try {
             await axios.post(`/api/customers/register`, {
@@ -50,100 +59,130 @@ export default function Signup() {
                 user: {
                     email: formData.email,
                     password: formData.password,
+                }
+            });
 
-                }});
-
-            setUserEmail(formData.email); // Set the dynamic email
+            setUserEmail(formData.email); // Set the email for OTP verification
             setOtpPopupOpen(true); // Show OTP popup
-        } catch (error) {
-            console.error(error.response?.data?.message || "Failed to create account. Please try again.");
-            alert("Failed to create account. Please try again.");
-        }
 
+        } catch (error) {
+            console.error("Signup error:", error.response?.data?.message || "Failed to create account.");
+            alert(error.response?.data?.message || "Failed to create account. Please try again.");
+        } finally {
+            setIsSubmitting(false); // Re-enable button
+        }
     };
 
     return (
-        <div className="flex h-screen bg-blue-900">
+        <div className="flex h-screen bg-gradient-to-br from-blue-900 to-purple-950 font-sans">
             <LeftPanel />
-            <div className="w-full lg:w-1/2 flex justify-center items-center">
+            <div className="w-full lg:w-1/2 flex justify-center items-center p-4">
                 <form
                     onSubmit={handleSignup}
-                    className="w-full max-w-xl p-8 bg-blue-950 rounded-[30px] text-white shadow-lg"
+                    className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl border border-gray-200 text-gray-800"
                 >
-                    <h2 className="text-2xl font-bold mb-6">Create an account</h2>
+                    <h2 className="text-3xl font-extrabold text-center mb-8 text-blue-800">
+                        Create Your Account
+                    </h2>
 
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Your name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="input mb-4"
-                        required
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="input mb-4"
-                        required
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="input mb-4"
-                        required
-                    />
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Re-enter your password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="input mb-4"
-                        required
-                    />
+                    <div className="mb-5">
+                        <label htmlFor="name" className="block text-gray-600 text-sm font-medium mb-2">
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="e.g., Jane Doe"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition duration-200 ease-in-out"
+                            required
+                        />
+                    </div>
 
-                    <div className="flex items-center mb-4">
+                    <div className="mb-5">
+                        <label htmlFor="email" className="block text-gray-600 text-sm font-medium mb-2">
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="your.email@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition duration-200 ease-in-out"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-5">
+                        <label htmlFor="password" className="block text-gray-600 text-sm font-medium mb-2">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition duration-200 ease-in-out"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-6">
+                        <label htmlFor="confirmPassword" className="block text-gray-600 text-sm font-medium mb-2">
+                            Confirm Password
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="••••••••"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition duration-200 ease-in-out"
+                            required
+                        />
+                    </div>
+
+                    <div className="flex items-center mb-6">
                         <input
                             type="checkbox"
+                            id="termsAccepted"
                             name="termsAccepted"
                             checked={formData.termsAccepted}
                             onChange={handleChange}
-                            className="mr-2"
+                            className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" // Styled checkbox
                         />
-                        <span>
+                        <label htmlFor="termsAccepted" className="text-gray-600 text-sm">
                             I agree to the{" "}
-                            <a href="/terms" className="text-blue-400 underline">
+                            <a href="/terms" className="text-blue-600 hover:text-blue-800 hover:underline transition duration-200 ease-in-out">
                                 Terms & Conditions
                             </a>
-                        </span>
+                        </label>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 hover:bg-blue-700 transition rounded-md py-2 text-white font-semibold mb-4"
+                        className="w-full bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        disabled={isSubmitting} // Disable button during submission
                     >
-                        Create account
+                        {isSubmitting ? (
+                            <svg className="animate-spin h-5 w-5 text-white mr-3" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        ) : null}
+                        {isSubmitting ? 'Creating Account...' : 'Create Account'}
                     </button>
 
-                    {/* <div className="flex items-center justify-between mt-4 gap-2">
-                        <button className="flex-1 bg-white text-black py-2 rounded-md shadow">
-                            Google
-                        </button>
-                        <button className="flex-1 bg-white text-black py-2 rounded-md shadow">
-                            Apple
-                        </button>
-                    </div> */}
-
-                    <div className="text-center text-sm mt-6">
+                    <div className="text-center text-sm mt-8 text-gray-600">
                         Already have an account?{" "}
-                        <Link to="/login" className="text-blue-400 hover:underline">
+                        <Link to="/login" className="text-blue-600 hover:text-blue-800 hover:underline font-semibold transition duration-200 ease-in-out">
                             Log in
                         </Link>
                     </div>
@@ -155,7 +194,6 @@ export default function Signup() {
                 email={userEmail}
                 userType="customer"
             />
-
         </div>
     );
 }

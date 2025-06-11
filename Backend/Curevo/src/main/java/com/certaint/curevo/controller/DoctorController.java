@@ -30,12 +30,7 @@ public class DoctorController {
         Doctor savedDoctor = doctorService.saveDoctor(doctor,image);
         return ResponseEntity.ok(new ApiResponse<>(true, "Doctor saved successfully", savedDoctor));
     }
-//    @GetMapping("/specializations/all")
-//    public ApiResponse<List<String>> getAllSpecializations() {
-//        return Arrays.stream(Specialization.values())
-//                .map(Enum::name) // Get the string name of each enum constant
-//                .collect(Collectors.toList());
-//    }
+
 
     @GetMapping("/get/paging")
     public ResponseEntity<ApiResponse<Page<Doctor>>> getAllDoctors(
