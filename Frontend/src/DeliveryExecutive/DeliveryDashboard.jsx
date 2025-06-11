@@ -1,92 +1,24 @@
-// DeliveryDashboard.jsx
-import { useState, useEffect } from "react";
-import axios from "axios";
+// DeliveryPage.jsx
+import React, { useState } from "react";
+import DeliverySidebar from "./Components/DeliverySidebar";   // your sidebar component
+import DeliveryMainContent from "./Components/DeliveryMainContent"; // we'll create this
 
-import Sidebar from "./Components/Sidebar";
-import Header from "./Components/Header";
-
-// Dashboard
-import SummaryCards from "./Components/SummaryCards";
-import ClientStats from "./Components/ClientStats";
-import RevenueChart from "./Components/PendingOrders";
-import RecentEmails from "./Components/RecentEmails";
-import FormationStatus from "./Components/FormationStatus";
-import TodoList from "./Components/TodoList";
-import DeliveryStatusCard from "./Components/DeliveryStatusCard";
-
-// Delivered section
-import DeliveredHeader from "./Components/DeliveredHeader";
-import DeliveredTable from "./Components/DeliveredTable";
-
-export default function DeliveryDashboard() {
-  const [view, setView] = useState("dashboard");
-  const [deliveryAvailable, setDeliveryAvailable] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch delivery status on mount
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const res = await axios.get("https://your-api.com/api/delivery-status", {
-          params: { deliveryGuyId: "12345" },
-        });
-        setDeliveryAvailable(res.data.status === "available");
-      } catch (err) {
-        console.error("Error fetching initial availability:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStatus();
-  }, []);
+export default function DeliveryPage() {
+  // shared view state: "overview", "orders", or "delivered"
+  const [view, setView] = useState("overview");
 
   return (
-    <div className="flex max-h-screen">
-      {/* Sidebar */}
-      <aside className="hidden md:block md:w-1/5 min-w-[200px] bg-transparent">
-        <Sidebar />
-      </aside>
+    <div className="flex min-h-screen">
+      {/* Sidebar always mounted */}
+      <DeliverySidebar
+        classNameWrapper="hidden md:block md:w-1/5 min-w-[200px]"
+        activeView={view}
+        setView={setView}
+      />
 
-      {/* Main */}
-      <main className="flex-1 p-8 overflow-y-scroll">
-        <Header setView={setView} />
-
-        {view === "delivered" ? (
-          <div className="mt-6 flex flex-col gap-6">
-            <DeliveredHeader />
-            <DeliveredTable />
-          </div>
-        ) : (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-[1fr_1fr_360px] gap-6">
-            {/* Summary Cards */}
-            <section className="md:col-span-2 flex flex-row gap-2.5">
-              <SummaryCards />
-            </section>
-
-            {/* Right Column */}
-            <section className="md:col-start-3 md:row-start-1 md:row-span-3 flex flex-col gap-6">
-              {/* Show only if available */}
-              {deliveryAvailable && <FormationStatus />}
-              <DeliveryStatusCard
-                available={deliveryAvailable}
-                setAvailable={setDeliveryAvailable}
-                loading={loading}
-              />
-              <TodoList />
-            </section>
-
-            {/* Stats */}
-            <section className="md:col-span-2 md:row-start-2 flex md:flex-row flex-col gap-2.5">
-              <ClientStats />
-              <RevenueChart />
-            </section>
-
-            {/* Emails */}
-            <section className="md:col-span-2 md:row-start-3">
-              <RecentEmails />
-            </section>
-          </div>
-        )}
+      {/* Main content grows to fill remaining width */}
+      <main className="flex-1 md:ml-0 p-4 pt-16 md:pt-4 overflow-y-auto bg-gray-50">
+        <DeliveryMainContent view={view} setView={setView} />
       </main>
     </div>
   );

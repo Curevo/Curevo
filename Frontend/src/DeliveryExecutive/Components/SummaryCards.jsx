@@ -5,9 +5,9 @@
 
 // Ensure the backend formats the numbers or currency (like $) unless you want to format it on the frontend.
 
-
+// SummaryCards.jsx
 import React, { useEffect, useState } from "react";
-import axios from '@/Config/axiosConfig.js';
+import { useAxiosInstance } from '@/Config/axiosConfig.js';
 import {
   FiDollarSign,
   FiShoppingCart,
@@ -16,6 +16,7 @@ import {
 } from "react-icons/fi";
 
 export default function SummaryCards() {
+  const axios = useAxiosInstance();
   const [summary, setSummary] = useState({
     revenue: "Loading...",
     totalOrders: "Loading...",
@@ -27,9 +28,7 @@ export default function SummaryCards() {
     const fetchSummary = async () => {
       try {
         const res = await axios.get("https://your-api.com/api/summary-cards", {
-          params: {
-            deliveryGuyId: "12345", // Optional: Use dynamically if needed
-          },
+          params: { deliveryGuyId: "12345" },
         });
         setSummary(res.data);
       } catch (error) {
@@ -42,7 +41,6 @@ export default function SummaryCards() {
         });
       }
     };
-
     fetchSummary();
   }, []);
 
@@ -74,19 +72,22 @@ export default function SummaryCards() {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className="relative bg-[#d1e0e9] rounded-[24px] p-6 min-h-[120px] shadow-[0_8px_24px_rgba(0,0,0,0.04)]"
+          className="
+            relative bg-[#d1e0e9] rounded-2xl p-6
+            shadow-lg
+            flex flex-col items-start
+          "
         >
-          {/* Icon */}
-          <div className="absolute top-4 left-4 w-[40px] h-[40px] bg-white rounded-full flex items-center justify-center text-[16px] text-[#0f172a]">
+          {/* Icon at top-left */}
+          <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-lg text-[#0f172a]">
             {card.icon}
           </div>
-
-          {/* Content */}
-          <div className="flex flex-col justify-end h-full gap-2">
-            <div className="ml-[56px] text-[32px] font-bold text-[#0f172a]">
+          {/* Content block: add left margin so it’s not overlapped by icon */}
+          <div className="ml-[56px] flex flex-col gap-1">
+            <div className="text-2xl font-bold text-[#0f172a]">
               {card.value}
             </div>
-            <div className="text-sm text-[#475569] leading-[1.4]">
+            <div className="text-sm text-[#475569] leading-snug">
               {card.title}
             </div>
           </div>
