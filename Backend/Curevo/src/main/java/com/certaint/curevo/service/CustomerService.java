@@ -111,6 +111,9 @@ public class CustomerService {
             existingCustomer.setName(customer.getName());
             existingCustomer.setAge(customer.getAge());
             existingCustomer.setAddress(customer.getAddress());
+            if(existingCustomer.getUser().getPhone() != null && !existingCustomer.getUser().getPhone().isEmpty()) {
+                existingCustomer.getUser().setPhone(customer.getUser().getPhone());
+            }
 
             if(image != null && !image.isEmpty()) {
 
