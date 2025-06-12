@@ -32,6 +32,9 @@ import AccountPage from "@/customer/Pages/AccountPage.jsx";
 import OrderManagement from "./Admin/Pages/OrderManageAdmin.jsx"
 import ExecutiveManagement from "./Admin/Pages/DeliveryExecManageAdmin.jsx"
 import ResetPassword from "./customer/Pages/ResetPassword.jsx"
+import ProfileSettingsMain from './DeliveryExec/Pages/ProfileSettingsMain.jsx'
+import OrderDashboardMain from './DeliveryExec/Pages/OrderDashboardMain.jsx'
+import OrderHistoryMain from './DeliveryExec/Pages/OrderHistoryMain.jsx'
 
 
 
@@ -90,6 +93,9 @@ const App = () => {
 
                   <Route path="/executive/signup" element={<DeliveryExecutiveRegister />} />
 
+                  <Route path="/executive/dashboard" element={<ProfileSettingsMain />} />
+                  <Route path="/executive/orders" element={<OrderDashboardMain />} />
+                  <Route path="/executive/orders-history" element={<OrderHistoryMain />} />
             </Routes>
       );
 
