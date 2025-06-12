@@ -27,4 +27,5 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i JOIN FETCH i.store WHERE i.product = :product")
     List<Inventory> findByProductWithStore(@Param("product") Product product);
 
+    Page<Inventory> findByProduct_NameContainingIgnoreCase(String keyword, Pageable pageable);
 }

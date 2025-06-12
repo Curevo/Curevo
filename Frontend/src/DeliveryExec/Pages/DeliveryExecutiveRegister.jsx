@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAxiosInstance } from '@/Config/axiosConfig.js';
-import OTPVerifyPopup from './OTPVerifyPopup';
+import OTPVerifyPopup from '../../Components/OTPVerifyPopup.jsx';
 
 const DeliveryExecutiveRegister = () => {
     const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ const DeliveryExecutiveRegister = () => {
         bankName: '',
         vehicleNumber: '',
         vehicleType: '',
-        phone: '',
+        phone: '', // Renamed from phoneNumber to phone
         email: '',
         password: '',
         confirmPassword: '',
@@ -71,6 +71,15 @@ const DeliveryExecutiveRegister = () => {
             isValid = false;
         }
 
+        // Phone number validation
+        if (!formData.phone.trim()) { // Changed from formData.phoneNumber to formData.phone
+            newErrors.phone = 'Phone number is required'; // Changed error key
+            isValid = false;
+        } else if (!/^\d{10}$/.test(formData.phone.trim())) { // Example: 10-digit number
+            newErrors.phone = 'Please enter a valid 10-digit phone number'; // Changed error key
+            isValid = false;
+        }
+
         setErrors(newErrors);
         return isValid;
     };
@@ -82,7 +91,6 @@ const DeliveryExecutiveRegister = () => {
         if (validateForm()) {
             setLoading(true);
 
-            // Corrected: Initialize FormData correctly here
             const submitData = new FormData();
 
             if (formData.photo) {
@@ -98,12 +106,11 @@ const DeliveryExecutiveRegister = () => {
                 bankName: formData.bankName,
                 vehicleNumber: formData.vehicleNumber,
                 vehicleType: formData.vehicleType,
-                phoneNumber: formData.phoneNumber,
+                phone: formData.phone, // Renamed from phoneNumber to phone
                 email: formData.email,
                 password: formData.password,
             };
 
-            // Append the DTO as a JSON string under the 'executive' part name
             submitData.append('executive', new Blob([JSON.stringify(executiveDTO)], { type: 'application/json' }));
 
             try {
@@ -338,19 +345,24 @@ const DeliveryExecutiveRegister = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700"> {/* Renamed htmlFor */}
                             Phone Number*
                         </label>
                         <input
                             type="tel"
-                            name="phoneNumber"
-                            id="phoneNumber"
-                            value={formData.phone}
+                            name="phone" // Renamed name
+                            id="phone" // Renamed id
+                            value={formData.phone} // Already correct, but explicitly noting the consistent name
                             onChange={handleChange}
-                            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className={`mt-1 block w-full px-4 py-3 border ${
+                                errors.phone ? 'border-red-500' : 'border-gray-300' // Changed error key
+                            } rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                             placeholder="Enter Phone Number"
                             required
                         />
+                        {errors.phone && ( // Changed error key
+                            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                        )}
                     </div>
 
                     <hr className="my-4 border-t border-gray-300" />

@@ -8,6 +8,7 @@ import com.certaint.curevo.entity.CartItem;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.Order;
 import com.certaint.curevo.entity.Payment;
+import com.certaint.curevo.enums.OrderStatus;
 import com.certaint.curevo.enums.PaymentStatus;
 import com.certaint.curevo.security.JwtService;
 import com.certaint.curevo.service.*;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,9 +95,17 @@ public class OrderController {
         BigDecimal platformFee = BigDecimal.TEN;
         BigDecimal deliveryCharges = subtotal.compareTo(minimumOrderAmount) < 0 ? BigDecimal.valueOf(50) : BigDecimal.ZERO;
         BigDecimal totalAmount = subtotal.add(platformFee).add(deliveryCharges);
-        totalAmount = subtotal.multiply(BigDecimal.valueOf(0.18)); // 18% GST
+        BigDecimal gstRate = BigDecimal.valueOf(0.18);
+        BigDecimal taxableAmount = subtotal.add(platformFee).add(deliveryCharges);
 
-        order.setTotalAmount(totalAmount);
+        // Calculate GST amount: taxableAmount * 18%
+        // Use RoundingMode.HALF_UP for standard rounding in financial contexts
+        BigDecimal gstAmount = taxableAmount.multiply(gstRate).setScale(2, RoundingMode.HALF_UP);
+
+        // Final Total Amount: taxableAmount + gstAmount
+        BigDecimal finalTotalAmount = taxableAmount.add(gstAmount).setScale(2, RoundingMode.HALF_UP);
+
+        order.setTotalAmount(finalTotalAmount);
 
         // Save Order
         Order newOrder = orderService.createOrder(customer, order, prescriptionFile);
@@ -109,14 +119,19 @@ public class OrderController {
 
         Payment savedPayment = paymentService.createPayment(payment);
 
-        // 💥 Assign Order to Executive AFTER Payment Success
-        try {
-            executiveService.assignOrder(newOrder);
-        } catch (RuntimeException e) {
-            return new ApiResponse<>(true, "Order created and payment completed, but no executive available at the moment", savedPayment);
+
+        if (newOrder.getStatus() != OrderStatus.NEEDS_VERIFICATION) {
+            try {
+                executiveService.assignOrder(newOrder);
+                return new ApiResponse<>(true, "Order, Payment created and assigned successfully", savedPayment);
+            } catch (RuntimeException e) {
+                return new ApiResponse<>(true, "Order created and payment completed, but no executive available at the moment.", savedPayment);
+            }
+        } else {
+            // If the order status is NEEDS_VERIFICATION, it's not ready for executive assignment.
+            return new ApiResponse<>(true, "Order created and payment completed. Awaiting prescription verification before executive assignment.", savedPayment);
         }
 
-        return new ApiResponse<>(true, "Order and Payment created and assigned successfully", savedPayment);
     }
 
 

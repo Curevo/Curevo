@@ -27,10 +27,7 @@ public class OrderService {
     private final ImageHostingService imageHostingService;
     private final CartController cartController; // This might be a circular dependency, consider if OrderService really needs CartController.
 
-    // Assuming you have an OrderStatus enum defined elsewhere, e.g.:
-    // public enum OrderStatus {
-    //     PENDING, NEEDS_VERIFICATION, PROCESSING, SHIPPED, DELIVERED, CANCELLED
-    // }
+
 
 
     public Order save(Order order) {
@@ -95,22 +92,24 @@ public class OrderService {
     }
 
     public Boolean verifyPrescription(Long orderId) {
+        System.out.println("Verifying prescription for order ID: " + orderId);
         Optional<Order> orderOpt = repository.findById(orderId);
+        System.out.println("Verifying prescription for order ID: " + orderId);
         if (orderOpt.isEmpty()) {
             return false;
         }
 
         Order order = orderOpt.get();
-        if (order.getStatus() != OrderStatus.NEEDS_VERIFICATION) {
-            return false;
-        }
 
-        // Upload the prescription file
-        String imgUrl = imageHostingService.deleteImage(order.getPrescriptionUrl());
-        System.out.println("Deleted the image from the previous URL: " + imgUrl);
+        if( order.getPrescriptionUrl() != null ) {
+            imageHostingService.deleteImage(order.getPrescriptionUrl());
+            System.out.println("Deleted it: " + orderId);
+        }
+        System.out.println("Just outside the if: " + orderId);
         order.setPrescriptionUrl(null);
-        order.setPrescriptionUrl(imgUrl);
+        System.out.println("Setting prescription URL to null for order ID: " + orderId);
         order.setStatus(OrderStatus.VERIFIED);
+        System.out.println("Setting order status to VERIFIED for order ID: " + orderId);
         order.setPrescriptionVerified(true);
         System.out.println("Eveyrhting working fine");
         repository.save(order);

@@ -7,6 +7,7 @@ import com.certaint.curevo.entity.Product;
 import com.certaint.curevo.entity.Inventory;
 import com.certaint.curevo.entity.Store;
 import com.certaint.curevo.enums.ProductCategory;
+import com.certaint.curevo.repository.InventoryRepository;
 import com.certaint.curevo.repository.ProductRepository;
 import com.certaint.curevo.dto.StoreDistanceInfo;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class ProductService {
     private final ImageHostingService imageHostingService;
     private final StoreService storeService;
     private final InventoryService inventoryService; // Keep this for direct inventory operations if needed
+    private final InventoryRepository inventoryRepository; // For direct inventory queries
 
     @Transactional
     public ProductWithInventoryDTO saveOrUpdateProduct(
@@ -219,25 +221,24 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
+    @Transactional
     public Page<ProductWithDistanceTagDTO> getProductsByLocation(double userLat, double userLon, double radiusKm, Pageable pageable) {
-        List<StoreDistanceInfo> storeDistances = storeService.getStoresWithDistancesWithinRadius(userLat, userLon, radiusKm);
+        // Here's the fix: Use storeId() and distance() instead of getStoreId() and getDistance()
+        List<StoreService.StoreDistanceInfo> storeDistances = storeService.getStoresWithDistancesWithinRadius(userLat, userLon, radiusKm);
 
         if (storeDistances.isEmpty()) {
             return Page.empty(pageable);
         }
 
         Map<Long, Double> storeIdToDistanceMap = storeDistances.stream()
-                .collect(Collectors.toMap(StoreDistanceInfo::getStoreId, StoreDistanceInfo::getDistance));
+                .collect(Collectors.toMap(StoreService.StoreDistanceInfo::storeId, StoreService.StoreDistanceInfo::distance));
 
         List<Long> storeIds = storeDistances.stream()
-                .map(StoreDistanceInfo::getStoreId)
+                .map(StoreService.StoreDistanceInfo::storeId) // Fix here
                 .collect(Collectors.toList());
 
-        // This still makes sense to use inventoryService as it might have optimized queries
-        // for specific store IDs and pagination. If you're confident in Product.getInventories()
-        // with filtering, you could use that.
-        Page<Inventory> inventories = inventoryService.getInventoriesByStoreIds(storeIds, pageable);
+        // Assuming inventoryRepository has a method to get inventories by store IDs and paginate
+        Page<Inventory> inventories = inventoryRepository.findByStore_StoreIdIn(storeIds, pageable);
 
         List<ProductWithDistanceTagDTO> productWithDistanceTags = inventories.stream()
                 .map(inventory -> {
@@ -251,16 +252,63 @@ public class ProductService {
         return new PageImpl<>(productWithDistanceTags, pageable, inventories.getTotalElements());
     }
 
-    @Transactional // Ensure this method is transactional for lazy loading of inventories/stores
-    public Page<ProductWithDistanceTagDTO> searchProducts(String keyword, Pageable pageable, Double userLat, Double userLon) {
-        // Fetch products, now Product.getInventories() will be accessible (possibly lazily loaded)
-        Page<Product> productsPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+    @Transactional
+    public Page<ProductWithDistanceTagDTO> getProducts(
+            String keyword,
+            Double userLat,
+            Double userLon,
+            Double radiusKm,
+            Pageable pageable) {
 
-        List<ProductWithDistanceTagDTO> dtoList = productsPage.stream()
-                .map(product -> convertProductToProductWithDistanceTagDTOForSearch(product, userLat, userLon))
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean calculateLocationInfo = (userLat != null && userLon != null);
+
+        Page<Inventory> inventoriesPage;
+
+        if (hasKeyword) {
+            inventoriesPage = inventoryRepository.findByProduct_NameContainingIgnoreCase(keyword, pageable);
+        } else {
+            List<Long> storeIdsWithinRadius = null;
+            if (calculateLocationInfo) {
+                // Here's the fix: Use storeId() and distance() within getStoresWithDistancesWithinRadius
+                List<StoreService.StoreDistanceInfo> storeDistances = storeService.getStoresWithDistancesWithinRadius(userLat, userLon, radiusKm != null ? radiusKm : Double.MAX_VALUE);
+                if (storeDistances.isEmpty()) {
+                    return Page.empty(pageable);
+                }
+                storeIdsWithinRadius = storeDistances.stream()
+                        .map(StoreService.StoreDistanceInfo::storeId) // Fix here
+                        .collect(Collectors.toList());
+            }
+
+            if (storeIdsWithinRadius != null && !storeIdsWithinRadius.isEmpty()) {
+                inventoriesPage = inventoryRepository.findByStore_StoreIdIn(storeIdsWithinRadius, pageable);
+            } else if (!calculateLocationInfo) {
+                inventoriesPage = inventoryRepository.findAll(pageable);
+            } else {
+                return Page.empty(pageable);
+            }
+        }
+
+        List<ProductWithDistanceTagDTO> dtoList = inventoriesPage.stream()
+                .map(inventory -> {
+                    String distanceTag = "N/A";
+                    if (calculateLocationInfo && inventory.getStore() != null) {
+                        double distance = calculateDistance(userLat, userLon,
+                                inventory.getStore().getLatitude(),
+                                inventory.getStore().getLongitude());
+                        distanceTag = formatDistanceToTag(distance);
+                    }
+                    Integer availableStock = inventory.getStock();
+                    return new ProductWithDistanceTagDTO(
+                            inventory.getProduct(),
+                            distanceTag,
+                            availableStock,
+                            inventory.getStore()
+                    );
+                })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(dtoList, pageable, productsPage.getTotalElements());
+        return new PageImpl<>(dtoList, pageable, inventoriesPage.getTotalElements());
     }
 
     @Transactional // Ensure this method is transactional for lazy loading of inventories/stores

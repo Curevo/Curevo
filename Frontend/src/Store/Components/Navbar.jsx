@@ -1,11 +1,12 @@
-// Navbar.jsx (The relevant parts for endpoint calls are unchanged, as they are already correct)
 import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import {useAxiosInstance} from "@/Config/axiosConfig.js";
+import { useAxiosInstance } from "@/Config/axiosConfig.js";
 import { FaSpinner } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 export default function Navbar({ isCartOpen, setIsCartOpen }) {
     const axios = useAxiosInstance();
+    const navigate = useNavigate(); // Initialize useNavigate hook
     const [isMobileMenuOpen, setMobileMenuMenuOpen] = useState(false);
     const [isCartClosing, setIsCartClosing] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -26,12 +27,32 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
     };
 
     const toggleSearch = () => {
+        console.log("Toggle Search clicked. Current isSearchOpen:", isSearchOpen);
         setIsSearchOpen(!isSearchOpen);
         if (!isSearchOpen) {
+            setSearchQuery(""); // Clear search query when closing
+            console.log("Search bar opening. Clearing search query.");
+        } else {
+            // This else block runs when closing the search bar via the icon click
+            // The logic for clearing query was already handled above.
+            // When opening, it should focus.
             setTimeout(() => {
                 searchRef.current?.focus();
+                console.log("Search bar opened. Focusing input.");
             }, 100);
         }
+    };
+
+    const handleCartError = (err) => {
+        let errorMessage = err.response?.data?.message || err.message || "Failed to complete action.";
+        if (err.response) {
+            if (err.response.status === 401 || err.response.status === 403) {
+                errorMessage = "Please log in to access cart features or place an order.";
+            } else if (errorMessage.toLowerCase().includes("customer not found") || errorMessage.toLowerCase().includes("unauthorized")) {
+                errorMessage = "Please log in to access cart features or place an order.";
+            }
+        }
+        setCartError(errorMessage);
     };
 
     useEffect(() => {
@@ -44,29 +65,26 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
         setCartLoading(true);
         setCartError(null);
         try {
-            // This GET call to /api/cart fetches all cart items, each with a unique 'id'
             const response = await axios.get('/api/cart');
             setCartItems(response.data.data.items || []);
         } catch (err) {
             console.error("Error fetching cart items:", err);
-            setCartError(err.response?.data?.message || err.message || "Failed to load cart.");
+            handleCartError(err);
         } finally {
             setCartLoading(false);
         }
     };
 
-    const removeFromCart = async (itemId, storeId) => {
+    const removeFromCart = async (itemId) => {
         setCartLoading(true);
         setCartError(null);
         try {
-            // Sends DELETE /api/cart/{itemId}?storeId={storeId}
-            // This perfectly matches the new @DeleteMapping("/{itemId}") in CartController.java
             await axios.delete(`/api/cart/${itemId}`);
             fetchCartItems();
             window.dispatchEvent(new CustomEvent('cartUpdated'));
         } catch (err) {
             console.error("Error removing from cart:", err);
-            setCartError(err.response?.data?.message || err.message || "Failed to remove item.");
+            handleCartError(err);
         } finally {
             setCartLoading(false);
         }
@@ -83,7 +101,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
             window.dispatchEvent(new CustomEvent('cartUpdated'));
         } catch (err) {
             console.error("Error updating quantity:", err);
-            setCartError(err.response?.data?.message || err.message || "Failed to update quantity.");
+            handleCartError(err);
         } finally {
             setCartLoading(false);
         }
@@ -127,18 +145,31 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
         };
     }, [isSearchOpen]);
 
+    const handleSearchSubmit = (e) => {
+        console.log("handleSearchSubmit triggered. Key pressed:", e.key, "Search Query:", searchQuery);
+        if (e.key === 'Enter') {
+            if (searchQuery.trim() !== "") {
+                console.log("Navigating to:", `/store/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
+                setIsSearchOpen(false); // Close search bar on submit
+                navigate(`/store/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
+            } else {
+                console.log("Search query is empty or just spaces. Not navigating.");
+            }
+        }
+    };
+
     return (
         <>
             <nav className="flex items-center justify-between px-4 sm:px-6 md:px-32 py-4 bg-white/30 backdrop-blur-md shadow-sm fixed top-0 w-full z-50">
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => (window.location.href = "/")}>
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
                     <img src="/Assets/Curevo-logo.png" alt="Curevo logo" className="h-8 sm:h-10 w-auto transition-transform duration-200 hover:scale-105" />
                 </div>
 
                 <ul className="hidden md:flex gap-6 text-gray-700 font-medium">
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/store/home")}>Home</li>
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/store/products")}>Shop</li>
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/about")}>About</li>
-                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => (window.location.href = "/contact")}>Contact</li>  
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => navigate("/store/home")}>Home</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => navigate("/store/products")}>Shop</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => navigate("/about")}>About</li>
+                    <li className="cursor-pointer hover:text-blue-500 transition-colors duration-200" onClick={() => navigate("/contact")}>Contact</li>
                 </ul>
 
                 <div className="flex items-center gap-4">
@@ -151,14 +182,12 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                     placeholder="Search..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleSearchSubmit} // Add onKeyDown for search
                                     className="outline-none text-sm w-40 transition-all duration-200 focus:w-52"
                                 />
                                 <X
                                     className="w-4 h-4 text-gray-500 cursor-pointer ml-2"
-                                    onClick={() => {
-                                        setIsSearchOpen(false);
-                                        setSearchQuery("");
-                                    }}
+                                    onClick={toggleSearch}
                                 />
                             </div>
                         ) : (
@@ -179,14 +208,12 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                         placeholder="Search..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyDown={handleSearchSubmit} // Add onKeyDown for search
                                         className="outline-none text-sm w-full bg-transparent"
                                     />
                                     <X
                                         className="w-4 h-4 text-gray-500 cursor-pointer ml-2"
-                                        onClick={() => {
-                                            setIsSearchOpen(false);
-                                            setSearchQuery("");
-                                        }}
+                                        onClick={toggleSearch}
                                     />
                                 </div>
                             </div>
@@ -226,25 +253,25 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                         <ul className="flex flex-col items-start gap-4 p-4 text-gray-700 font-medium">
                             <li
                                 className="text-blue-800 cursor-pointer hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/store/home")}
+                                onClick={() => navigate("/store/home")}
                             >
                                 Home
                             </li>
                             <li
                                 className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/store/products")}
+                                onClick={() => navigate("/store/products")}
                             >
                                 Shop
                             </li>
                             <li
                                 className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/about")}
+                                onClick={() => navigate("/about")}
                             >
                                 About
                             </li>
                             <li
                                 className="cursor-pointer hover:text-blue-800 hover:pl-2 transition-all duration-200"
-                                onClick={() => (window.location.href = "/contact")}
+                                onClick={() => navigate("/contact")}
                             >
                                 Contact
                             </li>
@@ -358,8 +385,8 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                             <span>Total</span>
                                             <span>${cartSummary.subtotal.toFixed(2)}</span>
                                         </div>
-                                        <button onClick={() => (window.location.href = "/orderDetails")}
-                                            className="w-full py-2 sm:py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base transition-colors duration-200 hover:shadow-md"
+                                        <button onClick={() => navigate("/orderDetails")}
+                                                className="w-full py-2 sm:py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base transition-colors duration-200 hover:shadow-md"
                                         >
                                             Proceed to Checkout
                                         </button>

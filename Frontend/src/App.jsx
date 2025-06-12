@@ -25,7 +25,7 @@ import TermsAndConditions from './Components/TermsAndConditions'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import Licenses from './Components/Licenses'
 import OrderDetails from './HealthCare/Components/CustomerDetailsAtOrder.jsx'
-import DeliveryExecutiveRegister from './Components/DeliveryExecutiveRegister.jsx'
+import DeliveryExecutiveRegister from './DeliveryExec/Pages/DeliveryExecutiveRegister.jsx'
 import OrderPage from "@/customer/Pages/OrderPage.jsx";
 import AppointmentPage from "@/customer/Pages/AppointmentPage.jsx";
 import AccountPage from "@/customer/Pages/AccountPage.jsx";
@@ -36,6 +36,7 @@ import ProfileSettingsMain from './DeliveryExec/Pages/ProfileSettingsMain.jsx'
 import OrderDashboardMain from './DeliveryExec/Pages/OrderDashboardMain.jsx'
 import OrderHistoryMain from './DeliveryExec/Pages/OrderHistoryMain.jsx'
 import LogoutComponent from './customer/Pages/Logout.jsx'
+import HelpPage from "./HealthCare/Pages/Help.jsx"
 
 
 
@@ -89,6 +90,7 @@ const App = () => {
                   <Route path="/terms" element={<TermsAndConditions/>} />
                   <Route path="/policies" element={<PrivacyPolicy/>} />
                   <Route path="/licenses" element={<Licenses/>} />
+                  <Route path="/help" element={<HelpPage/>} />
                   <Route path="/orderDetails" element={<OrderDetails />} />
 
 

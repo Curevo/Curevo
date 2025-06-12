@@ -8,7 +8,7 @@ const DoctorsPage = () => {
     const didFetch = useRef(false);
     const [doctors, setDoctors] = useState([]);
     const [page, setPage] = useState(0);
-    const size = 3;
+    const size = 9;
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [search, setSearch] = useState('');

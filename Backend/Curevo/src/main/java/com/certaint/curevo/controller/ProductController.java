@@ -108,17 +108,23 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Products retrieved successfully", productsPage));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ProductWithDistanceTagDTO>>> searchProducts(
-            @RequestParam String keyword,
-            @RequestHeader(value = "userLat", required = false) Double userLat, // Optional user location
-            @RequestHeader(value = "userLon", required = false) Double userLon, // Optional user location
+    @GetMapping("/products") // Unified endpoint for products
+    public ResponseEntity<ApiResponse<Page<ProductWithDistanceTagDTO>>> getProducts(
+            @RequestParam(required = false) String keyword, // Keyword is now optional
+            @RequestHeader(value = "userLat", required = false) Double userLat, // User Lat from header
+            @RequestHeader(value = "userLon", required = false) Double userLon, // User Lon from header
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "5") int size, // Match ProductGrid's default size
+            @RequestParam(defaultValue = "50.0") double radiusKm) { // Default radius for location filter
+
         Pageable pageable = PageRequest.of(page, size);
-        // Pass userLat/Lon to service so it can calculate distance tags if provided
-        Page<ProductWithDistanceTagDTO> results = productService.searchProducts(keyword, pageable, userLat, userLon);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Search completed successfully", results));
+
+        // Call the unified service method
+        Page<ProductWithDistanceTagDTO> results = productService.getProducts(
+                keyword, userLat, userLon, radiusKm, pageable
+        );
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Products retrieved successfully", results));
     }
 
     @GetMapping("/{productId}/store/{storeId}")

@@ -49,6 +49,7 @@ const FooterHome = () => {
                 <a href="/policies"><li>Privacy Policy</li></a>
                 <a href="/licenses"><li>Licensing</li></a>
                 <a href="/services"><li>Services</li></a>
+                <a href="/help"><li>Help</li></a>
             </ul>
             </div>
 

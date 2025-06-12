@@ -7,6 +7,7 @@ import WellBeingSection from "../Components/Home/WellBeingSection"
 import NavbarHome from "../Components/NavbarHome"
 import StatsSection from "../Components/StatsSection"
 import ChatbotLauncher from '../../Components/ChatbotLauncher'
+import DoctorsPreview from "@/HealthCare/Components/Doctors/DoctorsPreview.jsx";
 
 const Home = () => {
   return (
@@ -16,6 +17,7 @@ const Home = () => {
         <HeroHome/>
         <InfoCards/>
         <WellBeingSection/>
+        <DoctorsPreview/>
         <StatsSection/>
         <HealthFooter/>
         <FooterHome/>

@@ -117,7 +117,9 @@ public class CustomerService {
             }
 
             if(image != null && !image.isEmpty()) {
+                if (existingCustomer.getImage()!= null ) {
                     imageHostingService.deleteImage(existingCustomer.getImage());
+                }
                     String imageUrl = imageHostingService.uploadImage(image,"customers");
                     existingCustomer.setImage(imageUrl);
             }

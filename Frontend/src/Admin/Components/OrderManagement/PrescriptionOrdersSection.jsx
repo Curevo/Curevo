@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAxiosInstance } from '@/Config/axiosConfig.js';
 
+// Helper function to format currency consistently
+const formatCurrency = (amount) => `₹${Number(amount || 0).toFixed(2)}`;
+
 const PrescriptionOrdersSection = () => {
     const axios = useAxiosInstance();
     const [orders, setOrders] = useState([]);
@@ -13,9 +16,8 @@ const PrescriptionOrdersSection = () => {
         const fetchOrders = async () => {
             try {
                 const response = await axios.get('/api/orders/get-all');
-                let fetchedOrders = response.data.data; // Accessing the 'data' property
+                let fetchedOrders = response.data.data;
 
-                // Ensure fetchedOrders is an array. If not, default to an empty array.
                 if (!Array.isArray(fetchedOrders)) {
                     console.error("API response.data.data is not an array. Actual type:", typeof fetchedOrders, "Value:", fetchedOrders);
                     if (fetchedOrders && typeof fetchedOrders === 'object') {
@@ -25,7 +27,6 @@ const PrescriptionOrdersSection = () => {
                     }
                 }
 
-                // Display all orders, no frontend filtering needed here
                 setOrders(fetchedOrders);
                 setLoading(false);
             } catch (err) {
@@ -41,8 +42,7 @@ const PrescriptionOrdersSection = () => {
     const handleApprove = async (orderId) => {
         try {
             await axios.post(`/api/orders/verify-prescription/${orderId}`);
-            // Update the specific order in the local state to reflect its new verified status
-            // Assuming status transitions to 'PROCESSING' once prescription is approved
+            console.log(`Order ${orderId} approved successfully.`);
             setOrders(prevOrders =>
                 prevOrders.map(order =>
                     order.id === orderId ? { ...order, prescriptionVerified: true, status: 'PROCESSING' } : order
@@ -83,31 +83,33 @@ const PrescriptionOrdersSection = () => {
         );
     }
 
-    // Helper function to determine the badge for the order list
+    // Helper function to determine the badge for the order list and modal status
     const getStatusBadge = (order) => {
         const hasPrescriptionRequiredItem = order.orderItems?.some(item => item.product?.prescriptionRequired);
-        const prescriptionUploaded = order.prescriptionUrl; // Check if URL exists
-        const prescriptionVerifiedStatus = order.prescriptionVerified; // true, false, or null
+        const prescriptionUploaded = order.prescriptionUrl;
+        const prescriptionVerifiedStatus = order.prescriptionVerified;
 
         let colorClass;
         let iconPath;
         let statusText;
 
-        // Priority 1: Prescription status if relevant and not yet verified
-        if (hasPrescriptionRequiredItem && prescriptionUploaded && (prescriptionVerifiedStatus === false || prescriptionVerifiedStatus === null)) {
-            colorClass = 'bg-orange-100 text-orange-800'; // Orange for "Awaiting Prescription Verification"
-            iconPath = "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"; // Exclamation triangle
-            statusText = "Prescription Awaiting Verification";
-        } else if (hasPrescriptionRequiredItem && !prescriptionUploaded) {
-            colorClass = 'bg-yellow-100 text-yellow-800';
-            iconPath = "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"; // Exclamation triangle
-            statusText = "Prescription Missing (Follow-up)";
-        } else if (hasPrescriptionRequiredItem && prescriptionVerifiedStatus === true) {
-            colorClass = 'bg-green-100 text-green-800';
-            iconPath = "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"; // Checkmark circle
-            statusText = "Prescription Verified";
+        // **PRESCRIPTION LOGIC (High Priority, only if a prescription is actually required)**
+        if (hasPrescriptionRequiredItem) {
+            if (prescriptionVerifiedStatus === true) {
+                colorClass = 'bg-green-100 text-green-800';
+                iconPath = "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"; // Checkmark circle
+                statusText = "Prescription Verified";
+            } else if (prescriptionUploaded) {
+                colorClass = 'bg-orange-100 text-orange-800';
+                iconPath = "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"; // Exclamation triangle
+                statusText = "Prescription Awaiting Verification";
+            } else {
+                colorClass = 'bg-yellow-100 text-yellow-800';
+                iconPath = "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"; // Exclamation triangle
+                statusText = "Prescription Missing (Follow-up)";
+            }
         }
-        // Priority 2: General order status if no specific prescription status
+        // **GENERAL ORDER STATUS (Fallback if no prescription issues are active/awaiting)**
         else {
             const status = order.status?.toLowerCase();
             switch (status) {
@@ -118,7 +120,7 @@ const PrescriptionOrdersSection = () => {
                     break;
                 case 'processing':
                     colorClass = 'bg-purple-100 text-purple-800';
-                    iconPath = "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.545.333 1.25.623 2.001.789z"; // Gear icon
+                    iconPath = "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37-2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37.545.333 1.25.623 2.001.789z"; // Gear icon
                     statusText = 'Processing';
                     break;
                 case 'out_for_delivery':
@@ -141,14 +143,17 @@ const PrescriptionOrdersSection = () => {
                     iconPath = "M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"; // X circle
                     statusText = 'Rejected';
                     break;
+                case 'assigned':
+                    colorClass = 'bg-indigo-100 text-indigo-800';
+                    iconPath = "M18 10a8 8 0 10-16 0 8 8 0 0016 0zm-7 4v2m0-8V7m0 10a1 1 0 100-2 1 1 0 000 2z"; // User icon
+                    statusText = 'Assigned';
+                    break;
                 default:
                     colorClass = 'bg-gray-100 text-gray-800';
                     iconPath = "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"; // Info icon
                     statusText = order.status?.replace('_', ' ').toLowerCase() || 'Unknown Status';
             }
         }
-
-
         return (
             <div className={`mt-2 flex items-center text-xs font-medium px-2 py-1 rounded-full ${colorClass} w-fit`}>
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -159,6 +164,24 @@ const PrescriptionOrdersSection = () => {
         );
     };
 
+    // --- START: Manual Order Calculations (Performed directly here when selectedOrder is set) ---
+    let calculatedSubtotal = 0;
+    let calculatedDeliveryFee = 0;
+    const platformFee = 10;
+    let taxableAmount = 0;
+    let calculatedTaxAmount = 0;
+    let calculatedTotalAmount = 0;
+
+    if (selectedOrder) {
+        calculatedSubtotal = selectedOrder.orderItems?.reduce((acc, item) => acc + (item.totalPrice || 0), 0) || 0;
+        const minimumOrderAmount = 300;
+        calculatedDeliveryFee = calculatedSubtotal < minimumOrderAmount ? 50 : 0;
+        taxableAmount = calculatedSubtotal + platformFee + calculatedDeliveryFee;
+        const gstRate = 0.18;
+        calculatedTaxAmount = taxableAmount * gstRate;
+        calculatedTotalAmount = taxableAmount + calculatedTaxAmount;
+    }
+    // --- END: Manual Order Calculations ---
 
     return (
         <div className="flex-1 p-6 bg-gray-100 min-h-screen">
@@ -186,7 +209,7 @@ const PrescriptionOrdersSection = () => {
                                 <div className="flex flex-col">
                                     <p className="text-lg font-bold text-gray-900 mb-1">Order ID: <span className="font-mono text-blue-700">#{order.id}</span></p>
                                     <p className="text-sm text-gray-700">Customer: <span className="font-medium">{order.customer?.name}</span> (<span className="text-gray-600">{order.recipientEmail}</span>)</p>
-                                    {getStatusBadge(order)} {/* Use the helper function */}
+                                    {getStatusBadge(order)}
                                 </div>
                                 <svg
                                     className="h-6 w-6 text-gray-500 hover:text-gray-700 transition-colors"
@@ -203,7 +226,7 @@ const PrescriptionOrdersSection = () => {
                 )}
             </div>
 
-            {/* Order Details and Prescription Modal */}
+            {/* Order Details and Prescription Modal - Now fully integrated here */}
             {selectedOrder && (
                 <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 animate-fade-in">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto transform scale-95 animate-zoom-in">
@@ -229,20 +252,22 @@ const PrescriptionOrdersSection = () => {
                                     {/* Prescription Image/Status */}
                                     <div className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
                                         <h4 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-3">Prescription Review</h4>
-                                        {/* Logic for displaying prescription: only show if needed for verification */}
+
+                                        {/* Display Prescription Image if URL exists, regardless of verification status */}
+                                        {selectedOrder.prescriptionUrl && (
+                                            <div className="mb-4">
+                                                <img
+                                                    src={selectedOrder.prescriptionUrl}
+                                                    alt="Prescription"
+                                                    className="w-full max-h-96 object-contain rounded-md border border-gray-300 shadow-md"
+                                                />
+                                                <a href={selectedOrder.prescriptionUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm mt-2 block text-center">View Full Prescription</a>
+                                            </div>
+                                        )}
+
+                                        {/* Prescription Status (similar logic to getStatusBadge, but focused on modal's display) */}
                                         {selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) ? (
-                                            selectedOrder.prescriptionUrl && (selectedOrder.prescriptionVerified === false || selectedOrder.prescriptionVerified === null) ? (
-                                                <>
-                                                    <img
-                                                        src={selectedOrder.prescriptionUrl}
-                                                        alt="Prescription"
-                                                        className="w-full max-h-96 object-contain rounded-md border border-gray-300 mb-4 shadow-md"
-                                                    />
-                                                    <div className="text-center py-2 rounded-md font-medium text-sm bg-orange-100 text-orange-800">
-                                                        Status: <span className="font-bold">Awaiting Verification</span>
-                                                    </div>
-                                                </>
-                                            ) : selectedOrder.prescriptionVerified === true ? (
+                                            selectedOrder.prescriptionVerified === true ? (
                                                 <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md text-center">
                                                     <div className="flex items-center justify-center">
                                                         <svg className="h-6 w-6 text-green-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -251,7 +276,16 @@ const PrescriptionOrdersSection = () => {
                                                         <p className="text-sm text-green-800 font-medium">Prescription has been **Verified**.</p>
                                                     </div>
                                                 </div>
-                                            ) : ( // No prescription URL but required
+                                            ) : selectedOrder.prescriptionUrl ? (
+                                                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-md text-center">
+                                                    <div className="flex items-center justify-center">
+                                                        <svg className="h-6 w-6 text-orange-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                        </svg>
+                                                        <p className="text-sm text-orange-800 font-medium">Prescription uploaded. **Awaiting Verification**.</p>
+                                                    </div>
+                                                </div>
+                                            ) : ( // Required but not uploaded
                                                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md text-center">
                                                     <div className="flex items-center justify-center">
                                                         <svg className="h-6 w-6 text-yellow-800 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -288,8 +322,8 @@ const PrescriptionOrdersSection = () => {
                                                         <div className="flex-1">
                                                             <p className="text-base font-medium text-gray-900">{item.product?.name}</p>
                                                             <p className="text-sm text-gray-600">Category: {item.product?.category}</p>
-                                                            <p className="text-sm text-gray-600">Qty: {item.quantity} @ ₹{item.unitPrice?.toFixed(2)}</p>
-                                                            <p className="text-md font-bold text-gray-800 mt-1">Total: ₹{item.totalPrice?.toFixed(2)}</p>
+                                                            <p className="text-sm text-gray-600">Qty: {item.quantity} @ {formatCurrency(item.unitPrice)}</p>
+                                                            <p className="text-md font-bold text-gray-800 mt-1">Total: {formatCurrency(item.totalPrice)}</p>
                                                             {item.product?.prescriptionRequired && (
                                                                 <span className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                                     Prescription Required
@@ -304,9 +338,35 @@ const PrescriptionOrdersSection = () => {
                                         )}
                                         <div className="mt-6 pt-4 border-t border-gray-200 text-right">
                                             <p className="text-xl font-bold text-gray-900">
-                                                Overall Order Total: ₹
-                                                {(selectedOrder.orderItems?.reduce((acc, item) => acc + (item.totalPrice || 0), 0) || 0).toFixed(2)}
+                                                Subtotal (Items): {formatCurrency(calculatedSubtotal)}
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Price Breakdown Section */}
+                                    <div className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-3">Price Breakdown</h4>
+                                        <div className="space-y-2 text-gray-700 text-sm">
+                                            <div className="flex justify-between">
+                                                <span>Subtotal (Items):</span>
+                                                <span>{formatCurrency(calculatedSubtotal)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Platform Fee:</span>
+                                                <span>{formatCurrency(platformFee)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Delivery Charges:</span>
+                                                <span>{formatCurrency(calculatedDeliveryFee)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>GST (18%):</span>
+                                                <span>{formatCurrency(calculatedTaxAmount)}</span>
+                                            </div>
+                                            <div className="flex justify-between font-bold border-t border-gray-300 pt-3 text-lg text-gray-800">
+                                                <span>Grand Total:</span>
+                                                <span>{formatCurrency(calculatedTotalAmount)}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -349,14 +409,14 @@ const PrescriptionOrdersSection = () => {
                                             </div>
                                             <div>
                                                 <p className="text-gray-500">Current Order Status</p>
-                                                {getStatusBadge(selectedOrder)} {/* Use the same badge helper for consistency */}
+                                                {getStatusBadge(selectedOrder)}
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Action buttons - Only show if prescription needs verification */}
-                                    {(selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) && selectedOrder.prescriptionUrl && (selectedOrder.prescriptionVerified === false || selectedOrder.prescriptionVerified === null)) ||
-                                    (selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) && !selectedOrder.prescriptionUrl) ? (
+                                    {/* Action buttons - Final Corrected Logic */}
+                                    {selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) && selectedOrder.prescriptionUrl && selectedOrder.prescriptionVerified !== true ? (
+                                        // Show approve button ONLY if prescription is required, uploaded, and NOT yet verified.
                                         <div className="flex flex-col space-y-4 pt-2">
                                             <button
                                                 onClick={() => handleApprove(selectedOrder.id)}
@@ -366,7 +426,7 @@ const PrescriptionOrdersSection = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        // This block now shows the status when buttons aren't needed
+                                        // Otherwise, show a message based on the scenario
                                         <div className="mt-8 text-center">
                                             {selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) && selectedOrder.prescriptionVerified === true ? (
                                                 <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
@@ -375,8 +435,10 @@ const PrescriptionOrdersSection = () => {
                                                     </svg>
                                                     Prescription Verified
                                                 </span>
+                                            ) : selectedOrder.orderItems?.some(item => item.product?.prescriptionRequired) && !selectedOrder.prescriptionUrl ? (
+                                                <p className="text-gray-600 font-medium">Prescription missing. Cannot approve.</p>
                                             ) : (
-                                                <p className="text-gray-600 font-medium">This order does not require prescription verification or has already been reviewed.</p>
+                                                <p className="text-gray-600 font-medium">No prescription action required for this order.</p>
                                             )}
                                         </div>
                                     )}
