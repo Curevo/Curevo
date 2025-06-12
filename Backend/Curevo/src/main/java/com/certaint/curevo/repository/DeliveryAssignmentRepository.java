@@ -17,4 +17,8 @@ public interface DeliveryAssignmentRepository extends JpaRepository<DeliveryAssi
 
     List<DeliveryAssignment> findByExecutive(DeliveryExecutive executive);
 
-    List<DeliveryAssignment> findAllByExecutiveAndStatus(DeliveryExecutive executive, DeliveryAssignmentStatus deliveryAssignmentStatus);}
+    List<DeliveryAssignment> findAllByExecutiveAndStatus(DeliveryExecutive executive, DeliveryAssignmentStatus deliveryAssignmentStatus);
+
+    Long countByExecutiveAndStatus(DeliveryExecutive executive, DeliveryAssignmentStatus status);
+
+}

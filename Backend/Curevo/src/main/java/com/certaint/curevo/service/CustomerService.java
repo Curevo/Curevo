@@ -27,7 +27,6 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final UserService userService;
     private final ImageHostingService imageHostingService;
-    private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
     private final SignupCacheService cacheService;
     private final EmailService emailService;

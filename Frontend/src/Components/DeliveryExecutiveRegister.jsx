@@ -345,7 +345,7 @@ const DeliveryExecutiveRegister = () => {
                             type="tel"
                             name="phoneNumber"
                             id="phoneNumber"
-                            value={formData.phoneNumber}
+                            value={formData.phone}
                             onChange={handleChange}
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             placeholder="Enter Phone Number"

@@ -52,7 +52,7 @@ const StorePaymentGateway = () => {
                 const platformFee = 10;
                 // Delivery fee logic: 50 if subtotal is less than 300, else 0.
                 const deliveryFee = rawSubtotal < 300 ? 50 : 0;
-                const tax = rawSubtotal * 0.05; // 5% tax
+                const tax = rawSubtotal * 0.18; // 5% tax
                 const total = rawSubtotal + tax + platformFee + deliveryFee;
 
                 setOrderSummary({
@@ -231,7 +231,7 @@ const StorePaymentGateway = () => {
                                 <span>₹{orderSummary.deliveryFee.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Tax (5%)</span>
+                                <span>Tax (18%)</span>
                                 <span>₹{orderSummary.tax.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-lg font-bold">

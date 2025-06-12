@@ -40,7 +40,7 @@ export default function Login() {
                 } else if (decodedToken.role === "CUSTOMER") {
                     navigate("/");
                 } else if (decodedToken.role === "DELIVERY_EXECUTIVE") {
-                    navigate("/delivery-executive/home");
+                    navigate("/executive/dashboard");
                 } else {
                     // Fallback for any other roles or default
                     navigate("/");

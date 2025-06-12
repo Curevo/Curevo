@@ -4,12 +4,12 @@ import {useAxiosInstance} from '@/Config/axiosConfig.js';
 
 const DoctorsPreview = () => {
     const [doctors, setDoctors] = useState([]);
+    const axios = useAxiosInstance();
 
     useEffect(() => {
-        const axios = useAxiosInstance();
         const fetchDoctors = async () => {
             try {
-                const res = await axios.get('/api/doctors', {
+                const res = await axios.get('/api/doctors/get/paging', {
                     params: { page: 0, size: 20 }, // fetch more doctors to shuffle
                 });
 

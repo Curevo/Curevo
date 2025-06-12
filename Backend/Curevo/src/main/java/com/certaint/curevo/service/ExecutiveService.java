@@ -1,6 +1,8 @@
 package com.certaint.curevo.service;
 
+import com.certaint.curevo.dto.ApiResponse;
 import com.certaint.curevo.dto.DeliveryExecutiveDTO;
+import com.certaint.curevo.dto.ExecutivePerformanceDTO;
 import com.certaint.curevo.entity.*;
 import com.certaint.curevo.enums.DeliveryAssignmentStatus;
 import com.certaint.curevo.enums.DeliveryExecutiveStatus;
@@ -11,9 +13,12 @@ import com.certaint.curevo.repository.*;
 import com.certaint.curevo.security.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +44,8 @@ public class ExecutiveService {
     private final EmailService emailService;
     private final SignupCacheService cacheService;
     private final JwtService jwtservice;
+
+    private static final double PER_DELIVERY_FEE_INR = 40.0; // ₹50 per delivered order (adjust as needed)
 
 
     public void assignOrder(Order order) {
@@ -84,16 +91,23 @@ public class ExecutiveService {
         }
     }
 
-    /**
-     * Starts the delivery executive's day by setting their status to AVAILABLE.
-     */
     public void startDay(Long executiveId) {
         DeliveryExecutive executive = executiveRepo.findById(executiveId)
                 .orElseThrow(() -> new RuntimeException("Executive not found"));
-        executive.setStatus(AVAILABLE);
+
+        // Step 1: Set initial status based on intent
+        executive.setStatus(DeliveryExecutiveStatus.AVAILABLE);
+
+        // Step 2: Double-check capacity and adjust status if necessary
+        if (hasReachedMaxAssignments(executive.getId())) {
+            executive.setStatus(DeliveryExecutiveStatus.UNAVAILABLE); // Override to UNAVAILABLE if at max capacity
+        }
+
+        // Step 3: Save the (potentially adjusted) status
         executiveRepo.save(executive);
 
-        // 💥 Try assigning pending orders now that this executive is available
+        // Step 4: Try assigning pending orders now that this executive is available
+        // This will only assign if their FINAL status is AVAILABLE
         processPendingOrders();
     }
 
@@ -187,7 +201,7 @@ public class ExecutiveService {
     public void markUnavailable(Long executiveId) {
         DeliveryExecutive executive = executiveRepo.findById(executiveId)
                 .orElseThrow(() -> new RuntimeException("Executive not found"));
-        executive.setStatus(UNAVAILABLE);
+        executive.setStatus(MANUALLY_UNAVAILABLE);
         executiveRepo.save(executive);
     }
 
@@ -233,6 +247,13 @@ public class ExecutiveService {
         user.setPhone(executiveDTO.getPhone());
 
         userRepository.save(user);
+
+        if (image != null && !image.isEmpty()) {
+            // Upload new image and update the URL
+            imageHostingService.deleteImage(executive.getImage());
+            String imageUrl = imageHostingService.uploadImage(image, "executive");
+            executive.setImage(imageUrl);
+        }
 
 
         executive.setVehicleType(executiveDTO.getVehicleType());
@@ -354,25 +375,6 @@ public class ExecutiveService {
             return executive;
         }
 
-    @Transactional
-    public DeliveryExecutive acceptExecutive(Long executiveId) {
-        DeliveryExecutive executive = executiveRepo.findById(executiveId)
-                .orElseThrow(() -> new RuntimeException("Delivery Executive not found with ID: " + executiveId));
-
-        if (executive.getStatus() != NOT_VERIFIED) {
-            throw new IllegalStateException("Executive with ID: " + executiveId + " is not in 'NOT_VERIFIED' status.");
-        }
-
-        executive.setStatus(INACTIVE); // Set to INACTIVE as per your requirement
-        executiveRepo.save(executive);
-
-        // Send approval email
-        String executiveEmail = executive.getUser().getEmail();
-        String executiveName = executive.getName();
-        emailService.sendExecutiveApprovalEmail(executiveEmail, executiveName);
-
-        return executive;
-    }
 
     // New method for Admin to reject an executive
     @Transactional
@@ -427,8 +429,10 @@ public class ExecutiveService {
     }
 
 
-    public List<Order> getActiveOrdersForExecutive(String authorizationHeader) {
-        String email = jwtservice.extractEmail(authorizationHeader);
+    public List<Order> getActiveOrdersForExecutive(String authHeader) {
+
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        String email = jwtservice.extractEmail(authHeader);
         DeliveryExecutive executive = executiveRepo.getDeliveryExecutiveByUserEmail(email);
 
         List<DeliveryAssignment> currentAssignments = assignmentRepo.findAllByExecutiveAndStatus(executive, CURRENT);
@@ -450,5 +454,41 @@ public class ExecutiveService {
         List<DeliveryExecutive> notVerifiedExecutives = executiveRepo.findByStatus(NOT_VERIFIED);
 
         return notVerifiedExecutives;
+    }
+
+
+
+    public ExecutivePerformanceDTO getExecutivePerformanceMetrics(DeliveryExecutive executive) {
+        List<DeliveryAssignment> deliveredAssignments = assignmentRepo
+                .findAllByExecutiveAndStatus(executive, DeliveryAssignmentStatus.DELIVERED);
+
+        long totalOrdersDelivered = deliveredAssignments.size();
+
+
+        // --- Calculate Average Delivery Time ---
+        double averageDeliveryTimeInMinutes = 0.0;
+        if (totalOrdersDelivered > 0) {
+            long totalDurationSeconds = 0;
+            for (DeliveryAssignment assignment : deliveredAssignments) {
+                // Ensure both timestamps are present for a valid calculation
+                if (assignment.getAssignedAt() != null && assignment.getActualDelivery() != null) {
+                    Duration duration = Duration.between(assignment.getAssignedAt(), assignment.getActualDelivery());
+                    totalDurationSeconds += duration.getSeconds();
+                }
+            }
+            // Avoid division by zero if all relevant assignments somehow had null timestamps
+            if (totalDurationSeconds > 0 && totalOrdersDelivered > 0) {
+                averageDeliveryTimeInMinutes = (double) totalDurationSeconds / 60.0 / totalOrdersDelivered;
+            }
+        }
+
+        // --- Calculate Estimated Total Earnings ---
+        double estimatedTotalEarnings = totalOrdersDelivered * PER_DELIVERY_FEE_INR;
+
+        return new ExecutivePerformanceDTO(
+                averageDeliveryTimeInMinutes,
+                totalOrdersDelivered,
+                estimatedTotalEarnings
+        );
     }
 }

@@ -47,7 +47,9 @@ public class SecurityConfig {
                         "/healthz",
                         "/api/doctors",
                         "/api/products",
-                        "/api/products/**"
+                        "/api/products/**",
+                        "/api/executives/register",
+                        "api/executives/verify-and-save"
                 )
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();

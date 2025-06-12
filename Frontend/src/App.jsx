@@ -35,6 +35,7 @@ import ResetPassword from "./customer/Pages/ResetPassword.jsx"
 import ProfileSettingsMain from './DeliveryExec/Pages/ProfileSettingsMain.jsx'
 import OrderDashboardMain from './DeliveryExec/Pages/OrderDashboardMain.jsx'
 import OrderHistoryMain from './DeliveryExec/Pages/OrderHistoryMain.jsx'
+import LogoutComponent from './customer/Pages/Logout.jsx'
 
 
 
@@ -96,6 +97,9 @@ const App = () => {
                   <Route path="/executive/dashboard" element={<ProfileSettingsMain />} />
                   <Route path="/executive/orders" element={<OrderDashboardMain />} />
                   <Route path="/executive/orders-history" element={<OrderHistoryMain />} />
+
+                  <Route path="/logout" element={<LogoutComponent />} />
+
             </Routes>
       );
 
