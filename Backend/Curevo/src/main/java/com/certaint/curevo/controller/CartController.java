@@ -33,22 +33,31 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<CartItem>> addToCart(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam Long productId,
             @RequestParam Long storeId
     ) {
+        // Check if the Authorization header is missing or doesn't start with "Bearer "
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(false, "Login to access cart feature and place orders", null));
+        }
+
         String token = authHeader.substring(7);
         String email = jwtService.extractEmail(token);
         Optional<Customer> customer = customerService.getByEmail(email);
+
         if (customer.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(false, "Customer not found", null));
         }
+
         CartItem addedItem = cartItemService.addToCart(customer.get(), productId, storeId);
 
         ApiResponse<CartItem> response = new ApiResponse<>(true, "Item added to cart successfully", addedItem);
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/decrease")
     public ResponseEntity<ApiResponse<CartResponse>> decreaseProductQuantity(

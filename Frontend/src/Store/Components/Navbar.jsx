@@ -48,7 +48,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
         if (err.response) {
             if (err.response.status === 401 || err.response.status === 403) {
                 errorMessage = "Please log in to access cart features or place an order.";
-            } else if (errorMessage.toLowerCase().includes("customer not found") || errorMessage.toLowerCase().includes("unauthorized")) {
+            } else  {
                 errorMessage = "Please log in to access cart features or place an order.";
             }
         }

@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { useLocation } from '@/Hooks/LocationContext';
+import { useNavigate } from 'react-router-dom';
 
 export function useAxiosInstance() {
     const locationContext = useLocation();
-
+    const navigate = useNavigate();
     const axiosInstance = useMemo(() => {
         console.log("Creating new Axios instance. Location context available:", !!locationContext);
         const instance = axios.create({
@@ -66,7 +67,7 @@ export function useAxiosInstance() {
                     console.warn("Axios Interceptor: Auth error, redirecting to login.");
                     localStorage.removeItem('token');
                     if (typeof window !== 'undefined') {
-                        window.location.href = '/login';
+                        navigate('/login', { state: { showAuthErrorModal: true } })
                     }
                 }
                 return Promise.reject(error);

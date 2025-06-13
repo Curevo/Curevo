@@ -1,17 +1,51 @@
 import React, { useState } from "react";
-import {useAxiosInstance} from '@/Config/axiosConfig.js';
+import axios from 'axios'; // Direct import for signup to avoid interceptor conflict
 import { Link, useNavigate } from "react-router-dom";
-import LeftPanel from "../../Components/LeftPanel2";
+import LeftPanel from "../../Components/LeftPanel2"; // Assuming this is your background/decorative panel
 import OTPVerifyPopup from '@/Components/OTPVerifyPopup'; // Assuming this component exists
+
+// Reusing the Enhanced Modal Component for consistency
+const Modal = ({ message, onClose, title = "Notification" }) => {
+    if (!message) return null;
+
+    return (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-2xl p-7 w-full max-w-sm flex flex-col items-center transform scale-95 animate-zoom-in border border-gray-200">
+                <h3 className="text-2xl font-bold text-center text-blue-700 mb-4">
+                    {title}
+                </h3>
+                <p className="text-gray-700 text-center text-base leading-relaxed mb-6">
+                    {message}
+                </p>
+                <button
+                    onClick={onClose}
+                    className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                >
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    );
+};
+
 
 export default function Signup() {
     const navigate = useNavigate();
-    const axios = useAxiosInstance();
+    // For signup, we'll use a direct axios instance to avoid global interceptors for auth flow
+    const signupAxios = axios.create({
+        baseURL: import.meta.env.VITE_BACKEND_URL || 'https://api.example.com/v1',
+        timeout: 60000,
+    });
 
     // State for OTP popup
     const [isOtpPopupOpen, setOtpPopupOpen] = useState(false);
     const [userEmail, setUserEmail] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false); // New state for loading indicator
+    const [isSubmitting, setIsSubmitting] = useState(false); // State for loading indicator
+
+    // State for general error modal messages
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [errorTitle, setErrorTitle] = useState("Error");
+
 
     const [formData, setFormData] = useState({
         name: "",
@@ -32,29 +66,33 @@ export default function Signup() {
     const handleSignup = async (e) => {
         e.preventDefault();
         setIsSubmitting(true); // Disable button and show loading
+        setErrorMessage(null); // Clear previous errors
 
         if (!formData.termsAccepted) {
-            alert("Please accept the terms and conditions to create an account.");
+            setErrorTitle("Terms Not Accepted");
+            setErrorMessage("Please accept the terms and conditions to create an account.");
             setIsSubmitting(false);
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match. Please re-enter.");
+            setErrorTitle("Password Mismatch");
+            setErrorMessage("Passwords do not match. Please re-enter.");
             setIsSubmitting(false);
             return;
         }
 
         // Basic password strength check (optional, but good practice)
         if (formData.password.length < 6) {
-            alert("Password must be at least 6 characters long.");
+            setErrorTitle("Password Too Short");
+            setErrorMessage("Password must be at least 6 characters long.");
             setIsSubmitting(false);
             return;
         }
 
 
         try {
-            await axios.post(`/api/customers/register`, {
+            await signupAxios.post(`/api/customers/register`, {
                 name: formData.name,
                 user: {
                     email: formData.email,
@@ -67,7 +105,8 @@ export default function Signup() {
 
         } catch (error) {
             console.error("Signup error:", error.response?.data?.message || "Failed to create account.");
-            alert(error.response?.data?.message || "Failed to create account. Please try again.");
+            setErrorTitle("Signup Failed");
+            setErrorMessage(error.response?.data?.message || "Failed to create account. Please try again.");
         } finally {
             setIsSubmitting(false); // Re-enable button
         }
@@ -188,11 +227,19 @@ export default function Signup() {
                     </div>
                 </form>
             </div>
+            {/* OTP Verification Popup */}
             <OTPVerifyPopup
                 isOpen={isOtpPopupOpen}
                 onClose={() => setOtpPopupOpen(false)}
                 email={userEmail}
                 userType="customer"
+            />
+
+            {/* General Error Modal for signup validation/API errors */}
+            <Modal
+                title={errorTitle}
+                message={errorMessage}
+                onClose={() => setErrorMessage(null)}
             />
         </div>
     );

@@ -39,15 +39,26 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .securityMatcher(
                         "/api/auth/**",
+
                         "/api/customers/register",
                         "/api/customers/verify-otp",
                         "/api/customers/add",
-                        "/api/chat",
+
+                        "/api/cart/**",
+
                         "/",
                         "/healthz",
-                        "/api/doctors",
-                        "/api/products",
-                        "/api/products/**",
+
+                        "/api/doctors/get/**",
+                        "/api/doctors/specializations",
+                        "/api/doctors/search",
+
+
+
+                        "/api/products/{productId}/store/**",
+                        "/api/products/products",
+
+
                         "/api/executives/register",
                         "api/executives/verify-and-save"
                 )
@@ -63,7 +74,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/chat").hasRole("CUSTOMER")
+                        .requestMatchers("/api/appointments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/customers/me").hasRole("CUSTOMER")
+                        .requestMatchers("/api/customers/update/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/appointments/**").hasRole("CUSTOMER")
+
+                        .requestMatchers("/api/executives/**").hasRole("DELIVERY_EXECUTIVE")
+
+                        .requestMatchers("/api/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
