@@ -414,7 +414,7 @@ const PaymentGateway = () => {
                                 Processing...
                             </>
                         ) : (
-                            `Pay $${totalAmount.toFixed(2)}`
+                            `Pay ₹${totalAmount.toFixed(2)}`
                         )}
                     </button>
 

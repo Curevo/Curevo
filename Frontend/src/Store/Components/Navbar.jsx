@@ -348,7 +348,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                                             <X className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 mb-2">${(item.product?.price ?? 0).toFixed(2)}</p>
+                                                    <p className="text-sm text-gray-500 mb-2">₹{(item.product?.price ?? 0).toFixed(2)}</p>
                                                     <div className="flex items-center border rounded w-max">
                                                         <button
                                                             className="px-2 py-1 text-gray-500 hover:bg-gray-100"
@@ -366,7 +366,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                                     </div>
                                                 </div>
                                                 <div className="font-medium">
-                                                    ${((item.product?.price ?? 0) * (item.quantity ?? 0)).toFixed(2)}
+                                                    ₹{((item.product?.price ?? 0) * (item.quantity ?? 0)).toFixed(2)}
                                                 </div>
                                             </div>
                                         ))}
@@ -375,7 +375,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                     <div className="border-t mt-4 sm:mt-6 pt-4 sm:pt-6">
                                         <div className="flex justify-between mb-3 sm:mb-4 text-sm sm:text-base">
                                             <span>Subtotal</span>
-                                            <span>${cartSummary.subtotal.toFixed(2)}</span>
+                                            <span>₹{cartSummary.subtotal.toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between mb-3 sm:mb-4 text-sm sm:text-base">
                                             <span>Shipping</span>
@@ -383,7 +383,7 @@ export default function Navbar({ isCartOpen, setIsCartOpen }) {
                                         </div>
                                         <div className="flex justify-between mb-3 sm:mb-4 text-sm sm:text-base font-bold">
                                             <span>Total</span>
-                                            <span>${cartSummary.subtotal.toFixed(2)}</span>
+                                            <span>₹{cartSummary.subtotal.toFixed(2)}</span>
                                         </div>
                                         <button onClick={() => navigate("/orderDetails")}
                                                 className="w-full py-2 sm:py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base transition-colors duration-200 hover:shadow-md"

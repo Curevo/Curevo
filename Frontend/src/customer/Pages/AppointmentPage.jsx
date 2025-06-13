@@ -17,7 +17,7 @@ export default function AppointmentPage() {
             <main className="flex-1 p-6 md:ml-64 relative">
                 {/* This div handles top spacing on mobile to clear the fixed mobile header */}
                 <div className="mt-12 md:mt-0">
-                    <h1 className="text-3xl font-extrabold text-gray-900 mb-8">My Appointments</h1>
+                    {/* <h1 className="text-3xl font-extrabold text-gray-900 mb-8">My Appointments</h1> */}
                     <Appointment /> {/* Your Appointment component goes here */}
                 </div>
             </main>
