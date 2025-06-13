@@ -13,6 +13,10 @@ const ProductDetails = ({ onOpenCartModal }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [productId, storeId]);
+
+    useEffect(() => {
         const fetchProductDetails = async () => {
             setLoading(true);
             setError(null);
