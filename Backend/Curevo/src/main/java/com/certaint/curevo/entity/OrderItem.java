@@ -19,7 +19,7 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("order-items")
     private Order order;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // Import useCallback
 import { FiTruck, FiCheckCircle, FiClock, FiPackage, FiFileText, FiInfo, FiX } from "react-icons/fi";
 import { useAxiosInstance } from '@/Config/axiosConfig.js';
 import OrderDetails from "./OrderDetails.jsx";
@@ -91,138 +91,137 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // New handleDelete function
-  const handleDelete = async (orderId) => {
-    if (!window.confirm(`Are you sure you want to delete order ${orderId}? This action cannot be undone.`)) {
+  // Moved fetchOrders definition outside useEffect and wrapped in useCallback
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("/api/orders/me");
+      const allOrders = res.data.data;
+
+      const scheduledOrders = [];
+      const previousOrders = [];
+
+      allOrders.forEach(order => {
+        const paymentType = "Online";
+
+        const calculatedTotalAmount = order.totalAmount !== null
+            ? order.totalAmount
+            : (order.orderItems ? order.orderItems.reduce((sum, item) => sum + item.totalPrice, 0) : 0);
+        const totalAmountFormatted = `₹${calculatedTotalAmount.toFixed(2)}`;
+
+        const itemsCount = order.orderItems ? order.orderItems.reduce((sum, item) => sum + item.quantity, 0) : 0;
+        const orderedAtTimestamp = order.placedAt || order.updatedAt;
+        const orderedAgo = formatOrderTime(orderedAtTimestamp);
+
+        const needsPrescriptionVerification = order.prescriptionUrl && (order.prescriptionVerified === null || order.prescriptionVerified === false);
+
+        const { statusStep, eta, statusText, statusColor } =
+            getOrderStatusInfo(order.status, order.prescriptionUrl, order.prescriptionVerified);
+
+        const transformedOrder = {
+          // Properties primarily used for the MyOrders card display:
+          id: order.id,
+          total: totalAmountFormatted,
+          itemsCount: itemsCount,
+          paymentType: paymentType,
+          orderedAgo: orderedAgo,
+          eta: eta,
+          statusStep: statusStep,
+          statusText: statusText,
+          statusColor: statusColor,
+
+          // Properties that are *re-including* the original API fields for OrderDetails:
+          customer: {
+            customerId: order.customer?.customerId,
+            name: order.recipientName || order.customer?.name || "N/A",
+            age: order.customer?.age,
+            address: order.customer?.address,
+            image: order.customer?.image,
+            user: {
+              id: order.customer?.user?.id,
+              email: order.recipientEmail || order.customer?.user?.email || "N/A",
+              password: order.customer?.user?.password,
+              phone: order.recipientPhone || order.customer?.user?.phone || "N/A",
+              role: order.customer?.user?.role,
+              createdAt: order.customer?.user?.createdAt,
+            }
+          },
+          recipientName: order.recipientName,
+          recipientPhone: order.recipientPhone,
+          recipientEmail: order.recipientEmail,
+          deliveryInstructions: order.deliveryInstructions,
+          deliveryAddress: order.deliveryAddress,
+          deliveryLat: order.deliveryLat,
+          deliveryLng: order.deliveryLng,
+          prescriptionUrl: order.prescriptionUrl,
+          prescriptionVerified: order.prescriptionVerified,
+          totalAmount: calculatedTotalAmount,
+          status: order.status,
+          placedAt: order.placedAt,
+          updatedAt: order.updatedAt,
+          orderItems: order.orderItems ? order.orderItems.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            totalPrice: item.totalPrice,
+            product: {
+              productId: item.product?.productId,
+              name: item.product?.name || "N/A",
+              description: item.product?.description || "No description",
+              price: item.product?.price,
+              image: item.product?.image || "",
+              hoverImage: item.product?.hoverImage,
+              quantity: item.product?.quantity,
+              prescriptionRequired: item.product?.prescriptionRequired,
+              category: item.product?.category,
+              inventories: item.product?.inventories,
+            }
+          })) : [],
+          needsPrescriptionVerification: needsPrescriptionVerification,
+        };
+
+        if (["PENDING", "NEEDS_VERIFICATION", "VERIFIED", "ASSIGNED", "OUT_FOR_DELIVERY"].includes(order.status)) {
+          scheduledOrders.push(transformedOrder);
+        } else if (["DELIVERED", "CANCELLED"].includes(order.status)) {
+          previousOrders.push(transformedOrder);
+        }
+      });
+
+      setScheduled(scheduledOrders);
+      setPrevious(previousOrders);
+    } catch (err) {
+      console.error("Failed to load orders:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [axios, setScheduled, setPrevious, setLoading]); // Add all dependencies here
+
+  // Updated cancelOrder function
+  const cancelOrder = async (orderId) => {
+    if (!window.confirm(`Are you sure you want to cancel order ${orderId}?`)) {
       return; // User cancelled
     }
 
     try {
-      setLoading(true); // Indicate loading state
-      const response = await axios.post(`/api/orders/delete/${orderId}`);
-      console.log(`Order ${orderId} deleted successfully:`, response.data);
+      setLoading(true);
+      const response = await axios.post(`/api/orders/cancel/${orderId}`);
+      console.log(`Order ${orderId} cancelled successfully:`, response.data);
 
-      // Optimistically update the UI by removing the deleted order
-      setScheduled(prevOrders => prevOrders.filter(order => order.id !== orderId));
-      setPrevious(prevOrders => prevOrders.filter(order => order.id !== orderId));
+      // After successful cancellation, refetch all orders to get updated statuses
+      await fetchOrders(); // Now fetchOrders is in scope and callable
 
-      // Optionally, refetch all orders to ensure state consistency
-      // fetchOrders(); // Uncomment if you prefer a full data refresh
     } catch (error) {
-      console.error(`Error deleting order ${orderId}:`, error);
-      alert(`Failed to delete order ${orderId}. Please try again.`);
+      console.error(`Error cancelling order ${orderId}:`, error);
+      alert(`Failed to cancel order ${orderId}. Please try again.`);
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get("/api/orders/me");
-        const allOrders = res.data.data;
-
-        const scheduledOrders = [];
-        const previousOrders = [];
-
-        allOrders.forEach(order => {
-          const paymentType = "Online";
-
-          const calculatedTotalAmount = order.totalAmount !== null
-              ? order.totalAmount
-              : (order.orderItems ? order.orderItems.reduce((sum, item) => sum + item.totalPrice, 0) : 0);
-          const totalAmountFormatted = `₹${calculatedTotalAmount.toFixed(2)}`;
-
-          const itemsCount = order.orderItems ? order.orderItems.reduce((sum, item) => sum + item.quantity, 0) : 0;
-          const orderedAtTimestamp = order.placedAt || order.updatedAt;
-          const orderedAgo = formatOrderTime(orderedAtTimestamp);
-
-          const needsPrescriptionVerification = order.prescriptionUrl && (order.prescriptionVerified === null || order.prescriptionVerified === false);
-
-          const { statusStep, eta, statusText, statusColor } =
-              getOrderStatusInfo(order.status, order.prescriptionUrl, order.prescriptionVerified);
-
-          const transformedOrder = {
-            // Properties primarily used for the MyOrders card display:
-            id: order.id,
-            total: totalAmountFormatted,
-            itemsCount: itemsCount,
-            paymentType: paymentType,
-            orderedAgo: orderedAgo,
-            eta: eta,
-            statusStep: statusStep,
-            statusText: statusText,
-            statusColor: statusColor,
-
-            // Properties that are *re-including* the original API fields for OrderDetails:
-            customer: {
-              customerId: order.customer?.customerId,
-              name: order.recipientName || order.customer?.name || "N/A",
-              age: order.customer?.age,
-              address: order.customer?.address,
-              image: order.customer?.image,
-              user: {
-                id: order.customer?.user?.id,
-                email: order.recipientEmail || order.customer?.user?.email || "N/A",
-                password: order.customer?.user?.password,
-                phone: order.recipientPhone || order.customer?.user?.phone || "N/A",
-                role: order.customer?.user?.role,
-                createdAt: order.customer?.user?.createdAt,
-              }
-            },
-            recipientName: order.recipientName,
-            recipientPhone: order.recipientPhone,
-            recipientEmail: order.recipientEmail,
-            deliveryInstructions: order.deliveryInstructions,
-            deliveryAddress: order.deliveryAddress,
-            deliveryLat: order.deliveryLat,
-            deliveryLng: order.deliveryLng,
-            prescriptionUrl: order.prescriptionUrl,
-            prescriptionVerified: order.prescriptionVerified,
-            totalAmount: calculatedTotalAmount,
-            status: order.status,
-            placedAt: order.placedAt,
-            updatedAt: order.updatedAt,
-            orderItems: order.orderItems ? order.orderItems.map(item => ({
-              id: item.id,
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              totalPrice: item.totalPrice,
-              product: {
-                productId: item.product?.productId,
-                name: item.product?.name || "N/A",
-                description: item.product?.description || "No description",
-                price: item.product?.price,
-                image: item.product?.image || "",
-                hoverImage: item.product?.hoverImage,
-                quantity: item.product?.quantity,
-                prescriptionRequired: item.product?.prescriptionRequired,
-                category: item.product?.category,
-                inventories: item.product?.inventories,
-              }
-            })) : [],
-            needsPrescriptionVerification: needsPrescriptionVerification,
-          };
-
-          if (["PENDING", "NEEDS_VERIFICATION", "VERIFIED", "ASSIGNED", "OUT_FOR_DELIVERY"].includes(order.status)) {
-            scheduledOrders.push(transformedOrder);
-          } else if (["DELIVERED", "CANCELLED"].includes(order.status)) {
-            previousOrders.push(transformedOrder);
-          }
-        });
-
-        setScheduled(scheduledOrders);
-        setPrevious(previousOrders);
-      } catch (err) {
-        console.error("Failed to load orders:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, [axios]);
+    fetchOrders(); // Initial fetch
+  }, [fetchOrders]); // Depend on fetchOrders (which is now a useCallback)
 
   const renderOrders = (ordersArray, isPrevious) => {
     if (loading) {
@@ -276,13 +275,13 @@ export default function MyOrders() {
                 >
                   Order Details
                 </button>
-                {/* Delete button (only for non-previous orders that are not cancelled) */}
+                {/* Cancel button (only for non-previous orders that are not cancelled) */}
                 {!isPrevious && order.statusText !== "Cancelled" && (
                     <button
-                        onClick={() => handleDelete(order.id)} // Call handleDelete with order ID
+                        onClick={() => cancelOrder(order.id)}
                         className="px-5 py-2 text-red-600 text-base font-medium border border-red-500 rounded-lg hover:bg-red-50 hover:text-red-700 transition duration-200"
                     >
-                      Delete Order
+                      Cancel Order
                     </button>
                 )}
               </div>
@@ -332,7 +331,7 @@ export default function MyOrders() {
                             top: '-10px', // Adjust to center the circle on the line
                           }}
                       >
-                        <step.icon className={`h-6 w-6 ${iconTextColorClass}`} /> {/* Applied iconTextColorClass here */}
+                        <step.icon className={`h-6 w-6 ${iconTextColorClass}`} />
                       </div>
                       <p
                           className={`text-xs mt-2 text-center${

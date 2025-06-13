@@ -1,6 +1,5 @@
 package com.certaint.curevo.service;
 
-import com.certaint.curevo.dto.ApiResponse;
 import com.certaint.curevo.dto.DeliveryExecutiveDTO;
 import com.certaint.curevo.dto.ExecutivePerformanceDTO;
 import com.certaint.curevo.entity.*;
@@ -13,8 +12,6 @@ import com.certaint.curevo.repository.*;
 import com.certaint.curevo.security.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +39,7 @@ public class ExecutiveService {
     private final ImageHostingService imageHostingService;
     private final OtpService otpService;
     private final EmailService emailService;
-    private final SignupCacheService cacheService;
+    private final CacheService cacheService;
     private final JwtService jwtservice;
 
     private static final double PER_DELIVERY_FEE_INR = 40.0; // ₹50 per delivered order (adjust as needed)
@@ -223,7 +220,7 @@ public class ExecutiveService {
                 .orElseThrow(() -> new RuntimeException("Executive not found with ID: " + executiveId));
 
         if (executive.getStatus() == NOT_VERIFIED) {
-            executive.setStatus(INACTIVE); // Set to INACTIVE or AVAILABLE, depending on your default
+            executive.setStatus(INACTIVE);
             executiveRepo.save(executive);
              emailService.sendExecutiveApprovalEmail(executive.getUser().getEmail(), executive.getName());
             return executive;

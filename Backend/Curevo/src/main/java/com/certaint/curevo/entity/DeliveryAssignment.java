@@ -2,6 +2,7 @@ package com.certaint.curevo.entity;
 
 
 import com.certaint.curevo.enums.DeliveryAssignmentStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class DeliveryAssignment {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonManagedReference("order-assignment")
     private Order order;
 
     @ManyToOne

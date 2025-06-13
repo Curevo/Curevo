@@ -2,12 +2,10 @@ package com.certaint.curevo.controller;
 
 
 
+import com.azure.core.annotation.Post;
 import com.certaint.curevo.dto.ApiResponse;
 import com.certaint.curevo.dto.OrderRequestDTO;
-import com.certaint.curevo.entity.CartItem;
-import com.certaint.curevo.entity.Customer;
-import com.certaint.curevo.entity.Order;
-import com.certaint.curevo.entity.Payment;
+import com.certaint.curevo.entity.*;
 import com.certaint.curevo.enums.OrderStatus;
 import com.certaint.curevo.enums.PaymentStatus;
 import com.certaint.curevo.security.JwtService;
@@ -21,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @RestController
@@ -165,6 +164,45 @@ public class OrderController {
     public ApiResponse<Boolean> verifyPrescription(@PathVariable Long Id) {
         Boolean status = orderService.verifyPrescription(Id);
         return new ApiResponse<>(true, "Prescription verified", status);
+    }
+    @DeleteMapping("/delete/{id}")
+    public void DeleteOrder(@PathVariable Long id) {
+        orderService.deleteById(id);
+    }
+    @PostMapping("/cancel/{id}")
+    public ApiResponse<Order> cancelOrder(@PathVariable Long id) {
+        Optional<Order> orderOpt = orderService.findById(id);
+        if (orderOpt.isEmpty()) {
+            return new ApiResponse<>(false, "Order not found", null);
+        }
+
+        Order order = orderOpt.get();
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            return new ApiResponse<>(false, "Order is already cancelled", null);
+        }
+
+        // --- NEW LOGIC: Handle Delivery Assignments ---
+        // Retrieve the collection of delivery assignments.
+        // This will trigger a lazy load if the collection is not already initialized.
+        Set<DeliveryAssignment> deliveryAssignments = order.getDeliveryAssignments();
+        if (deliveryAssignments != null && !deliveryAssignments.isEmpty()) {
+            deliveryAssignments.clear();
+        }
+
+
+        Payment payment = order.getPayment();
+        // Assuming a cancelled order means the payment should be marked as refunded
+        if (payment != null) { // Defensive check
+            payment.setStatus(PaymentStatus.REFUNDED);
+            paymentService.save(payment);
+        }
+
+
+        order.setStatus(OrderStatus.CANCELLED);
+        Order updatedOrder = orderService.save(order);
+        executiveService.processPendingOrders();
+
+        return new ApiResponse<>(true, "Order cancelled successfully", updatedOrder);
     }
 
 }

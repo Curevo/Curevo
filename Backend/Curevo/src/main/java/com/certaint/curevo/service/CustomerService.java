@@ -1,7 +1,6 @@
 package com.certaint.curevo.service;
 
 import com.certaint.curevo.dto.CustomerDTO;
-import com.certaint.curevo.dto.UserDTO;
 import com.certaint.curevo.entity.Customer;
 import com.certaint.curevo.entity.User;
 import com.certaint.curevo.enums.Role;
@@ -10,11 +9,9 @@ import com.certaint.curevo.exception.UserNotFoundException;
 import com.certaint.curevo.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static java.lang.Boolean.TRUE;
@@ -28,7 +25,7 @@ public class CustomerService {
     private final UserService userService;
     private final ImageHostingService imageHostingService;
     private final OtpService otpService;
-    private final SignupCacheService cacheService;
+    private final CacheService cacheService;
     private final EmailService emailService;
 
 

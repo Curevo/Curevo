@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class SignupCacheService {
+public class CacheService {
 
     private final Cache<String, CustomerDTO> customerCache;
     private final Cache<String, String> otpCache;
     private final Cache<String, DeliveryExecutiveDTO> deliveryExecutiveCache;
     private final Cache<String, String> deliveryOtpCache;
 
-    public SignupCacheService() {
+    public CacheService() {
         this.customerCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .maximumSize(1000)

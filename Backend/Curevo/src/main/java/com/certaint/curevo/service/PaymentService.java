@@ -137,4 +137,8 @@ public class PaymentService {
         appointmentRepository.save(appointment);
         return updatePayment(payment.getId(),payment);
     }
+
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
+    }
 }

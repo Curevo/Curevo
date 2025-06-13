@@ -81,8 +81,18 @@ export default function OrderDetails({ order, onClose = () => {} }) {
 
   const orderNumber = order.id ? `#${order.id}` : "#N/A";
   const createdAt = order.placedAt || order.updatedAt;
-  const paymentStatus = order.totalAmount !== null && order.totalAmount > 0 ? "Paid" : "Pending";
   const currentStatus = typeof order.status === 'string' ? order.status : "UNKNOWN";
+
+  // --- MODIFIED: Payment Status Logic ---
+  let paymentStatus;
+  if (currentStatus === "CANCELLED") {
+    paymentStatus = "Refunded";
+  } else if (order.totalAmount !== null && order.totalAmount > 0) {
+    paymentStatus = "Paid";
+  } else {
+    paymentStatus = "Pending";
+  }
+  // --- END MODIFIED ---
 
   const customerName = order.recipientName || order.customer?.name || "N/A";
   const customerEmail = order.recipientEmail || order.customer?.user?.email || "N/A";
@@ -108,7 +118,7 @@ export default function OrderDetails({ order, onClose = () => {} }) {
   const platformFee = 10;
 
   const totalBeforeTax = calculatedSubtotal + deliveryCharges + platformFee;
-  const tax = totalBeforeTax * 0.18; // 5% tax on the whole order (subtotal + delivery + platform fee)
+  const tax = totalBeforeTax * 0.18; // 18% tax as per current Indian GST norms
 
   const finalTotal = totalBeforeTax + tax;
 
@@ -168,7 +178,7 @@ export default function OrderDetails({ order, onClose = () => {} }) {
                             ? "bg-green-100 text-green-700"
                             : paymentStatus === "Pending"
                                 ? "bg-yellow-100 text-yellow-700"
-                                : "bg-red-100 text-red-700"
+                                : "bg-red-100 text-red-700" // Refunded will also use red styling
                     }`}
                 >
                 {paymentStatus}
@@ -320,7 +330,7 @@ export default function OrderDetails({ order, onClose = () => {} }) {
                 <div className="text-right font-medium">
                   ${paymentSummary.platformFee.toFixed(2)}
                 </div>
-                <div className="font-medium">Tax (5%):</div>
+                <div className="font-medium">Tax (18%):</div> {/* Updated tax percentage for clarity */}
                 <div className="text-right font-medium">
                   ${paymentSummary.tax.toFixed(2)}
                 </div>

@@ -2,15 +2,14 @@ package com.certaint.curevo.service;
 
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class OtpService {
 
-    private final SignupCacheService cacheService;
+    private final CacheService cacheService;
 
-    public OtpService(SignupCacheService cacheService) {
+    public OtpService(CacheService cacheService) {
         this.cacheService = cacheService;
     }
 

@@ -2,6 +2,7 @@ package com.certaint.curevo.entity;
 
 import com.certaint.curevo.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class Payment {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = true)
+    @JsonManagedReference("order-payment")
     private Order order;
 
     @Column(name = "created_at", nullable = false, updatable = false)
