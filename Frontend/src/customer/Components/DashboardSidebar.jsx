@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaUser, FaShoppingCart, FaCalendarAlt } from "react-icons/fa";
 import { FiMenu, FiX, FiLogOut }               from "react-icons/fi";
+import { MdOutlineHelpOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import CurevoLogo from "/Assets/Curevo-logo.png";
 
@@ -15,6 +16,7 @@ export default function DashboardSidebar({
         { label: "Account",     icon: <FaUser />,         view: "Account",     path: "/my-profile"      },
         { label: "My Orders",   icon: <FaShoppingCart />, view: "My Orders",   path: "/my-orders"       },
         { label: "Appointment", icon: <FaCalendarAlt />,  view: "Appointment", path: "/my-appointments" },
+        { label: "Help", icon: <MdOutlineHelpOutline />,  view: "Help", path: "/help" },
     ];
 
     return (
@@ -22,17 +24,16 @@ export default function DashboardSidebar({
             {/* ── 1) SLIM MOBILE HEADER (shown only on small screens) ── */}
             <div
                 className="
-          md:hidden
-          fixed top-0 left-0 right-0 h-12
-          bg-white shadow-md
-          flex items-center justify-between
-          px-4 z-40
-        "
+                md:hidden
+                fixed top-0 left-0 right-0 h-12
+                bg-white shadow-md
+                flex items-center justify-between
+                px-4 z-40"
             >
                 <button onClick={() => setIsOpen(true)} className="p-1">
                     <FiMenu size={24} />
                 </button>
-                <img src={CurevoLogo} alt="Curevo Logo" className="h-8" />
+                <img src={CurevoLogo} alt="Curevo Logo" className="h-8" onClick={() => navigate('/')}/>
                 <div className="w-6 h-6" />
             </div>
 
@@ -46,15 +47,15 @@ export default function DashboardSidebar({
 
             <div
                 className={`
-          fixed top-0 bottom-0 left-0
-          w-3/4 max-w-xs
-          bg-white p-6 shadow-lg
-          flex flex-col
-          transition-transform duration-300 ease-in-out
-          z-50
-          md:hidden
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
+                fixed top-0 bottom-0 left-0
+                w-3/4 max-w-xs
+                bg-white p-6 shadow-lg
+                flex flex-col
+                transition-transform duration-300 ease-in-out
+                z-50
+                md:hidden
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}
             >
                 <div className="flex justify-between items-center mb-6">
                     <img src={CurevoLogo} alt="Curevo Logo" className="h-8" />
@@ -125,7 +126,7 @@ export default function DashboardSidebar({
                         ))}
                     </nav>
                     <button
-                        onClick={() => {/* Implement logout logic here */}}
+                        onClick={() => {window.location.href = '/logout'}}
                         className="
               mt-auto
               flex items-center gap-3 text-red-500 hover:bg-red-100

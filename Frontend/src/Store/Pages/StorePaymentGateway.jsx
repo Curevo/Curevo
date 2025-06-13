@@ -194,6 +194,7 @@ const StorePaymentGateway = () => {
                             src="/Assets/curevo-bright.png"
                             alt="Curevo logo"
                             className="h-10 w-auto"
+                            onClick={()=> {window.location.href = "/logout"}}
                         />
                         <h1 className="text-2xl font-semibold ml-2"></h1>
                     </div>

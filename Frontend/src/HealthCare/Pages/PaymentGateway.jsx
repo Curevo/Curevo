@@ -141,6 +141,7 @@ const PaymentGateway = () => {
                             src="/Assets/Curevo-logo.png"
                             alt="Curevo logo"
                             className="h-10 w-auto"
+                            onClick={() => navigate('/')}
                         />
                         <h1 className="text-2xl font-semibold ml-2"></h1>
                     </div>
@@ -416,6 +417,17 @@ const PaymentGateway = () => {
                         ) : (
                             `Pay ₹${totalAmount.toFixed(2)}`
                         )}
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`w-full py-3 rounded-lg font-medium flex items-center justify-center ${
+                            !agreeTerms || isProcessingPayment
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        } transition`}
+                        >
+                        Pay Later
                     </button>
 
                     <p className="text-xs text-gray-500 mt-4 text-center">

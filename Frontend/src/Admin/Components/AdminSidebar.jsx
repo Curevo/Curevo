@@ -28,7 +28,7 @@ const Sidebar = () => {
         { icon: <Hospital size={20} />, label: "Clinic Management", path: "/admin/clinics" },
         { icon: <ContactRound size={20} />, label: "Captains Management", path: "/admin/captains" },
         { icon: <PackageSearch size={20} />, label: "Order Management", path: "/admin/orders" },
-        { icon: <HelpCircle size={20} />, label: "Help", path: "/admin/help" },
+        { icon: <HelpCircle size={20} />, label: "Help", path: "/help" },
     ];
 
     const handleNavClick = (path) => {
@@ -62,7 +62,7 @@ const Sidebar = () => {
             <div className="flex flex-col justify-center">
             {/* Mobile Close Button */}
             <div className="flex justify-between items-center mb-8 md:hidden">
-                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" />
+                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" onClick={() => navigate('/')} />
                 <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-500 hover:text-red-500"
@@ -93,7 +93,7 @@ const Sidebar = () => {
             {/* Logout Button */}
             <button
             className="flex items-center bg-gray-200 gap-2 text-red-500 hover:bg-red-100 px-3 py-2 rounded-md transition"
-            onClick={handleLogout}
+            onClick={()=> {window.location.href = "/logout"}}
             >
             <LogOut size={20} /> Logout
             </button>

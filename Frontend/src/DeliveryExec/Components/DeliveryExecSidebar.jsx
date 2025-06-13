@@ -24,7 +24,7 @@ const DeliveryExecSidebar = () => {
         { icon: <UserPen size={20} />, label: "Profiles Settings", path: "/executive/dashboard" },
         { icon: <Pill size={20} />, label: "Order Dashboard", path: "/executive/orders" },
         { icon: <PackageSearch size={20} />, label: "Order History", path: "/executive/orders-history" },
-        { icon: <HelpCircle size={20} />, label: "Help", path: "/executive/help" },
+        { icon: <HelpCircle size={20} />, label: "Help", path: "/help" },
     ];
 
     const handleNavClick = (path) => {
@@ -69,7 +69,7 @@ const DeliveryExecSidebar = () => {
 
             {/* Desktop Logo */}
             <div className="hidden md:block text-2xl font-bold text-blue-600 mb-10">
-                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" />
+                <img src="/Assets/Curevo-logo.png" alt="Logo" className="h-10" onClick={() => navigate('/')} />
             </div>
 
             {/* Navigation Items */}
@@ -89,7 +89,7 @@ const DeliveryExecSidebar = () => {
             {/* Logout Button */}
             <button
             className="flex items-center bg-gray-200 gap-2 text-red-500 hover:bg-red-100 px-3 py-2 rounded-md transition"
-            onClick={handleLogout}
+            onClick={()=> {window.location.href = "/logout"}}
             >
             <LogOut size={20} /> Logout
             </button>
