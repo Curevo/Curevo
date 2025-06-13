@@ -13,6 +13,7 @@ import {
   FiCreditCard,
   FiEye,
 } from "react-icons/fi";
+import { MdCurrencyRupee } from "react-icons/md";
 
 export default function AppointmentDetails({
                                              appointment = null,
@@ -129,7 +130,7 @@ export default function AppointmentDetails({
 
 
   return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999] p-4 sm:p-6"> {/* Added padding here */}
+      <div className="fixed inset-0 h-screen flex items-center justify-center bg-black bg-opacity-50 z-[9999] p-4 sm:p-6"> {/* Added padding here */}
         <div className="bg-white rounded-lg shadow-xl w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl overflow-hidden max-h-[95vh] flex flex-col"> {/* Increased max-width */}
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200"> {/* Increased padding */}
@@ -269,7 +270,7 @@ export default function AppointmentDetails({
 
                 {/* Base Amount */}
                 <div className="flex items-start space-x-3">
-                  <FiDollarSign className="mt-1 text-green-600" size={18} />
+                  <MdCurrencyRupee className="mt-1 text-green-600" size={18} />
                   <div>
                     <div className="text-xs font-medium text-gray-600">Base Amount</div>
                     <div className="text-sm font-semibold text-gray-800">
@@ -280,7 +281,7 @@ export default function AppointmentDetails({
 
                 {/* Service Charge */}
                 <div className="flex items-start space-x-3">
-                  <FiDollarSign className="mt-1 text-green-600" size={18} />
+                  <MdCurrencyRupee className="mt-1 text-green-600" size={18} />
                   <div>
                     <div className="text-xs font-medium text-gray-600">Service Charge</div>
                     <div className="text-sm font-semibold text-gray-800">
@@ -291,7 +292,7 @@ export default function AppointmentDetails({
 
                 {/* Extra Charge */}
                 <div className="flex items-start space-x-3">
-                  <FiDollarSign className="mt-1 text-green-600" size={18} />
+                  <MdCurrencyRupee className="mt-1 text-green-600" size={18} />
                   <div>
                     <div className="text-xs font-medium text-gray-600">Extra Charge</div>
                     <div className="text-sm font-semibold text-gray-800">
@@ -302,7 +303,7 @@ export default function AppointmentDetails({
 
                 {/* Total Amount */}
                 <div className="flex items-start space-x-3">
-                  <FiDollarSign className="mt-1 text-green-600" size={18} />
+                  <MdCurrencyRupee className="mt-1 text-green-600" size={18} />
                   <div>
                     <div className="text-xs font-medium text-gray-600">Total Amount</div>
                     <div className="text-lg font-bold text-green-700"> {/* Larger total amount */}

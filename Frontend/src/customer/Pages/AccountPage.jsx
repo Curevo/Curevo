@@ -17,7 +17,7 @@ export default function AccountPage() {
             <main className="flex-1 p-6 md:ml-64 relative">
                 {/* This div handles top spacing on mobile to push content below the fixed mobile header */}
                 <div className="mt-12 md:mt-0">
-                    <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Account Settings</h1>
+                    {/* <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Account Settings</h1> */}
                     <UserProfile />
                 </div>
             </main>

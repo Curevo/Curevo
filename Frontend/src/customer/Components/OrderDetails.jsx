@@ -301,7 +301,7 @@ export default function OrderDetails({ order, onClose = () => {} }) {
                             </p>
                           </div>
                           <p className="text-base font-semibold text-gray-700 ml-auto">
-                            {item.quantity} × ${item.price.toFixed(2)}
+                            {item.quantity} × ₹{item.price.toFixed(2)}
                           </p>
                         </div>
                     ))}
@@ -315,7 +315,7 @@ export default function OrderDetails({ order, onClose = () => {} }) {
               <div className="grid grid-cols-2 gap-y-2 sm:gap-x-6 text-base text-gray-700">
                 <div className="font-medium">Subtotal:</div>
                 <div className="text-right font-medium">
-                  ${paymentSummary.subtotal.toFixed(2)}
+                  ₹{paymentSummary.subtotal.toFixed(2)}
                 </div>
                 {/* Discount is 0 as per your rule, can be omitted or kept if logic changes */}
                 {/* <div className="font-medium">Discount:</div>
@@ -324,19 +324,19 @@ export default function OrderDetails({ order, onClose = () => {} }) {
                 </div> */}
                 <div className="font-medium">Delivery Charges:</div>
                 <div className="text-right font-medium">
-                  ${paymentSummary.deliveryCharges.toFixed(2)}
+                  ₹{paymentSummary.deliveryCharges.toFixed(2)}
                 </div>
                 <div className="font-medium">Platform Fee:</div>
                 <div className="text-right font-medium">
-                  ${paymentSummary.platformFee.toFixed(2)}
+                  ₹{paymentSummary.platformFee.toFixed(2)}
                 </div>
                 <div className="font-medium">Tax (18%):</div> {/* Updated tax percentage for clarity */}
                 <div className="text-right font-medium">
-                  ${paymentSummary.tax.toFixed(2)}
+                  ₹{paymentSummary.tax.toFixed(2)}
                 </div>
                 <div className="font-bold text-gray-900 text-lg">Total:</div>
                 <div className="text-right font-bold text-gray-900 text-lg">
-                  ${paymentSummary.total.toFixed(2)}
+                  ₹{paymentSummary.total.toFixed(2)}
                 </div>
               </div>
             </div>
