@@ -56,12 +56,12 @@ const PaymentGateway = () => {
         toast.loading("Processing your payment...", { id: 'paymentProcessing' });
 
         try {
-            const response = await axios.post(`/api/payments/process/appointment/${paymentDetails.id}`);
+            const response = await axios.post(`/api/payments/process/appointment/${appointmentId}`);
 
             if (response.data.success) {
                 toast.success("Payment successful!", { id: 'paymentProcessing' });
 
-                navigate(`/my-appointment/${appointmentId}`);
+                navigate(`/my-appointments`);
             } else {
                 toast.error(response.data.message || "Payment failed. Please try again.", { id: 'paymentProcessing' });
             }

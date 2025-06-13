@@ -67,6 +67,8 @@ public class PaymentController {
             @PathVariable Long appointmentId,
             @RequestHeader("Authorization") String authHeader) {
 
+//        System.out.println("Processing payment for appointment ID:********************************************** " + appointmentId);
+
         Optional<Customer> customerOpt = getAuthenticatedCustomer(authHeader);
 
         if (customerOpt.isEmpty()) {
@@ -91,7 +93,6 @@ public class PaymentController {
                     .body(new ApiResponse<>(false, "An unexpected error occurred: " + e.getMessage(), null));
         }
     }
-
 
 
     private Optional<Customer> getAuthenticatedCustomer(String authHeader) {

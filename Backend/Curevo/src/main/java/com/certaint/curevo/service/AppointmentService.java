@@ -151,4 +151,11 @@ public class AppointmentService {
 
         return true;
     }
+
+    public void deleteAppointment(Long id) {
+        if (!appointmentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Appointment not found with ID: " + id);
+        }
+        appointmentRepository.deleteById(id);
+    }
 }

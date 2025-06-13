@@ -123,19 +123,30 @@ public class PaymentService {
     }
 
 
+    // Assume appointmentService.getAppointmentByIdAndCustomer returns a valid Appointment object
     public Payment processPayment(Appointment appointment) {
-        Payment payment=paymentRepository.getPaymentByAppointment(appointment);
-        if (payment == null) {
+        // Use findByAppointmentId from your repository
+        Optional<Payment> paymentOpt = paymentRepository.findByAppointment(appointment);
+
+
+        if (paymentOpt.isEmpty()) { // Use isPresent() or isEmpty() with Optional
             throw new EntityNotFoundException("Payment not found for appointment ID: " + appointment.getId());
         }
-        if (payment.getStatus() != PaymentStatus.PENDING && appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
-            throw new IllegalStateException("Payment is not in a processable state: " + payment.getStatus());
+        Payment payment = paymentOpt.get(); // Get the Payment object from the Optional
+
+        if (payment.getStatus() != PaymentStatus.PENDING || appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            // Note: I've changed '&&' to '||' here, assuming both conditions must be met to proceed,
+            // and if either is not met, it's an illegal state. Adjust based on your exact logic.
+            throw new IllegalStateException("Payment or Appointment is not in a processable state. Payment Status: " + payment.getStatus() + ", Appointment Status: " + appointment.getStatus());
         }
+
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setMethod("ONLINE");
         appointment.setStatus(AppointmentStatus.BOOKED);
+
         appointmentRepository.save(appointment);
-        return updatePayment(payment.getId(),payment);
+        // Assuming updatePayment calls paymentRepository.save(payment) internally, this is fine
+        return updatePayment(payment.getId(), payment);
     }
 
     public Payment save(Payment payment) {

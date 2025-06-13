@@ -291,6 +291,7 @@ const AppointmentForm = () => {
         return errors;
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -311,25 +312,39 @@ const AppointmentForm = () => {
                 email: formData.email,
                 appointmentDate: formData.date,
                 appointmentTime: formData.time,
-                serviceType: "Consultation",
                 customer: customer ? { customerId: customer.customerId } : null,
                 doctor: { doctorId: doctorIdNumber }
             };
 
-            // FIX: Explicitly set Content-Type for the JSON part using a Blob
+            // This part is already correct for setting application/json content type for 'appointment' part
             data.append('appointment', new Blob([JSON.stringify(appointmentObject)], {
                 type: 'application/json'
             }));
 
+            // --- START FIX ---
+            // Ensure the 'image' part is ALWAYS appended, even if no file is selected.
+            // Spring's @RequestPart(required = false) expects the part to be present,
+            // even if it's an empty file.
             if (formData.prescription) {
+                // If a file is selected, append the actual file
                 data.append('image', formData.prescription);
+            } else {
+                // If no file is selected, append an empty Blob with a generic binary content type.
+                // This ensures the 'image' part exists in the FormData, even if empty.
+                data.append('image', new Blob([], { type: 'application/octet-stream' }));
+                // Alternatively, some sources suggest data.append('image', ''); which might also work,
+                // but an empty Blob is more explicit for file uploads.
             }
+            // --- END FIX ---
 
+
+            // Note: Axios automatically sets the 'Content-Type' header to 'multipart/form-data'
+            // with the correct boundary when you pass a FormData object.
+            // DO NOT manually set 'Content-Type': 'multipart/form-data' in headers,
+            // as it will likely lead to boundary issues.
             const res = await axios.post('/api/appointments/book', data, {
                 headers: {
-                    // Axios automatically sets 'multipart/form-data' for FormData objects,
-                    // but it's good practice to ensure it's not overridden.
-                    // 'Content-Type': 'multipart/form-data', // Can be omitted, axios handles it.
+                    // Remove any manual Content-Type setting here if you had one.
                 },
             });
 

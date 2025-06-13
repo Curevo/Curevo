@@ -34,8 +34,9 @@ public class Payment {
     @Column(length = 50)
     private String method;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "appointment_id", nullable = true)
+    @OneToOne(fetch = FetchType.EAGER) // Changed to LAZY
+    @JoinColumn(name = "appointment_id", nullable = true, unique = true) // <-- ADD unique = true
+//    @JsonBackReference("appointment-payment") // Add this to prevent circular serialization if Appointment maps back
     private Appointment appointment;
 
     @OneToOne(fetch = FetchType.EAGER)

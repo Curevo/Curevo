@@ -192,6 +192,18 @@ public class AppointmentController {
 
         }
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.deleteAppointment(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Appointment deleted successfully", "Appointment with ID " + id + " has been deleted."));
+        } catch (Exception ex) {
+            System.err.println("Error deleting appointment: " + ex.getMessage());
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Something went wrong: " + ex.getMessage(), null));
+        }
+    }
 
 
 }

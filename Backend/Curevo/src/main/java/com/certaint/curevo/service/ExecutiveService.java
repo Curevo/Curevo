@@ -157,6 +157,12 @@ public class ExecutiveService {
         assignment.setActualDelivery(Instant.now()); // Set the actual delivery timestamp
         assignmentRepo.save(assignment);
 
+        Order order = assignment.getOrder(); // Get the Order object directly from the assignment
+        if (order != null) { // Defensive check
+            order.setStatus(OrderStatus.DELIVERED); // Set the Order status to DELIVERED
+            orderRepository.save(order); // Save the updated Order
+        }
+
         // Check if executive can now take more orders
         if (executive.getStatus() == UNAVAILABLE && !hasReachedMaxAssignments(executive.getId())) {
             executive.setStatus(AVAILABLE);

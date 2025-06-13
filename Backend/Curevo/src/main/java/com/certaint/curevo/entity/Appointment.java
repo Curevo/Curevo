@@ -66,6 +66,10 @@ public class Appointment {
     @Column(nullable = true)
     private String prescription;
 
+//    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+//    @JsonManagedReference("appointment-payment") // <-- ADD THIS
+//    private Payment payment;
+
 
     @PrePersist
     @PreUpdate
