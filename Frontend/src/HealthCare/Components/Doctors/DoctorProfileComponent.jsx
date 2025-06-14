@@ -131,81 +131,117 @@ const DoctorProfileComponent = () => {
     const email = doctor.user?.email || 'Not specified'; // Access email from nested user object
 
     return (
-        <div className="max-w-7xl mx-auto rounded-lg shadow-md py-16 px-6 sm:px-12 md:px-20 lg:px-32 bg-white">
-            {/* Profile Header */}
-            <div className="flex flex-col items-center md:flex-row gap-6">
-                {/* Doctor Image */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-200 overflow-hidden shadow-sm flex-shrink-0">
-                    {renderDoctorImage()}
-                </div>
+        <div className="w-full flex flex-col items-center pt-24 pb-10 bg-gray-50 min-h-screen">
+            {/* Main Doctor Profile Section - Reverted to original max-w-7xl */}
+            <div className="max-w-7xl mx-auto rounded-lg shadow-md py-16 px-6 sm:px-12 md:px-20 lg:px-32 bg-white">
+                {/* Profile Header */}
+                <div className="flex flex-col items-center md:flex-row gap-6">
+                    {/* Doctor Image */}
+                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-200 overflow-hidden shadow-sm flex-shrink-0">
+                        {renderDoctorImage()}
+                    </div>
 
-                {/* Doctor Info */}
-                <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-                        {doctorName}
-                    </h1>
-                    <p className="text-lg text-blue-600 font-medium mb-2">
-                        {specialization}
-                    </p>
-                    <p className="text-gray-600">{qualification}</p>
-                    {clinicName && (
-                        <p className="text-gray-600 mt-1">Clinic: {clinicName}</p>
-                    )}
-                    {clinicAddress && (
-                        <p className="text-gray-600 text-sm">{clinicAddress}</p>
-                    )}
-                </div>
-            </div>
-
-            {/* Bio Section - No direct 'bio' in your JSON, so it remains generic */}
-            {/*<div className="my-8">*/}
-            {/*    <h2 className="text-xl font-semibold text-gray-800 mb-3">About</h2>*/}
-            {/*    <p className="text-gray-500 italic">No detailed biography available.</p>*/}
-            {/*</div>*/}
-
-            <div className="border-t border-gray-200 my-6"></div>
-
-            {/* Doctor Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-                    <h3 className="font-medium text-gray-500 mb-1">Qualification</h3>
-                    <p className="text-gray-800">
-                        {qualification}
-                    </p>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-                    <h3 className="font-medium text-gray-500 mb-1">Availability</h3>
-                    <p className="text-gray-800">
-                        {availableDays}
-                    </p>
-                    {consultationFee !== 'N/A' && (
-                        <p className="text-gray-600 text-sm mt-1">
-                            Fee: ₹{consultationFee}
+                    {/* Doctor Info */}
+                    <div className="flex-1 text-center md:text-left">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                            {doctorName}
+                        </h1>
+                        <p className="text-lg text-blue-600 font-medium mb-2">
+                            {specialization}
                         </p>
-                    )}
+                        <p className="text-gray-600">{qualification}</p>
+                        {clinicName && (
+                            <p className="text-gray-600 mt-1">Clinic: {clinicName}</p>
+                        )}
+                        {clinicAddress && (
+                            <p className="text-gray-600 text-sm">{clinicAddress}</p>
+                        )}
+                    </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-                    <h3 className="font-medium text-gray-500 mb-1">Contact</h3>
-                    <p className="text-gray-800">
-                        Phone: {phone}
-                    </p>
-                    <p className="text-gray-600 text-sm mt-1">
-                        Email: {email}
-                    </p>
+                {/* Bio Section - No direct 'bio' in your JSON, so it remains generic */}
+                {/*<div className="my-8">*/}
+                {/* <h2 className="text-xl font-semibold text-gray-800 mb-3">About</h2>*/}
+                {/* <p className="text-gray-500 italic">No detailed biography available.</p>*/}
+                {/*</div>*/}
+
+                <div className="border-t border-gray-200 my-6"></div>
+
+                {/* Doctor Details */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <h3 className="font-medium text-gray-500 mb-1">Qualification</h3>
+                        <p className="text-gray-800">
+                            {qualification}
+                        </p>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <h3 className="font-medium text-gray-500 mb-1">Availability</h3>
+                        <p className="text-gray-800">
+                            {availableDays}
+                        </p>
+                        {consultationFee !== 'N/A' && (
+                            <p className="text-gray-600 text-sm mt-1">
+                                Fee: ₹{consultationFee}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <h3 className="font-medium text-gray-500 mb-1">Contact</h3>
+                        <p className="text-gray-800">
+                            Phone: {phone}
+                        </p>
+                        <p className="text-gray-600 text-sm mt-1">
+                            Email: {email}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Appointment Button */}
+                <div className="flex justify-center">
+                    <button
+                        className="mt-6 w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition-colors shadow-md"
+                        onClick={handleBookAppointment}
+                    >
+                        Book Appointment
+                    </button>
                 </div>
             </div>
 
-            {/* Appointment Button */}
-            <div className="flex justify-center">
-                <button
-                    className="mt-6 w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition-colors shadow-md"
-                    onClick={handleBookAppointment}
-                >
-                    Book Appointment
-                </button>
-            </div>
+            {/* --- */}
+
+            {/* Why Choose Our Doctors Section */}
+            <section className="max-w-[90%] mx-auto mt-12 mb-5 px-6 py-10 bg-white rounded-2xl shadow-xl">
+                <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Why Choose Our Doctors?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Icon 1: Verified Expertise */}
+                    <div className="flex flex-col items-center text-center p-4">
+                        <svg className="h-16 w-16 text-blue-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Verified Expertise</h3>
+                        <p className="text-gray-600">All our doctors are highly qualified and undergo rigorous verification.</p>
+                    </div>
+                    {/* Icon 2: Patient-Centered Care */}
+                    <div className="flex flex-col items-center text-center p-4">
+                        <svg className="h-16 w-16 text-green-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Patient-Centered Care</h3>
+                        <p className="text-gray-600">Receive personalized care tailored to your individual health needs.</p>
+                    </div>
+                    {/* Icon 3: Accessible & Convenient */}
+                    <div className="flex flex-col items-center text-center p-4">
+                        <svg className="h-16 w-16 text-purple-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Accessible & Convenient</h3>
+                        <p className="text-gray-600">Easily find and book appointments at your convenience.</p>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };
