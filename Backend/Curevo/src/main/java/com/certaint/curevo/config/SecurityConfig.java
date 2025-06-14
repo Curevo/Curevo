@@ -74,15 +74,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/orders/**").hasAnyRole("CUSTOMER","ADMIN")
                         .requestMatchers("/api/chat").hasRole("CUSTOMER")
-                        .requestMatchers("/api/appointments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/appointments/**").hasAnyRole("CUSTOMER","ADMIN")
                         .requestMatchers("/api/customers/me").hasRole("CUSTOMER")
                         .requestMatchers("/api/customers/update/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
-                        .requestMatchers("/api/appointments/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/appointments/**").hasAnyRole("CUSTOMER","ADMIN")
 
-                        .requestMatchers("/api/executives/**").hasRole("DELIVERY_EXECUTIVE")
+                        .requestMatchers("/api/executives/**").hasAnyRole("DELIVERY_EXECUTIVE","ADMIN")
 
                         .requestMatchers("/api/**").hasRole("ADMIN")
 
