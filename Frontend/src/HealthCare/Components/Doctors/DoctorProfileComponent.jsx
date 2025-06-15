@@ -11,6 +11,11 @@ const DoctorProfileComponent = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // --- NEW: Scroll to top on component mount ---
+    useEffect(() => {
+        window.scrollTo(0, 0); // Scrolls to the top left corner of the window
+    }, []); // Empty dependency array ensures this runs only once on mount
+
     useEffect(() => {
         const fetchDoctorProfile = async () => {
             if (!doctorId) {

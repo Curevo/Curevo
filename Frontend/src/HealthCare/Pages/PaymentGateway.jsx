@@ -15,7 +15,7 @@ const PaymentGateway = () => {
     const [paymentDetails, setPaymentDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isProcessingPayment, setIsProcessingPayment] = useState(false); // New state for payment processing
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false); // State for payment processing
 
     useEffect(() => {
         const fetchPaymentDetails = async () => {
@@ -60,7 +60,6 @@ const PaymentGateway = () => {
 
             if (response.data.success) {
                 toast.success("Payment successful!", { id: 'paymentProcessing' });
-
                 navigate(`/my-appointments`);
             } else {
                 toast.error(response.data.message || "Payment failed. Please try again.", { id: 'paymentProcessing' });
@@ -71,6 +70,13 @@ const PaymentGateway = () => {
         } finally {
             setIsProcessingPayment(false);
         }
+    };
+
+    // --- NEW: Handle Pay Later functionality ---
+    const handlePayLater = () => {
+        // No terms check needed for "Pay Later"
+        toast("You can complete the payment later from 'My Appointments'.", { icon: 'ℹ️' });
+        navigate('/my-appointments');
     };
 
     if (loading) {
@@ -108,8 +114,6 @@ const PaymentGateway = () => {
     const extraCharge = paymentDetails?.appointment?.extraCharge || 0;
     const totalAmount = paymentDetails?.amount || 0;
 
-    // For display consistency, subtotal is the sum of base, service, and extra charges,
-    // assuming no separate "tax" in the provided JSON structure.
     const subtotalDisplay = baseAmount + serviceCharge + extraCharge;
     const taxDisplay = 0; // Explicitly zero as per the JSON structure
 
@@ -172,7 +176,7 @@ const PaymentGateway = () => {
                             )}
                             {serviceCharge > 0 && (
                                 <div className="flex justify-between border-b border-blue-400 pb-2">
-                                    <span>Service Charge</span> {/* Changed from "Service" to "Service Charge" for clarity */}
+                                    <span>Service Charge</span>
                                     <span>₹{serviceCharge.toFixed(2)}</span>
                                 </div>
                             )}
@@ -401,7 +405,7 @@ const PaymentGateway = () => {
 
                     {/* Pay Now Button */}
                     <button
-                        onClick={handlePayment} // Add onClick handler here
+                        onClick={handlePayment}
                         disabled={!agreeTerms || isProcessingPayment}
                         className={`w-full py-3 rounded-lg font-medium flex items-center justify-center ${
                             !agreeTerms || isProcessingPayment
@@ -419,14 +423,18 @@ const PaymentGateway = () => {
                         )}
                     </button>
 
+                    {/* --- NEW: Pay Later Button --- */}
                     <button
                         type="button"
-                        className={`w-full py-3 rounded-lg font-medium flex items-center justify-center ${
-                            !agreeTerms || isProcessingPayment
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        onClick={handlePayLater}
+                        // Always enabled, no terms check
+                        disabled={isProcessingPayment} // Still disable if main payment is processing
+                        className={`w-full py-3 rounded-lg font-medium flex items-center justify-center mt-4
+                            ${isProcessingPayment
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-white border border-blue-600 text-blue-600 hover:bg-blue-50'
                         } transition`}
-                        >
+                    >
                         Pay Later
                     </button>
 
