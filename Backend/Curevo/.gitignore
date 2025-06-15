@@ -34,3 +34,4 @@ build/
 
 ###Manual Ignores###
 .env
+.env2

@@ -439,7 +439,7 @@ const ProductManagement = () => {
                                     <span className="font-medium">Description:</span> {product.description || 'N/A'}
                                 </p>
                                 <p className="text-gray-600 text-sm mb-1">
-                                    <span className="font-medium">Price:</span> ${product.price ? product.price.toFixed(2) : '0.00'}
+                                    <span className="font-medium">Price:</span> ₹{product.price ? product.price.toFixed(2) : '0.00'}
                                 </p>
                                 {product.quantity && (
                                     <p className="text-gray-600 text-sm mb-1">
@@ -665,7 +665,7 @@ const ProductManagement = () => {
                                     {/* Price */}
                                     <div>
                                         <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                                            Price ($) *
+                                            Price (₹) *
                                         </label>
                                         <input
                                             type="number"

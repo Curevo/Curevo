@@ -95,7 +95,6 @@ const App = () => {
 
 
                   <Route path="/executive/signup" element={<DeliveryExecutiveRegister />} />
-
                   <Route path="/executive/dashboard" element={<ProfileSettingsMain />} />
                   <Route path="/executive/orders" element={<OrderDashboardMain />} />
                   <Route path="/executive/orders-history" element={<OrderHistoryMain />} />
